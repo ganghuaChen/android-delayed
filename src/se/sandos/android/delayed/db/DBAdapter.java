@@ -2,6 +2,7 @@ package se.sandos.android.delayed.db;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -48,6 +49,13 @@ public class DBAdapter {
 		cv.put(KEY_NAME, name);
 		cv.put(KEY_URLID, urlid);
 		return db.insert(TABLE_NAME, null, cv);
+	}
+	
+	public int getNumberOfStations()
+	{
+		Cursor c = db.rawQuery("select count(*) from stations", null);
+		c.move(1);
+		return c.getInt(0);
 	}
 	
 	private static class DBHelper extends SQLiteOpenHelper

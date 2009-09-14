@@ -30,9 +30,11 @@ public class Delayed extends Activity {
 		setContentView(R.layout.main);
 
 		db = new DBAdapter(this);
+		db.open();
+		
 		
 		//Create db
-		new Thread() {
+		Thread t = new Thread() {
 			public void run() {
 				HttpClient hc = new DefaultHttpClient();
 				// HttpGet("http://m.banverket.se/trafik");
@@ -50,7 +52,6 @@ public class Delayed extends Activity {
 				// JF=-1&stationlink=5 Q-Ö
 
 				try {
-					db.open();
 					HttpResponse hr = hc.execute(hg);
 					Log.i(Tag, "Got page: " + hr.getStatusLine());
 					InputStream is = hr.getEntity().getContent();
@@ -77,6 +78,9 @@ public class Delayed extends Activity {
 					Log.i(Tag, "IOExc: " + e);
 				}
 			}
-		}.start();
+		};
+		if(db.getNumberOfStations() == 0) {
+			t.start();
+		}
 	}
 }

@@ -34,7 +34,7 @@ public class StationListActivity extends ListActivity {
 		List<Map<String, String>> content = new ArrayList<Map<String, String>>();
 		for(int i = 0; i < 10; i++) {
 			Map<String, String> m = new HashMap<String, String>();
-			m.put("name", "V�ster�s");
+			m.put("name", "Västerås");
 			content.add(m);
 		}
 		

@@ -21,7 +21,6 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.Parcel;
 import android.util.Log;
 
 public class Delayed extends Activity {
@@ -86,11 +85,8 @@ public class Delayed extends Activity {
 						}
 					}
 					//Done, signal this
-					Message done = Message.obtain();
-					Bundle b = new Bundle();
-					Parcel p = new Parcel();
-					done.setData();
-					mHandler.sendMessage(null);
+					Message done = Message.obtain(mHandler, 0, stations);
+					mHandler.sendMessage(done);
 				} catch (ClientProtocolException e) {
 					Log.i(Tag, "Something happened: " + e);
 				} catch (IOException e) {

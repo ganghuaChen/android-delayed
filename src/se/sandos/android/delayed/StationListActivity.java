@@ -7,14 +7,25 @@ import java.util.Map;
 
 import android.app.ListActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.ListAdapter;
 import android.widget.SimpleAdapter;
 
 public class StationListActivity extends ListActivity {
+	private final static String Tag = "StationListActivity";
 	
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
+		
+		Bundle extras = getIntent().getExtras(); 
+		Object o = extras.getParcelableArrayList("se.sandos.android.delayed.StationList");
+		Log.i(Tag, "Obj: " + o);
+		
+		for(String k : extras.keySet()) {
+			Log.i(Tag, "Key: " + k + " " + extras.get(k));
+		}
+		
 		
 		setContentView(R.layout.liststations);
 

@@ -5,8 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URLDecoder;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.ArrayList;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.http.HttpResponse;
@@ -22,13 +21,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.Parcel;
 import android.util.Log;
 
 public class Delayed extends Activity {
 	private static final String Tag = "Delayed";
 
 	protected DBAdapter db = null;
+	
+	protected ArrayList<Station> stations = null;
 	
 	private Handler mHandler = new Handler() {
 		public void handleMessage(Message msg) {
@@ -76,7 +76,7 @@ public class Delayed extends Activity {
 					InputStreamReader isr = new InputStreamReader(is);
 					BufferedReader br = new BufferedReader(isr);
 					String s = null;
-					List<Station> stations = new LinkedList<Station>();
+					stations = new ArrayList<Station>();
 					while ((s = br.readLine()) != null) {
 						if(s.contains("station=")) {
 							try {
@@ -108,7 +108,11 @@ public class Delayed extends Activity {
 		} else {
 			Intent i = new Intent("se.sandos.android.StationList", null, getApplicationContext(), StationListActivity.class);
 			//Make a parcelable List?
-			//Parcel p = new Parcel();
+			Bundle extras = new Bundle();
+			extras.putString("majs", "majs");
+			extras.putParcelableArrayList("se.sandos.android.delayed.StationList", stations);
+			i.putExtras(extras);
+			
 			startActivity(i);
 		}
 	}

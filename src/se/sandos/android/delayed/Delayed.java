@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URLDecoder;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.http.HttpResponse;
@@ -14,14 +16,24 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import se.sandos.android.delayed.db.DBAdapter;
+import se.sandos.android.delayed.db.Station;
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
+import android.os.Parcel;
 import android.util.Log;
 
 public class Delayed extends Activity {
 	private static final String Tag = "Delayed";
 
 	protected DBAdapter db = null;
+	
+	private Handler mHandler = new Handler() {
+		public void handleMessage(Message msg) {
+			
+		}
+	};
 	
 	/** Called when the activity is first created. */
 	@Override
@@ -31,7 +43,6 @@ public class Delayed extends Activity {
 
 		db = new DBAdapter(this);
 		db.open();
-		
 		
 		//Create db
 		Thread t = new Thread() {
@@ -58,6 +69,7 @@ public class Delayed extends Activity {
 					InputStreamReader isr = new InputStreamReader(is);
 					BufferedReader br = new BufferedReader(isr);
 					String s = null;
+					List<Station> stations = new LinkedList<Station>();
 					while ((s = br.readLine()) != null) {
 						if(s.contains("station=")) {
 							try {
@@ -67,11 +79,18 @@ public class Delayed extends Activity {
 								String urlid = s.substring(s.indexOf("href=\"") + 6, s.indexOf("\">"));
 								urlid = URLDecoder.decode(urlid);
 								db.addStation(station, urlid);
+								stations.add(new Station(station, urlid));
 							} catch(Throwable e) {
 								Log.w(Tag, "Could not decode: " + s + " " + e.getMessage());
 							}
 						}
 					}
+					//Done, signal this
+					Message done = Message.obtain();
+					Bundle b = new Bundle();
+					Parcel p = new Parcel();
+					done.setData();
+					mHandler.sendMessage(null);
 				} catch (ClientProtocolException e) {
 					Log.i(Tag, "Something happened: " + e);
 				} catch (IOException e) {

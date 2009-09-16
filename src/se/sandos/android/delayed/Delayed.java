@@ -16,6 +16,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 import se.sandos.android.delayed.db.DBAdapter;
 import se.sandos.android.delayed.db.Station;
+import se.sandos.android.delayed.db.StationList;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -110,7 +111,8 @@ public class Delayed extends Activity {
 			//Make a parcelable List?
 			Bundle extras = new Bundle();
 			extras.putString("majs", "majs");
-			extras.putParcelableArrayList("se.sandos.android.delayed.StationList", stations);
+			StationList sl = new StationList(stations);
+			extras.putParcelable("se.sandos.android.delayed.StationList", sl);
 			i.putExtras(extras);
 			
 			startActivity(i);

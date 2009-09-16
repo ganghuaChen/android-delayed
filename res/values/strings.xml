@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="hello">Fetching list of stations</string>
+    <string name="app_name">Delayed</string>
+</resources>

@@ -64,7 +64,7 @@ public class ClassUtils {
     /**
      * Maps primitive <code>Class</code>es to their corresponding wrapper <code>Class</code>.
      */
-    private static Map primitiveWrapperMap = new HashMap();
+    private static Map<Class, Class> primitiveWrapperMap = new HashMap<Class, Class>();
     static {
          primitiveWrapperMap.put(Boolean.TYPE, Boolean.class);
          primitiveWrapperMap.put(Byte.TYPE, Byte.class);
@@ -80,11 +80,11 @@ public class ClassUtils {
     /**
      * Maps wrapper <code>Class</code>es to their corresponding primitive types.
      */
-    private static Map wrapperPrimitiveMap = new HashMap();
+    private static Map<Class, Class> wrapperPrimitiveMap = new HashMap<Class, Class>();
     static {
-        for (Iterator it = primitiveWrapperMap.keySet().iterator(); it.hasNext();) {
-            Class primitiveClass = (Class) it.next();
-            Class wrapperClass = (Class) primitiveWrapperMap.get(primitiveClass);
+        for (Iterator<Class> it = primitiveWrapperMap.keySet().iterator(); it.hasNext();) {
+            Class primitiveClass = it.next();
+            Class wrapperClass = primitiveWrapperMap.get(primitiveClass);
             if (!primitiveClass.equals(wrapperClass)) {
                 wrapperPrimitiveMap.put(wrapperClass, primitiveClass);
             }
@@ -94,12 +94,12 @@ public class ClassUtils {
     /**
      * Maps a primitive class name to its corresponding abbreviation used in array class names.
      */
-    private static Map abbreviationMap = new HashMap();
+    private static Map<String, String> abbreviationMap = new HashMap<String, String>();
 
     /**
      * Maps an abbreviation used in array class names to corresponding primitive class name.
      */
-    private static Map reverseAbbreviationMap = new HashMap();
+    private static Map<String, String> reverseAbbreviationMap = new HashMap<String, String>();
     
     /**
      * Add primitive type abbreviation to maps of abbreviations.
@@ -251,11 +251,11 @@ public class ClassUtils {
      * @return the <code>List</code> of superclasses in order going up from this one
      *  <code>null</code> if null input
      */
-    public static List getAllSuperclasses(Class cls) {
+    public static List<Class> getAllSuperclasses(Class cls) {
         if (cls == null) {
             return null;
         }
-        List classes = new ArrayList();
+        List<Class> classes = new ArrayList<Class>();
         Class superclass = cls.getSuperclass();
         while (superclass != null) {
             classes.add(superclass);
@@ -277,20 +277,20 @@ public class ClassUtils {
      * @return the <code>List</code> of interfaces in order,
      *  <code>null</code> if null input
      */
-    public static List getAllInterfaces(Class cls) {
+    public static List<Class> getAllInterfaces(Class cls) {
         if (cls == null) {
             return null;
         }
-        List list = new ArrayList();
+        List<Class> list = new ArrayList<Class>();
         while (cls != null) {
             Class[] interfaces = cls.getInterfaces();
             for (int i = 0; i < interfaces.length; i++) {
                 if (list.contains(interfaces[i]) == false) {
                     list.add(interfaces[i]);
                 }
-                List superInterfaces = getAllInterfaces(interfaces[i]);
-                for (Iterator it = superInterfaces.iterator(); it.hasNext();) {
-                    Class intface = (Class) it.next();
+                List<Class> superInterfaces = getAllInterfaces(interfaces[i]);
+                for (Iterator<Class> it = superInterfaces.iterator(); it.hasNext();) {
+                    Class intface = it.next();
                     if (list.contains(intface) == false) {
                         list.add(intface);
                     }
@@ -315,11 +315,11 @@ public class ClassUtils {
      *  <code>null</code> if null input
      * @throws ClassCastException if classNames contains a non String entry
      */
-    public static List convertClassNamesToClasses(List classNames) {
+    public static List<Class> convertClassNamesToClasses(List classNames) {
         if (classNames == null) {
             return null;
         }
-        List classes = new ArrayList(classNames.size());
+        List<Class> classes = new ArrayList<Class>(classNames.size());
         for (Iterator it = classNames.iterator(); it.hasNext();) {
             String className = (String) it.next();
             try {
@@ -343,11 +343,11 @@ public class ClassUtils {
      *  <code>null</code> if null input
      * @throws ClassCastException if <code>classes</code> contains a non-<code>Class</code> entry
      */
-    public static List convertClassesToClassNames(List classes) {
+    public static List<String> convertClassesToClassNames(List classes) {
         if (classes == null) {
             return null;
         }
-        List classNames = new ArrayList(classes.size());
+        List<String> classNames = new ArrayList<String>(classes.size());
         for (Iterator it = classes.iterator(); it.hasNext();) {
             Class cls = (Class) it.next();
             if (cls == null) {
@@ -509,7 +509,7 @@ public class ClassUtils {
     public static Class primitiveToWrapper(Class cls) {
         Class convertedClass = cls;
         if (cls != null && cls.isPrimitive()) {
-            convertedClass = (Class) primitiveWrapperMap.get(cls);
+            convertedClass = primitiveWrapperMap.get(cls);
         }
         return convertedClass;
     }
@@ -557,7 +557,7 @@ public class ClassUtils {
      * @since 2.4
      */
     public static Class wrapperToPrimitive(Class cls) {
-        return (Class) wrapperPrimitiveMap.get(cls);
+        return wrapperPrimitiveMap.get(cls);
     }
 
     /**
@@ -708,12 +708,12 @@ public class ClassUtils {
             return declaredMethod;
         }
         
-        List candidateClasses = new ArrayList();
+        List<Class> candidateClasses = new ArrayList<Class>();
         candidateClasses.addAll(getAllInterfaces(cls));
         candidateClasses.addAll(getAllSuperclasses(cls));
         
-        for (Iterator it = candidateClasses.iterator(); it.hasNext(); ) {
-            Class candidateClass = (Class) it.next();
+        for (Iterator<Class> it = candidateClasses.iterator(); it.hasNext(); ) {
+            Class candidateClass = it.next();
             if (!Modifier.isPublic(candidateClass.getModifiers())) {
                 continue;
             }
@@ -749,7 +749,7 @@ public class ClassUtils {
                 className = className.substring(0, className.length() - 2);
                 classNameBuffer.append("[");
             }
-            String abbreviation = (String) abbreviationMap.get(className);
+            String abbreviation = abbreviationMap.get(className);
             if (abbreviation != null) {
                 classNameBuffer.append(abbreviation);
             } else {
@@ -909,7 +909,7 @@ public class ClassUtils {
                             : className.length());
                 } else {
                     if(className.length() > 0) {
-                        className = (String) reverseAbbreviationMap.get(
+                        className = reverseAbbreviationMap.get(
                             className.substring(0, 1));
                     }
                 }

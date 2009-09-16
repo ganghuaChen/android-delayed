@@ -18,9 +18,11 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import se.sandos.android.delayed.db.DBAdapter;
 import se.sandos.android.delayed.db.Station;
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.os.Parcel;
 import android.util.Log;
 
 public class Delayed extends Activity {
@@ -30,18 +32,23 @@ public class Delayed extends Activity {
 	
 	private Handler mHandler = new Handler() {
 		public void handleMessage(Message msg) {
-			
+			Log.i(Tag, "Sending intent");
+			startActivity(new Intent("se.sandos.android.StationList", null, getApplicationContext(), StationListActivity.class));
 		}
 	};
 	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
+		Log.i(Tag, "Starting");
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.main);
 
+		Log.i(Tag, "Opening DB");
 		db = new DBAdapter(this);
+		Log.i(Tag, "open db");
 		db.open();
+		Log.i(Tag, "Got db");
 		
 		//Create db
 		Thread t = new Thread() {
@@ -62,6 +69,7 @@ public class Delayed extends Activity {
 				// JF=-1&stationlink=5 Q-Ö
 
 				try {
+					Log.i(Tag, "fetching http");
 					HttpResponse hr = hc.execute(hg);
 					Log.i(Tag, "Got page: " + hr.getStatusLine());
 					InputStream is = hr.getEntity().getContent();
@@ -95,7 +103,13 @@ public class Delayed extends Activity {
 			}
 		};
 		if(db.getNumberOfStations() == 0) {
+			Log.i(Tag, "No stations");
 			t.start();
+		} else {
+			Intent i = new Intent("se.sandos.android.StationList", null, getApplicationContext(), StationListActivity.class);
+			//Make a parcelable List?
+			//Parcel p = new Parcel();
+			startActivity(i);
 		}
 	}
 }

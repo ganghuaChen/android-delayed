@@ -10,7 +10,12 @@ import se.sandos.android.delayed.db.StationList;
 import android.app.ListActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ContextMenu;
+import android.view.MenuItem;
+import android.view.View;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
 public class StationListActivity extends ListActivity {
@@ -35,5 +40,27 @@ public class StationListActivity extends ListActivity {
 		ListAdapter la = new SimpleAdapter(this.getBaseContext(), content, R.layout.row, new String[]{"name"}, new int[]{R.id.TextView01});
 		
 		setListAdapter(la);
+		
+		//Register context menu
+		registerForContextMenu(getListView());
+	}
+	
+	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo cmi)
+	{
+		menu.setHeaderTitle("Stationsgrejer");
+		menu.add("Lägg till som favorit");
+		menu.add("Kolla tidtabell");
+		menu.add("Öppna URL i webläsare");
+	}
+	
+	public boolean onContextItemSelected(MenuItem mi)
+	{
+		return false;
+	}
+	
+	protected void onListItemClick(ListView l, View v, int position, long id)
+	{
+		Object o = l.getAdapter().getItem(position);
+		Log.i(Tag, "Click: " + o);
 	}
 }

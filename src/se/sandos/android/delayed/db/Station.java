@@ -2,7 +2,6 @@ package se.sandos.android.delayed.db;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
 public class Station implements Parcelable {
 	private String mName;
@@ -14,11 +13,11 @@ public class Station implements Parcelable {
 		mUrl = url;
 	}	
 	
-	public String getmName() {
+	public String getName() {
 		return mName;
 	}
 
-	public String getmUrl() {
+	public String getUrl() {
 		return mUrl;
 	}
 
@@ -27,20 +26,18 @@ public class Station implements Parcelable {
 	}
 
 	public void writeToParcel(Parcel dest, int flags) {
-		Log.i("StationListActivity", "doing");
 		dest.writeString(mName);
 		dest.writeString(mUrl);
 	}
 	
-	public static Parcelable.Creator CREATOR = new Parcelable.Creator(){
+	public static Parcelable.Creator<Station> CREATOR = new Parcelable.Creator<Station>(){
 
-		public Object createFromParcel(Parcel source) {
+		public Station createFromParcel(Parcel source) {
 			return new Station(source.readString(), source.readString());
 		}
 
-		public Object[] newArray(int size) {
+		public Station[] newArray(int size) {
 			return new Station[size];
 		}
-		
 	};
 }

@@ -111,7 +111,7 @@ public class Delayed extends Activity {
 			//Make a parcelable List?
 			Bundle extras = new Bundle();
 			extras.putString("majs", "majs");
-			StationList sl = new StationList(stations);
+			StationList sl = db.getStations();
 			extras.putParcelable("se.sandos.android.delayed.StationList", sl);
 			i.putExtras(extras);
 			

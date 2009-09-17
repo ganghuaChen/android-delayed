@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import se.sandos.android.delayed.db.Station;
 import se.sandos.android.delayed.db.StationList;
 import android.app.ListActivity;
 import android.os.Bundle;
@@ -21,20 +22,13 @@ public class StationListActivity extends ListActivity {
 		
 		Bundle extras = getIntent().getExtras();
 		StationList sl = extras.getParcelable("se.sandos.android.delayed.StationList");
-		//Object o = extras.getParcelableArrayList("se.sandos.android.delayed.StationList");
-		Log.i(Tag, "Obj: " + sl);
-		
-		for(String k : extras.keySet()) {
-			Log.i(Tag, "Key: " + k + " " + extras.get(k));
-		}
-		
 		
 		setContentView(R.layout.liststations);
-
+		Log.i(Tag, "Number of stations: " + sl.getList().size());
 		List<Map<String, String>> content = new ArrayList<Map<String, String>>();
-		for(int i = 0; i < 10; i++) {
+		for(Station s : sl.getList()) {
 			Map<String, String> m = new HashMap<String, String>();
-			m.put("name", "Västerås");
+			m.put("name", s.getName());
 			content.add(m);
 		}
 		

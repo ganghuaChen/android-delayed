@@ -1,5 +1,8 @@
 package se.sandos.android.delayed.db;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -41,6 +44,21 @@ public class DBAdapter {
 	public void close()
 	{
 		helper.close();
+	}
+	
+	public StationList getStations()
+	{
+		Cursor c = db.rawQuery("select name, urlid from stations", null);
+		c.move(1);
+		List<Station> res = new LinkedList<Station>();
+		while(!c.isAfterLast() && !c.isBeforeFirst())
+		{
+			Station s = new Station(c.getString(0), c.getString(1)); 
+			res.add(s);
+			c.move(1);
+		}
+		
+		return new StationList(res);
 	}
 	
 	public long addStation(String name, String urlid)

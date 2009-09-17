@@ -1,10 +1,10 @@
 package se.sandos.android.delayed.db;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import android.os.Parcel;
 import android.os.Parcelable;
-import android.util.Log;
 
 public class StationList implements Parcelable {
 
@@ -17,30 +17,31 @@ public class StationList implements Parcelable {
 	
 	public StationList(Parcel p)
 	{
+		data = new ArrayList<Station>();
 		p.readTypedList(data, Station.CREATOR);
 	}
+
+	public List<Station> getList()
+	{
+		return data;
+	}
 	
-	@Override
 	public int describeContents() {
 		return 0;
 	}
 
-	@Override
 	public void writeToParcel(Parcel dest, int flags) {
-		Log.i("StationListActivity", "doing2");
 		dest.writeTypedList(data);
 	}
 	
-	public static Parcelable.Creator CREATOR = new Parcelable.Creator(){
+	public static Parcelable.Creator<StationList> CREATOR = new Parcelable.Creator<StationList>(){
 
-		public Object createFromParcel(Parcel source) {
+		public StationList createFromParcel(Parcel source) {
 			return new StationList(source);
 		}
 
-		public Object[] newArray(int size) {
+		public StationList[] newArray(int size) {
 			return new StationList[size];
 		}
-		
 	};
-
 }

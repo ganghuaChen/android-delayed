@@ -27,7 +27,7 @@ import android.util.Log;
 public class Delayed extends Activity {
 	private static final String Tag = "Delayed";
 
-	protected DBAdapter db = null;
+	public static DBAdapter db = null;
 	
 	protected ArrayList<Station> stations = null;
 	
@@ -107,7 +107,7 @@ public class Delayed extends Activity {
 			Log.i(Tag, "No stations");
 			t.start();
 		} else {
-			Intent i = new Intent("se.sandos.android.StationList", null, getApplicationContext(), StationListActivity.class);
+			Intent i = new Intent("se.sandos.android.delayed.StationList", null, getApplicationContext(), StationListActivity.class);
 			//Make a parcelable List?
 			Bundle extras = new Bundle();
 			extras.putString("majs", "majs");

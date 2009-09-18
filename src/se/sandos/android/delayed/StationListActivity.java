@@ -8,6 +8,7 @@ import java.util.Map;
 import se.sandos.android.delayed.db.Station;
 import se.sandos.android.delayed.db.StationList;
 import android.app.ListActivity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.ContextMenu;
@@ -17,6 +18,7 @@ import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 
 public class StationListActivity extends ListActivity {
 	private final static String Tag = "StationListActivity";
@@ -53,14 +55,28 @@ public class StationListActivity extends ListActivity {
 		menu.add("Öppna URL i webläsare");
 	}
 	
+	@SuppressWarnings("unchecked")
 	public boolean onContextItemSelected(MenuItem mi)
 	{
+		if(mi.getTitle().equals("Kolla tidtabell")) {
+			
+			AdapterContextMenuInfo cmi = (AdapterContextMenuInfo) mi.getMenuInfo();
+			Map<String, String> m = (Map) getListView().getAdapter().getItem(cmi.position);
+			String stationName = m.get("name");
+			String url = Delayed.db.getUrl(stationName);
+			
+			Intent i = new Intent("se.sandos.android.delayed.Station", null, getApplicationContext(), StationActivity.class);
+			i.putExtra("stationname", stationName);
+			i.putExtra("url", url);
+			startActivity(i);
+			return true;
+		}
 		return false;
 	}
 	
 	protected void onListItemClick(ListView l, View v, int position, long id)
 	{
 		Object o = l.getAdapter().getItem(position);
-		Log.i(Tag, "Click: " + o);
+		Log.i(Tag, "Click: " + o + " " + o.getClass());
 	}
 }

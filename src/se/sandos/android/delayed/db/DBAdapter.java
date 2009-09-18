@@ -10,8 +10,10 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
+import android.util.Log;
 
 public class DBAdapter {
+	private final static String Tag = "DBAdapter";
 	private final Context context;
 	
 	private final static String DATABASE_NAME = "delayed";
@@ -67,6 +69,22 @@ public class DBAdapter {
 		cv.put(KEY_NAME, name);
 		cv.put(KEY_URLID, urlid);
 		return db.insert(TABLE_NAME, null, cv);
+	}
+	
+	public String getUrl(String stationName) 
+	{
+		try {
+			Cursor c = db.rawQuery("select urlid from stations where name = ?", new String[]{stationName});
+			
+			if(c != null) {
+				c.move(1);
+				return c.getString(c.getColumnIndex(KEY_URLID));
+			}
+		} catch(Throwable e) {
+			Log.w(Tag, "Error when fetching data from db: " + e.getMessage());
+		}
+		
+		return null;
 	}
 	
 	public int getNumberOfStations()

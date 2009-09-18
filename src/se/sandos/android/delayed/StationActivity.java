@@ -27,13 +27,15 @@ public class StationActivity extends ListActivity {
 	private static final String Tag = "StationActivity";
 
 	private Handler mHandler = new Handler() {
+		@SuppressWarnings("unchecked")
 		public void handleMessage(Message msg) {
 			List<TrainEvent> l = (List<TrainEvent>) msg.obj;
 			
 			List<Map<String, String>> content = new ArrayList<Map<String, String>>();
-			for(TrainEvent s : l) {
+			for(TrainEvent te : l) {
 				Map<String, String> m = new HashMap<String, String>();
-				m.put("name", s.toString());
+				Log.i(Tag, "Adding " + te.toString());
+				m.put("name", te.toString());
 				content.add(m);
 			}
 			
@@ -81,8 +83,8 @@ public class StationActivity extends ListActivity {
 						te.parse(unescaped);
 						if(te.isParsed()) {
 							events.add(te);
-							te = new TrainEvent();
 							Log.i(Tag, "Added trainevent: " + te);
+							te = new TrainEvent();
 						}
 						stations.add(unescaped);
 					}

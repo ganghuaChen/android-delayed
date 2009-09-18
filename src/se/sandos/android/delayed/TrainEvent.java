@@ -17,9 +17,13 @@ public class TrainEvent {
 	private final static String Tag = "TrainEvent";
 	
 	private Station station;
-	private int id;
+	private int id = -1;
+	private int track = -1;
 	private Date arrival;
 	private Date departure;
+	private DateFormat df;
+	
+	
 	private boolean delimiterSeen = false;
 	private boolean done = false;
 	
@@ -35,8 +39,10 @@ public class TrainEvent {
 	public String toString()
 	{
 		StringBuffer sb = new StringBuffer();
-		sb.append("TrainEvent: ").append(arrival);
-		sb.append(" ").append(id);
+		if(df != null && arrival != null) {
+			sb.append(df.format(arrival));
+		}
+		sb.append(" nr:").append(id).append(" track:").append(track);
 		return sb.toString();
 	}
 	
@@ -45,12 +51,14 @@ public class TrainEvent {
 		if(html.indexOf(" till ") != -1) {
 			delimiterSeen = true;
 			String arrival = html.substring(0, html.indexOf(" "));
-			DateFormat df = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT, java.util.Locale.GERMANY);
+			df = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT, java.util.Locale.GERMANY);
 			Date dd = null;
 			try {
 				dd = df.parse(arrival);
 			} catch (ParseException e) {
+				Log.i(Tag, "Exception parsing date: " + e.getMessage());
 			}
+			this.arrival = dd;
 			Log.i(Tag, "Header for train time: " + dd);
 			//parse date
 			
@@ -71,5 +79,23 @@ public class TrainEvent {
 			return;
 		}
 		
+		if(html.startsWith("Tåg nr ")) {
+			int startNr = html.indexOf("\">") + 2;
+			Log.i(Tag, "start: " + startNr);
+			String d = html.substring(startNr);
+			int endNr = d.indexOf("</a>");
+			Log.i(Tag, "end: " + endNr);
+			d = d.substring(0, endNr);
+			id = Integer.valueOf(d);
+			return;
+		}
+		
+		if(html.startsWith("Spår ")) {
+			String d = html.substring(5, html.indexOf("<br>"));
+			track = Integer.valueOf(d);
+			return;
+		}
+
+		Log.i(Tag, "not handled: " + html);
 	}
 }

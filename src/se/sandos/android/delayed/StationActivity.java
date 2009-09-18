@@ -14,8 +14,6 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import se.sandos.android.delayed.db.Station;
-
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -30,12 +28,12 @@ public class StationActivity extends ListActivity {
 
 	private Handler mHandler = new Handler() {
 		public void handleMessage(Message msg) {
-			List<String> l = (List<String>) msg.obj;
+			List<TrainEvent> l = (List<TrainEvent>) msg.obj;
 			
 			List<Map<String, String>> content = new ArrayList<Map<String, String>>();
-			for(String s : l) {
+			for(TrainEvent s : l) {
 				Map<String, String> m = new HashMap<String, String>();
-				m.put("name", s);
+				m.put("name", s.toString());
 				content.add(m);
 			}
 			
@@ -88,7 +86,7 @@ public class StationActivity extends ListActivity {
 						}
 						stations.add(unescaped);
 					}
-					mHandler.sendMessage(Message.obtain(mHandler, 0, stations));
+					mHandler.sendMessage(Message.obtain(mHandler, 0, events));
 				} catch(Throwable e) {
 					Log.w(Tag, "Error when fetching: " + e.getMessage());
 				}

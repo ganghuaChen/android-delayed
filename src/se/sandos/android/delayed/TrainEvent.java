@@ -18,7 +18,7 @@ public class TrainEvent {
 	
 	private Station station;
 	private int id = -1;
-	private int track = -1;
+	private String track;
 	private Date arrival;
 	private Date departure;
 	private DateFormat df;
@@ -42,7 +42,10 @@ public class TrainEvent {
 		if(df != null && arrival != null) {
 			sb.append(df.format(arrival));
 		}
-		sb.append(" nr:").append(id).append(" track:").append(track);
+		sb.append(" nr:").append(id);
+		if(track != null) {
+			sb.append(" track:").append(track);
+		}
 		return sb.toString();
 	}
 	
@@ -91,8 +94,7 @@ public class TrainEvent {
 		}
 		
 		if(html.startsWith("Spår ")) {
-			String d = html.substring(5, html.indexOf("<br>"));
-			track = Integer.valueOf(d);
+			track = html.substring(5, html.indexOf("<br>"));
 			return;
 		}
 

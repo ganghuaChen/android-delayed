@@ -32,6 +32,29 @@ public class TrainEvent {
 	{
 	}
 	
+	public int getNumber()
+	{
+		return id;
+	}
+	
+	public String getDestination()
+	{
+		if(destination != null) {
+			return destination.getName();
+		}
+		
+		return " -- ";
+	}
+	
+	public String getTrack()
+	{
+		if(track != null) {
+			return track;
+		}
+		
+		return "-";
+	}
+	
 	public TrainEvent(Station s)
 	{
 		station = s;
@@ -47,10 +70,6 @@ public class TrainEvent {
 		StringBuffer sb = new StringBuffer();
 		if(df != null && arrival != null) {
 			sb.append(df.format(arrival));
-		}
-		sb.append(" nr:").append(id);
-		if(track != null) {
-			sb.append(" track:").append(track);
 		}
 		return sb.toString();
 	}

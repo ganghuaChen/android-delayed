@@ -42,7 +42,7 @@ public class StationListActivity extends ListActivity {
 			content.add(m);
 		}
 		
-		ListAdapter la = new SimpleAdapter(this.getBaseContext(), content, R.layout.row, new String[]{"name"}, new int[]{R.id.TextView01});
+		ListAdapter la = new SimpleAdapter(this.getBaseContext(), content, R.layout.stationrow, new String[]{"name"}, new int[]{R.id.TextView01});
 		
 		setListAdapter(la);
 		

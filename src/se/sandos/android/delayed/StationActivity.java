@@ -37,10 +37,15 @@ public class StationActivity extends ListActivity {
 				Map<String, String> m = new HashMap<String, String>();
 				Log.i(Tag, "Adding " + te.toString());
 				m.put("name", te.toString());
+				m.put("track", "Track: " + te.getTrack());
+				m.put("number", "  Train #: " + Integer.toString(te.getNumber()));
+				m.put("destination", te.getDestination());
 				content.add(m);
 			}
 			
-			ListAdapter la = new SimpleAdapter(getApplicationContext(), content, R.layout.row, new String[]{"name"}, new int[]{R.id.TextView01});
+			ListAdapter la = new SimpleAdapter(getApplicationContext(), content, R.layout.traineventrow, 
+					new String[]{"name", "destination", "track", "number"},
+					new int[]{R.id.TeTime, R.id.TeDestination, R.id.TeTrack, R.id.TeNumber});
 			
 			setListAdapter(la);
 		}

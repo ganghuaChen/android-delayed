@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="fill_parent">
+
+	<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="horizontal" android:layout_width="fill_parent" android:layout_height="fill_parent">
+		<TextView android:text="Time" android:id="@+id/TeTime" 
+			android:layout_width="wrap_content" android:layout_height="wrap_content" android:textStyle="bold" android:textSize="32sp"></TextView>
+		<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="vertical" android:layout_width="wrap_content" android:layout_height="fill_parent">
+            <TextView android:text="Destination" android:id="@+id/TeDestination" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                android:textSize="16sp"></TextView>
+            <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:orientation="horizontal" android:layout_width="wrap_content" android:layout_height="fill_parent">
+		   		<TextView android:text="Track#: 3" android:id="@+id/TeTrack" android:layout_width="wrap_content" android:layout_height="wrap_content"
+					android:textSize="11sp"></TextView>
+	            <TextView android:text="Train#: xyz" android:id="@+id/TeNumber" android:layout_width="wrap_content" android:layout_height="wrap_content"
+	                android:textSize="11sp"></TextView>
+            </LinearLayout>
+		</LinearLayout>
+		
+	</LinearLayout>
+</LinearLayout>

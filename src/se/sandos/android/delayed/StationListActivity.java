@@ -28,6 +28,9 @@ public class StationListActivity extends ListActivity {
 		super.onCreate(savedInstanceState);
 		
 		Bundle extras = getIntent().getExtras();
+		if(extras == null) {
+			return;
+		}
 		StationList sl = extras.getParcelable("se.sandos.android.delayed.StationList");
 		
 		setContentView(R.layout.liststations);

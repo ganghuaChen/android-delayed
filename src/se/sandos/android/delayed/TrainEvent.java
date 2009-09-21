@@ -63,8 +63,12 @@ public class TrainEvent {
 			}
 			this.arrival = dd;
 			Log.i(Tag, "Header for train time: " + dd);
-			//parse date
 			
+			//also parse destination
+			String dest = html.substring(html.indexOf(" till ")+5);
+			Log.i(Tag, "Dest: " + dest);
+			
+			return;
 		}
 		
 		if(html.endsWith("-<br>")) {

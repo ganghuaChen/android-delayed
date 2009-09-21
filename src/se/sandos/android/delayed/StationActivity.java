@@ -14,6 +14,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
+import se.sandos.android.delayed.db.Station;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -56,8 +57,6 @@ public class StationActivity extends ListActivity {
 		final String url = i.getStringExtra("url");
 		final String name = i.getStringExtra("name");
 		
-		SimpleAdapter sa = (SimpleAdapter) getListView().getAdapter();
-
 		new Thread(){
 			public void run(){
 				try {
@@ -77,9 +76,9 @@ public class StationActivity extends ListActivity {
 					String s = null;
 					List<String> stations = new ArrayList<String>();
 					List<TrainEvent> events = new ArrayList<TrainEvent>(20);
-					TrainEvent te = new TrainEvent();
+					TrainEvent te = new TrainEvent(new Station(name, url));
 					while ((s = br.readLine()) != null) {
-						String unescaped = StringEscapeUtils.unescapeHtml(s); 
+						String unescaped = StringEscapeUtils.unescapeHtml(s);
 						te.parse(unescaped);
 						if(te.isParsed()) {
 							events.add(te);

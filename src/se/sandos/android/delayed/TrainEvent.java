@@ -16,6 +16,7 @@ import android.util.Log;
 public class TrainEvent {
 	private final static String Tag = "TrainEvent";
 	
+	private Station destination;
 	private Station station;
 	private int id = -1;
 	private String track;
@@ -29,6 +30,11 @@ public class TrainEvent {
 	
 	public TrainEvent()
 	{
+	}
+	
+	public TrainEvent(Station s)
+	{
+		station = s;
 	}
 	
 	public boolean isParsed()
@@ -62,13 +68,21 @@ public class TrainEvent {
 				Log.i(Tag, "Exception parsing date: " + e.getMessage());
 			}
 			this.arrival = dd;
-			Log.i(Tag, "Header for train time: " + dd);
+			//Log.i(Tag, "Header for train time: " + dd);
 			
 			//also parse destination
-			String dest = html.substring(html.indexOf(" till ")+5);
+			String dest = html.substring(html.indexOf(" till ") + 6);
+			dest = dest.substring(0, dest.indexOf("<br>"));
 			Log.i(Tag, "Dest: " + dest);
 			
-			return;
+			//Try to find it in db
+			String url = Delayed.db.getUrl(dest);
+			if(url == null) {
+				Log.w(Tag, "Could not find " + dest);
+			} else {
+				destination = new Station(dest, url);
+			}
+			
 		}
 		
 		if(html.endsWith("-<br>")) {

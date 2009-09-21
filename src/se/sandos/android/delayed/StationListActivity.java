@@ -53,9 +53,9 @@ public class StationListActivity extends ListActivity {
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo cmi)
 	{
 		menu.setHeaderTitle("Stationsgrejer");
-		menu.add("L‰gg till som favorit");
+		menu.add("L√§gg till som favorit");
 		menu.add("Kolla tidtabell");
-		menu.add("÷ppna URL i webl‰sare");
+		menu.add("√ñppna URL i webl√§sare");
 	}
 	
 	@SuppressWarnings("unchecked")

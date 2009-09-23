@@ -76,7 +76,9 @@ public class TrainEvent {
 	
 	public void parse(String html)
 	{
+		boolean hasHandled = false;
 		if(html.indexOf(" till ") != -1) {
+			hasHandled = true;
 			delimiterSeen = true;
 			String arrival = html.substring(0, html.indexOf(" "));
 			df = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT, java.util.Locale.GERMANY);
@@ -105,10 +107,8 @@ public class TrainEvent {
 		}
 		
 		if(html.endsWith("-<br>")) {
-			Log.i(Tag, "Delimiter");
 			if(delimiterSeen) {
 				done = true;
-				Log.i(Tag, "Done!");
 			}
 			delimiterSeen = true;
 			return;
@@ -121,16 +121,14 @@ public class TrainEvent {
 		
 		if(html.startsWith("Tåg nr ")) {
 			int startNr = html.indexOf("\">") + 2;
-			Log.i(Tag, "start: " + startNr);
 			String d = html.substring(startNr);
 			int endNr = d.indexOf("</a>");
-			Log.i(Tag, "end: " + endNr);
 			d = d.substring(0, endNr);
 			id = Integer.valueOf(d);
 			
 			String url = html.substring(html.indexOf("href=\"") + 6);
 			url = url.substring(0, url.indexOf("\""));
-			Log.i(Tag, url);
+			Scraper.queueForParse(url);
 			return;
 		}
 		
@@ -139,6 +137,8 @@ public class TrainEvent {
 			return;
 		}
 
-		Log.i(Tag, "not handled: " + html);
+		if(!hasHandled) {
+			Log.i(Tag, "not handled: " + html);
+		}
 	}
 }

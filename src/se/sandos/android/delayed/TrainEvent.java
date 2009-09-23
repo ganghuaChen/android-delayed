@@ -108,6 +108,10 @@ public class TrainEvent {
 			Log.i(Tag, "end: " + endNr);
 			d = d.substring(0, endNr);
 			id = Integer.valueOf(d);
+			
+			String url = html.substring(html.indexOf("href=\"") + 6);
+			url = url.substring(0, url.indexOf("\""));
+			Log.i(Tag, url);
 			return;
 		}
 		

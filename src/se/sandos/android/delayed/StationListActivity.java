@@ -66,11 +66,16 @@ public class StationListActivity extends ListActivity {
 			AdapterContextMenuInfo cmi = (AdapterContextMenuInfo) mi.getMenuInfo();
 			Map<String, String> m = (Map) getListView().getAdapter().getItem(cmi.position);
 			String stationName = m.get("name");
-			String url = Delayed.db.getUrl(stationName);
+			String url = null;
+			
+			if(Delayed.db != null) {
+				url = Delayed.db.getUrl(stationName);
+			}
 			
 			Intent i = new Intent("se.sandos.android.delayed.Station", null, getApplicationContext(), StationActivity.class);
 			i.putExtra("stationname", stationName);
 			i.putExtra("url", url);
+			Log.i(Tag, "Url: " + url + " Name: " + stationName);
 			startActivity(i);
 			return true;
 		}

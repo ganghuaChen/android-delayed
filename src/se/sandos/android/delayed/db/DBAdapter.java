@@ -39,12 +39,14 @@ public class DBAdapter {
 	
 	public DBAdapter open() throws SQLException
 	{
+		Log.i(Tag, "opening db");
 		db = helper.getWritableDatabase();
 		return this;
 	}
 	
 	public void close()
 	{
+		Log.i(Tag, "closing db");
 		helper.close();
 	}
 	
@@ -60,6 +62,8 @@ public class DBAdapter {
 			c.move(1);
 		}
 		
+		c.close();
+		
 		return new StationList(res);
 	}
 	
@@ -73,15 +77,21 @@ public class DBAdapter {
 	
 	public String getUrl(String stationName) 
 	{
+		Cursor c = null;
 		try {
-			Cursor c = db.rawQuery("select urlid from stations where name = ?", new String[]{stationName});
+			c = db.rawQuery("select urlid from stations where name = ?", new String[]{stationName});
 			
-			if(c != null) {
+			if(c != null && c.getCount() != 0) {
 				c.move(1);
-				return c.getString(c.getColumnIndex(KEY_URLID));
+				String url = c.getString(c.getColumnIndex(KEY_URLID));
+				return url;
 			}
 		} catch(Throwable e) {
 			Log.w(Tag, "Error when fetching data from db: " + e.getMessage());
+		} finally {
+			if(c != null) {
+				c.close();
+			}
 		}
 		
 		return null;
@@ -91,7 +101,9 @@ public class DBAdapter {
 	{
 		Cursor c = db.rawQuery("select count(*) from stations", null);
 		c.move(1);
-		return c.getInt(0);
+		int num = c.getInt(0);
+		c.close();
+		return num;
 	}
 	
 	private static class DBHelper extends SQLiteOpenHelper

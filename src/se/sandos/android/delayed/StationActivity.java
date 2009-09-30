@@ -1,4 +1,4 @@
-package se.sandos.android.delayed;
+package se.sandos.android.delayed;	
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -14,6 +14,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
+import se.sandos.android.delayed.Scraper.Nameurl;
 import se.sandos.android.delayed.db.Station;
 import android.app.ListActivity;
 import android.content.Intent;
@@ -32,6 +33,31 @@ public class StationActivity extends ListActivity {
 	private Handler mHandler = new Handler() {
 		@SuppressWarnings("unchecked")
 		public void handleMessage(Message msg) {
+			if(msg.what == TrainEvent.MSG_DEST) {
+				
+				//Got a proper destination for some particular train. Mend.
+				Object[] vals = (Object[]) msg.obj;
+				List<Nameurl> stations = (List<Nameurl>) vals[1];
+				if(stations.size() > 0) {
+					Nameurl nu  = stations.get(stations.size()-1);
+
+					Log.i(Tag, "We got an end destination with value " + nu.name);
+
+					for(Map<String, String> v : listContent) {
+						String url = v.get("url");
+						if(url != null && url.equals(vals[0])) {
+							Log.i(Tag, "found match: " + vals[0]);
+							v.put("destination", nu.name);
+							sa.notifyDataSetInvalidated();
+						}
+					}
+				}
+
+				
+				return;
+			}
+			
+			
 			List<TrainEvent> l = (List<TrainEvent>) msg.obj;
 			
 			if(listContent == null) {
@@ -45,6 +71,7 @@ public class StationActivity extends ListActivity {
 				m.put("track", "Track: " + te.getTrack());
 				m.put("number", "  Train #: " + Integer.toString(te.getNumber()));
 				m.put("destination", te.getDestination());
+				m.put("url", te.getUrl());
 				listContent.add(m);
 			}
 			
@@ -68,7 +95,6 @@ public class StationActivity extends ListActivity {
 		super.onCreate(savedInstanceState);
 		
 		setContentView(R.layout.liststations);
-
 
 		Intent i = getIntent();
 		final String url = i.getStringExtra("url");
@@ -97,7 +123,7 @@ public class StationActivity extends ListActivity {
 					TrainEvent te = new TrainEvent(new Station(name, url));
 					while ((s = br.readLine()) != null) {
 						String unescaped = StringEscapeUtils.unescapeHtml(s);
-						te.parse(unescaped);
+						te.parse(unescaped, mHandler);
 						if(te.isParsed()) {
 							events.add(te);
 							

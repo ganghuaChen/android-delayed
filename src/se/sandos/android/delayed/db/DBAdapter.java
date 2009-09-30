@@ -23,6 +23,10 @@ public class DBAdapter {
 	private static final String STATION_KEY_NAME = "name";
 	private static final String STATION_KEY_URLID = "urlid";
 	
+	private static final String TRAIN_TABLE_NAME = "trains";
+	
+	private static final String TRAINEVENT_TABLE_NAME = "trainevents";
+	
     private static final String DATABASE_CREATE =
         "create table stations (_id integer primary key autoincrement, " +
         "name text not null, urlid text not null);" + 
@@ -31,6 +35,9 @@ public class DBAdapter {
 	    "create table trainevents(_id integer primary key autoincrement, " + 
 	    "station, time, track, number);";
     
+    
+    //Trains are identified by number
+    //Trainevents are identified by train and station? Time, track is mutable.
 
 	private DBHelper helper = null;
 	private SQLiteDatabase db = null;

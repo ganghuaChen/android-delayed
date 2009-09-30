@@ -20,13 +20,47 @@ public class Scraper extends Thread {
 	public final static String BASE_URL = "http://m.banverket.se/trafik/(111111111111111111111111)/WapPages/";
 	public final static String Tag = "Scraper";
 	
-	private static Queue<String> queue = new LinkedList<String>();
+	private static Queue<Job<?>> queue = new LinkedList<Job<?>>();
 	
 	private static Thread worker = new Scraper();
 	
-	public static void queueForParse(String relativeUrl)
+
+	public static class Nameurl {
+		public String name;
+		public String url;
+		public Nameurl(String n, String u) { name = n; url = u; }
+	}
+
+	public abstract static class Job<T> implements Runnable
 	{
-		queue.add(relativeUrl);
+		protected T value;
+		
+		public void execute()
+		{
+			
+		}
+		abstract public void run();
+	}
+
+	
+	public static void queueForParse(final String relativeUrl, final Job<List<Nameurl>> job)
+	{
+		queue(new Job<List<Nameurl>>(){
+			@Override
+			public void execute() {
+				job.value = parseTrainPage(relativeUrl);
+				job.run();
+			}
+
+			@Override
+			public void run() {
+			}
+		});
+	}
+	
+	public static void queue(Job<?> job)
+	{
+		queue.add(job);
 		if(!worker.isAlive()) {
 			worker.start();
 			worker.setPriority(Thread.MIN_PRIORITY);
@@ -48,9 +82,10 @@ public class Scraper extends Thread {
 			}
 			
 			if(!queue.isEmpty()) {
-				String url = queue.poll();
-				if(url != null) {
-					parseTrainPage(url);
+				Job<?> job = queue.poll();
+				if(job != null) {
+					job.execute();
+					//parseTrainPage(job.);
 				}
 			}
 		}
@@ -60,13 +95,13 @@ public class Scraper extends Thread {
 	 * Parse stations. End station specifically.
 	 * @param relativeUrl
 	 */
-	private static void parseTrainPage(String relativeUrl)
+	private static List<Nameurl> parseTrainPage(String relativeUrl)
 	{
 		String cut = relativeUrl.substring(relativeUrl.indexOf("WapPages/") + 9);
 
 		HttpClient hc = new DefaultHttpClient();
 		String url = BASE_URL + cut;
-		Log.i(Tag, "Correct url: " + url);
+		Log.i(Tag, "Parsing trainpage, full url: " + url);
 
 		HttpGet hg = new HttpGet(url);
 		
@@ -77,11 +112,6 @@ public class Scraper extends Thread {
 			InputStreamReader isr = new InputStreamReader(is);
 			BufferedReader br = new BufferedReader(isr);
 
-			class Nameurl {
-				public String name;
-				public String url;
-				public Nameurl(String n, String u) { name = n; url = u; }
-			}
 			
 			List<Nameurl> names = new ArrayList<Nameurl>(40);
 			while (true) {
@@ -102,7 +132,7 @@ public class Scraper extends Thread {
 			}
 			Log.i(Tag, "Got names of all stations for " + cut);
 
-			
+			return names;
 		} catch (Throwable e) {
 			String msg = e.getMessage();
 			if(msg == null) {
@@ -111,5 +141,6 @@ public class Scraper extends Thread {
 			Log.w(Tag, msg);
 		}
 
+		return new LinkedList<Nameurl>();
 	}
 }

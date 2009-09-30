@@ -4,8 +4,13 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 
+import se.sandos.android.delayed.Scraper.Job;
+import se.sandos.android.delayed.Scraper.Nameurl;
 import se.sandos.android.delayed.db.Station;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 
 /**
@@ -16,6 +21,8 @@ import android.util.Log;
 public class TrainEvent {
 	private final static String Tag = "TrainEvent";
 	
+	public final static int MSG_DEST = 1;
+	
 	private Station destination;
 	private Station station;
 	private int id = -1;
@@ -23,7 +30,7 @@ public class TrainEvent {
 	private Date arrival;
 	private Date departure;
 	private DateFormat df;
-	
+	private String url;
 	
 	private boolean delimiterSeen = false;
 	private boolean done = false;
@@ -60,6 +67,11 @@ public class TrainEvent {
 		station = s;
 	}
 	
+	public String getUrl()
+	{
+		return url;
+	}
+	
 	public boolean isParsed()
 	{
 		return done;
@@ -74,7 +86,12 @@ public class TrainEvent {
 		return sb.toString();
 	}
 	
-	public void parse(String html)
+	/**
+	 * Parse html, and post a message back when/if finding the proper destination
+	 * @param html
+	 * @param handler
+	 */
+	public void parse(final String html, final Handler handler)
 	{
 		boolean hasHandled = false;
 		if(html.indexOf(" till ") != -1) {
@@ -127,8 +144,13 @@ public class TrainEvent {
 			id = Integer.valueOf(d);
 			
 			String url = html.substring(html.indexOf("href=\"") + 6);
-			url = url.substring(0, url.indexOf("\""));
-			Scraper.queueForParse(url);
+			final String finalUrl = url.substring(0, url.indexOf("\""));
+			this.url = finalUrl;
+			Scraper.queueForParse(finalUrl, new Job<List<Nameurl>>(){
+				public void run() {
+					handler.sendMessage(Message.obtain(handler, MSG_DEST, new Object[] {finalUrl, value}));
+				}
+			});
 			return;
 		}
 		

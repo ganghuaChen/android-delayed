@@ -19,14 +19,18 @@ public class DBAdapter {
 	private final static String DATABASE_NAME = "delayed";
 	private final static int DATABASE_VERSION = 1;
 	
-	private static final String TABLE_NAME = "stations";
-	
-	private static final String KEY_NAME = "name";
-	private static final String KEY_URLID = "urlid";
+	private static final String STATION_TABLE_NAME = "stations";
+	private static final String STATION_KEY_NAME = "name";
+	private static final String STATION_KEY_URLID = "urlid";
 	
     private static final String DATABASE_CREATE =
-        "create table stations (_id integer primary key autoincrement, "
-        + "name text not null, urlid text not null) ";
+        "create table stations (_id integer primary key autoincrement, " +
+        "name text not null, urlid text not null);" + 
+        "create table trains (_id integer primary key autoincrement, " + 
+        "track, number, destination, time);" + 
+	    "create table trainevents(_id integer primary key autoincrement, " + 
+	    "station, time, track, number);";
+    
 
 	private DBHelper helper = null;
 	private SQLiteDatabase db = null;
@@ -70,9 +74,9 @@ public class DBAdapter {
 	public long addStation(String name, String urlid)
 	{
 		ContentValues cv = new ContentValues();
-		cv.put(KEY_NAME, name);
-		cv.put(KEY_URLID, urlid);
-		return db.insert(TABLE_NAME, null, cv);
+		cv.put(STATION_KEY_NAME, name);
+		cv.put(STATION_KEY_URLID, urlid);
+		return db.insert(STATION_TABLE_NAME, null, cv);
 	}
 	
 	public String getUrl(String stationName) 
@@ -83,7 +87,7 @@ public class DBAdapter {
 			
 			if(c != null && c.getCount() != 0) {
 				c.move(1);
-				String url = c.getString(c.getColumnIndex(KEY_URLID));
+				String url = c.getString(c.getColumnIndex(STATION_KEY_URLID));
 				return url;
 			}
 		} catch(Throwable e) {

@@ -57,10 +57,12 @@ public class StationActivity extends ListActivity {
 			}
 			
 			sa.notifyDataSetChanged();
+			sa.notifyDataSetInvalidated();
+			getListView().invalidate();
 			Log.i(Tag, "got mesg");
 		}
 	};
-	
+
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
@@ -91,6 +93,7 @@ public class StationActivity extends ListActivity {
 					String s = null;
 					List<String> stations = new ArrayList<String>();
 					List<TrainEvent> events = new ArrayList<TrainEvent>(20);
+					//XXX: Move this out to scraper
 					TrainEvent te = new TrainEvent(new Station(name, url));
 					while ((s = br.readLine()) != null) {
 						String unescaped = StringEscapeUtils.unescapeHtml(s);

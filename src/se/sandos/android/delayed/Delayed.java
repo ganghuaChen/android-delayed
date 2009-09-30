@@ -9,7 +9,6 @@ import java.util.ArrayList;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -27,24 +26,23 @@ import android.util.Log;
 public class Delayed extends Activity {
 	private static final String Tag = "Delayed";
 
+	private static final int MAX_DELAY = 1000*60*5;
+	private static final int MIN_DELAY = 1000;
+	private int retryDelay = MIN_DELAY;
+
 	public static DBAdapter db = null;
 	
 	protected ArrayList<Station> stations = null;
 	
 	private Handler mHandler = new Handler() {
+		@SuppressWarnings("unchecked")
 		public void handleMessage(Message msg) {
 			Log.i(Tag, "Sending intent");
-			startActivity(new Intent("se.sandos.android.StationList", null, getApplicationContext(), StationListActivity.class));
+			ArrayList<Station> stations = (ArrayList<Station>) msg.obj;
+			sendIntent(new StationList(stations));
 		}
 	};
-	
-//	@Override
-//	public void onStop()
-//	{
-//		super.onStop();
-//		db.close();
-//	}
-	
+		
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -60,6 +58,37 @@ public class Delayed extends Activity {
 		
 		//Create db
 		Thread t = new Thread() {
+			private void doWork(HttpClient hc, HttpGet hg) throws IOException
+			{
+				Log.i(Tag, "fetching http");
+				HttpResponse hr = hc.execute(hg);
+				Log.i(Tag, "Got page: " + hr.getStatusLine());
+				InputStream is = hr.getEntity().getContent();
+				InputStreamReader isr = new InputStreamReader(is);
+				BufferedReader br = new BufferedReader(isr);
+				String s = null;
+				stations = new ArrayList<Station>();
+				while ((s = br.readLine()) != null) {
+					if(s.contains("station=")) {
+						try {
+							//We should probably store the entire URL?
+							String station = s.substring(s.indexOf("\">") + 2, s.indexOf("</a>"));
+							station = StringEscapeUtils.unescapeHtml(station);
+							String urlid = s.substring(s.indexOf("href=\"") + 6, s.indexOf("\">"));
+							urlid = URLDecoder.decode(urlid);
+							Log.i(Tag, "Stationurl: " + urlid + " name: " + station);
+							db.addStation(station, urlid);
+							stations.add(new Station(station, urlid));
+						} catch(Throwable e) {
+							Log.w(Tag, "Could not decode: " + s + " " + e.getMessage());
+						}
+					}
+				}
+				//Done, signal this
+				Message done = Message.obtain(mHandler, 0, stations);
+				mHandler.sendMessage(done);
+			}
+			
 			public void run() {
 				HttpClient hc = new DefaultHttpClient();
 				// HttpGet("http://m.banverket.se/trafik");
@@ -76,38 +105,27 @@ public class Delayed extends Activity {
 				// JF=-1&stationlink=4 M-P
 				// JF=-1&stationlink=5 Q-Ö
 
-				try {
-					Log.i(Tag, "fetching http");
-					HttpResponse hr = hc.execute(hg);
-					Log.i(Tag, "Got page: " + hr.getStatusLine());
-					InputStream is = hr.getEntity().getContent();
-					InputStreamReader isr = new InputStreamReader(is);
-					BufferedReader br = new BufferedReader(isr);
-					String s = null;
-					stations = new ArrayList<Station>();
-					while ((s = br.readLine()) != null) {
-						if(s.contains("station=")) {
-							try {
-								//We should probably store the entire URL?
-								String station = s.substring(s.indexOf("\">") + 2, s.indexOf("</a>"));
-								station = StringEscapeUtils.unescapeHtml(station);
-								String urlid = s.substring(s.indexOf("href=\"") + 6, s.indexOf("\">"));
-								urlid = URLDecoder.decode(urlid);
-								Log.i(Tag, "Stationurl: " + urlid + " name: " + station);
-								db.addStation(station, urlid);
-								stations.add(new Station(station, urlid));
-							} catch(Throwable e) {
-								Log.w(Tag, "Could not decode: " + s + " " + e.getMessage());
-							}
-						}
+				retryDelay = MIN_DELAY;
+				while(true) {
+					try {
+						Log.i(Tag, "Trying to download");
+						doWork(hc, hg);
+						break;
+					} catch (IOException e) {
+						retryDelay();
 					}
-					//Done, signal this
-					Message done = Message.obtain(mHandler, 0, stations);
-					mHandler.sendMessage(done);
-				} catch (ClientProtocolException e) {
-					Log.i(Tag, "Something happened: " + e);
-				} catch (IOException e) {
-					Log.i(Tag, "IOExc: " + e);
+				}
+			}
+			
+			private void retryDelay()
+			{
+				try {
+					Thread.sleep(retryDelay);
+				} catch (InterruptedException e1) {
+				}
+				retryDelay *= 2;
+				if(retryDelay > MAX_DELAY) {
+					retryDelay = MAX_DELAY;
 				}
 			}
 		};
@@ -115,15 +133,19 @@ public class Delayed extends Activity {
 			Log.i(Tag, "No stations");
 			t.start();
 		} else {
-			Intent i = new Intent("se.sandos.android.delayed.StationList", null, getApplicationContext(), StationListActivity.class);
-			//Make a parcelable List?
-			Bundle extras = new Bundle();
-			extras.putString("majs", "majs");
 			StationList sl = db.getStations();
-			extras.putParcelable("se.sandos.android.delayed.StationList", sl);
-			i.putExtras(extras);
-			
-			startActivity(i);
+			sendIntent(sl);
 		}
+	}
+
+	private void sendIntent(StationList sl) {
+		Intent i = new Intent("se.sandos.android.delayed.StationList", null, getApplicationContext(), StationListActivity.class);
+		//Make a parcelable List?
+		Bundle extras = new Bundle();
+		Log.i(Tag, "Size of list: " + sl.getList().size());
+		extras.putParcelable("se.sandos.android.delayed.StationList", sl);
+		i.putExtras(extras);
+		
+		startActivity(i);
 	}
 }

@@ -15,7 +15,6 @@ import android.view.ContextMenu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
-import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.AdapterView.AdapterContextMenuInfo;
@@ -26,9 +25,12 @@ public class StationListActivity extends ListActivity {
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
+
+		Log.i(Tag, "Created StationList");
 		
 		Bundle extras = getIntent().getExtras();
 		if(extras == null) {
+			Log.i(Tag, "Extras are null!");
 			return;
 		}
 		StationList sl = extras.getParcelable("se.sandos.android.delayed.StationList");
@@ -42,9 +44,10 @@ public class StationListActivity extends ListActivity {
 			content.add(m);
 		}
 		
-		ListAdapter la = new SimpleAdapter(this.getBaseContext(), content, R.layout.stationrow, new String[]{"name"}, new int[]{R.id.TextView01});
+		SimpleAdapter la = new SimpleAdapter(this.getBaseContext(), content, R.layout.stationrow, new String[]{"name"}, new int[]{R.id.TextView01});
 		
 		setListAdapter(la);
+		la.notifyDataSetInvalidated();
 		
 		//Register context menu
 		registerForContextMenu(getListView());

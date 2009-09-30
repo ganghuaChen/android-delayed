@@ -38,6 +38,13 @@ public class Delayed extends Activity {
 		}
 	};
 	
+//	@Override
+//	public void onStop()
+//	{
+//		super.onStop();
+//		db.close();
+//	}
+	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -86,6 +93,7 @@ public class Delayed extends Activity {
 								station = StringEscapeUtils.unescapeHtml(station);
 								String urlid = s.substring(s.indexOf("href=\"") + 6, s.indexOf("\">"));
 								urlid = URLDecoder.decode(urlid);
+								Log.i(Tag, "Stationurl: " + urlid + " name: " + station);
 								db.addStation(station, urlid);
 								stations.add(new Station(station, urlid));
 							} catch(Throwable e) {

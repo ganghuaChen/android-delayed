@@ -21,18 +21,23 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.widget.ListAdapter;
 import android.widget.SimpleAdapter;
 
 public class StationActivity extends ListActivity {
 	private static final String Tag = "StationActivity";
 
+	private List<Map<String, String>> listContent = null;
+	private SimpleAdapter sa = null;
+	
 	private Handler mHandler = new Handler() {
 		@SuppressWarnings("unchecked")
 		public void handleMessage(Message msg) {
 			List<TrainEvent> l = (List<TrainEvent>) msg.obj;
 			
-			List<Map<String, String>> content = new ArrayList<Map<String, String>>();
+			if(listContent == null) {
+				listContent = new ArrayList<Map<String, String>>();
+			}
+			
 			for(TrainEvent te : l) {
 				Map<String, String> m = new HashMap<String, String>();
 				Log.i(Tag, "Adding " + te.toString());
@@ -40,14 +45,19 @@ public class StationActivity extends ListActivity {
 				m.put("track", "Track: " + te.getTrack());
 				m.put("number", "  Train #: " + Integer.toString(te.getNumber()));
 				m.put("destination", te.getDestination());
-				content.add(m);
+				listContent.add(m);
 			}
 			
-			ListAdapter la = new SimpleAdapter(getApplicationContext(), content, R.layout.traineventrow, 
-					new String[]{"name", "destination", "track", "number"},
-					new int[]{R.id.TeTime, R.id.TeDestination, R.id.TeTrack, R.id.TeNumber});
+			if(sa == null) {
+				sa = new SimpleAdapter(getApplicationContext(), listContent, R.layout.traineventrow, 
+						new String[]{"name", "destination", "track", "number"},
+						new int[]{R.id.TeTime, R.id.TeDestination, R.id.TeTrack, R.id.TeNumber});
+
+				setListAdapter(sa);
+			}
 			
-			setListAdapter(la);
+			sa.notifyDataSetChanged();
+			Log.i(Tag, "got mesg");
 		}
 	};
 	
@@ -61,7 +71,7 @@ public class StationActivity extends ListActivity {
 		Intent i = getIntent();
 		final String url = i.getStringExtra("url");
 		final String name = i.getStringExtra("name");
-		
+
 		new Thread(){
 			public void run(){
 				try {
@@ -69,7 +79,7 @@ public class StationActivity extends ListActivity {
 					
 					String base = "http://m.banverket.se/";
 					String stationSearch = base + url;
-					Log.i(Tag, "Dull url: " + stationSearch);
+					Log.i(Tag, "Full url: " + stationSearch);
 					HttpGet hg = new HttpGet(stationSearch);
 			
 					Log.i(Tag, "fetching http");
@@ -87,12 +97,15 @@ public class StationActivity extends ListActivity {
 						te.parse(unescaped);
 						if(te.isParsed()) {
 							events.add(te);
-							Log.i(Tag, "Added trainevent: " + te);
+							
+							List<TrainEvent> add = new ArrayList<TrainEvent>(1);
+							add.add(te);
+							mHandler.sendMessage(Message.obtain(mHandler, 0, add));
+							Log.i(Tag, "Sending trainevent: " + te);
 							te = new TrainEvent();
 						}
 						stations.add(unescaped);
 					}
-					mHandler.sendMessage(Message.obtain(mHandler, 0, events));
 				} catch(Throwable e) {
 					Log.w(Tag, "Error when fetching: " + e.getMessage());
 				}

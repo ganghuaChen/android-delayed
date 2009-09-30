@@ -3,9 +3,12 @@ package se.sandos.android.delayed;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
@@ -73,14 +76,39 @@ public class Scraper extends Thread {
 			InputStream is = hr.getEntity().getContent();
 			InputStreamReader isr = new InputStreamReader(is);
 			BufferedReader br = new BufferedReader(isr);
-			
-			String s = null;
-			while ((s = br.readLine()) != null) {
-				Log.i(Tag, s);
-			}
 
+			class Nameurl {
+				public String name;
+				public String url;
+				public Nameurl(String n, String u) { name = n; url = u; }
+			}
+			
+			List<Nameurl> names = new ArrayList<Nameurl>(40);
+			while (true) {
+				String s = br.readLine();
+				if(s == null) {
+					break;
+				}
+				if(s.indexOf("showallstations") != -1) {
+					String uri = s.substring(9, s.lastIndexOf("\">"));
+					Log.i(Tag, "Url: " + uri);
+					
+					String stationName = s.substring(s.lastIndexOf("\">") + 2, s.length() - 8);
+					stationName = StringEscapeUtils.unescapeHtml(stationName);
+					names.add(new Nameurl(stationName, uri));
+				} else {
+					Log.i(Tag, s);
+				}
+			}
+			Log.i(Tag, "Got names of all stations for " + cut);
+
+			
 		} catch (Throwable e) {
-			Log.w(Tag, e.getMessage());
+			String msg = e.getMessage();
+			if(msg == null) {
+				msg = "Something happened: " + e;
+			}
+			Log.w(Tag, msg);
 		}
 
 	}

@@ -6,9 +6,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import se.sandos.android.delayed.Scraper.Job;
-import se.sandos.android.delayed.Scraper.Nameurl;
 import se.sandos.android.delayed.db.Station;
+import se.sandos.android.delayed.scrape.Scraper;
+import se.sandos.android.delayed.scrape.Scraper.Job;
+import se.sandos.android.delayed.scrape.Scraper.Nameurl;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;

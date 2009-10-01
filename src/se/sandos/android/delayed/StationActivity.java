@@ -14,8 +14,8 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import se.sandos.android.delayed.Scraper.Nameurl;
 import se.sandos.android.delayed.db.Station;
+import se.sandos.android.delayed.scrape.Scraper.Nameurl;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -52,11 +52,9 @@ public class StationActivity extends ListActivity {
 						}
 					}
 				}
-
 				
 				return;
 			}
-			
 			
 			List<TrainEvent> l = (List<TrainEvent>) msg.obj;
 			

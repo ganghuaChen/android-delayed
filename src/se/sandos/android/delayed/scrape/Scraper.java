@@ -1,4 +1,4 @@
-package se.sandos.android.delayed;
+package se.sandos.android.delayed.scrape;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -16,15 +16,15 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 import android.util.Log;
 
-public class Scraper extends Thread {
+/**
+ * Helpers for scraping simple HTML pages.
+ * @author John Bäckstrand
+ *
+ */
+public class Scraper {
 	public final static String BASE_URL = "http://m.banverket.se/trafik/(111111111111111111111111)/WapPages/";
 	public final static String Tag = "Scraper";
 	
-	private static Queue<Job<?>> queue = new LinkedList<Job<?>>();
-	
-	private static Thread worker = new Scraper();
-	
-
 	public static class Nameurl {
 		public String name;
 		public String url;
@@ -35,60 +35,18 @@ public class Scraper extends Thread {
 	{
 		protected T value;
 		
-		public void execute()
-		{
-			
-		}
-		abstract public void run();
+		public abstract void run();
 	}
-
 	
 	public static void queueForParse(final String relativeUrl, final Job<List<Nameurl>> job)
 	{
-		queue(new Job<List<Nameurl>>(){
+		ScrapePool.addJob(new Job<List<Nameurl>>(){
 			@Override
-			public void execute() {
+			public void run() {
 				job.value = parseTrainPage(relativeUrl);
 				job.run();
 			}
-
-			@Override
-			public void run() {
-			}
 		});
-	}
-	
-	public static void queue(Job<?> job)
-	{
-		queue.add(job);
-		if(!worker.isAlive()) {
-			worker.start();
-			worker.setPriority(Thread.MIN_PRIORITY);
-		} else {
-			if(worker.getState() == Thread.State.TIMED_WAITING) {
-				worker.interrupt();
-			}
-		}
-	}
-	
-	public void run()
-	{
-		while(true) {
-			if(queue.isEmpty()) {
-				try {
-					Thread.sleep(100000);
-				} catch (InterruptedException e) {
-				}
-			}
-			
-			if(!queue.isEmpty()) {
-				Job<?> job = queue.poll();
-				if(job != null) {
-					job.execute();
-					//parseTrainPage(job.);
-				}
-			}
-		}
 	}
 	
 	/**

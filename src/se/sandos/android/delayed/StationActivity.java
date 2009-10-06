@@ -15,7 +15,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import se.sandos.android.delayed.db.Station;
-import se.sandos.android.delayed.scrape.Scraper.Nameurl;
+import se.sandos.android.delayed.scrape.ScraperHelper.Nameurl;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -48,7 +48,7 @@ public class StationActivity extends ListActivity {
 						if(url != null && url.equals(vals[0])) {
 							Log.i(Tag, "found match: " + vals[0]);
 							v.put("destination", nu.name);
-							sa.notifyDataSetInvalidated();
+							sa.notifyDataSetChanged();
 						}
 					}
 				}
@@ -82,8 +82,6 @@ public class StationActivity extends ListActivity {
 			}
 			
 			sa.notifyDataSetChanged();
-			sa.notifyDataSetInvalidated();
-			getListView().invalidate();
 			Log.i(Tag, "got mesg");
 		}
 	};

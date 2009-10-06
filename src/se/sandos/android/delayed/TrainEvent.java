@@ -7,9 +7,9 @@ import java.util.Date;
 import java.util.List;
 
 import se.sandos.android.delayed.db.Station;
-import se.sandos.android.delayed.scrape.Scraper;
-import se.sandos.android.delayed.scrape.Scraper.Job;
-import se.sandos.android.delayed.scrape.Scraper.Nameurl;
+import se.sandos.android.delayed.scrape.ScraperHelper;
+import se.sandos.android.delayed.scrape.ScraperHelper.Job;
+import se.sandos.android.delayed.scrape.ScraperHelper.Nameurl;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -147,7 +147,7 @@ public class TrainEvent {
 			String url = html.substring(html.indexOf("href=\"") + 6);
 			final String finalUrl = url.substring(0, url.indexOf("\""));
 			this.url = finalUrl;
-			Scraper.queueForParse(finalUrl, new Job<List<Nameurl>>(){
+			ScraperHelper.queueForParse(finalUrl, new Job<List<Nameurl>>(){
 				public void run() {
 					handler.sendMessage(Message.obtain(handler, MSG_DEST, new Object[] {finalUrl, value}));
 				}

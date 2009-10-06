@@ -162,9 +162,25 @@ public class StationListActivity extends ListActivity {
 		return false;
 	}
 	
+	@SuppressWarnings("unchecked")
 	protected void onListItemClick(ListView l, View v, int position, long id)
 	{
 		Object o = l.getAdapter().getItem(position);
+		Map<String, String> m = (Map) o;
 		Log.i(Tag, "Click: " + o + " " + o.getClass());
+
+		String stationName = m.get("name");
+		String url = null;
+		
+		if(Delayed.db != null) {
+			url = Delayed.db.getUrl(stationName);
+		}
+
+		Intent i = new Intent("se.sandos.android.delayed.Station", null, getApplicationContext(), StationActivity.class);
+		i.putExtra("stationname", stationName);
+		i.putExtra("url", url);
+		Log.i(Tag, "Url: " + url + " Name: " + stationName);
+		startActivity(i);
+
 	}
 }

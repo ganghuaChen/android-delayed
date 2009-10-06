@@ -17,6 +17,9 @@ import se.sandos.android.delayed.db.DBAdapter;
 import se.sandos.android.delayed.db.Station;
 import se.sandos.android.delayed.db.StationList;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -34,15 +37,67 @@ public class Delayed extends Activity {
 	
 	protected ArrayList<Station> stations = null;
 	
+	private AlertDialog dialog;
+	
 	private Handler mHandler = new Handler() {
 		@SuppressWarnings("unchecked")
 		public void handleMessage(Message msg) {
+			if(msg.what == 2) {
+				String m = (String) msg.obj;
+				dialog.setMessage(m);
+				
+				return;
+			}
 			Log.i(Tag, "Sending intent");
 			ArrayList<Station> stations = (ArrayList<Station>) msg.obj;
 			sendIntent(new StationList(stations));
 		}
 	};
+	
+	@Override
+	public Dialog onCreateDialog(int id)
+	{
+		AlertDialog.Builder ab = new AlertDialog.Builder(this);
+		ab.setMessage("asdas");
+		AlertDialog ad = ab.create();
+		dialog = ad;
+		return ad;
+	}
+	
+	@Override
+	public void onStart()
+	{
+		super.onStart();
+		showDialog(1);
 		
+		final Handler h = mHandler;
+		Thread t = new Thread(){
+			public void run()
+			{
+				Message m = h.obtainMessage(2, "majs " + System.currentTimeMillis());
+				h.sendMessage(m);
+				
+				try {
+					sleep(1000);
+				} catch (InterruptedException e) {
+				}
+			}
+		};
+	}
+	
+	public static DBAdapter getDb(Context ctx)
+	{
+		if(db == null) {
+			Log.i(Tag, "Opening DB");
+			db = new DBAdapter(ctx);
+			Log.i(Tag, "open db");
+			db.open();
+			Log.i(Tag, "Got db");
+		}
+		
+		return db;
+	}
+	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {

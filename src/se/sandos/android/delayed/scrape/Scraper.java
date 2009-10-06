@@ -1,104 +1,71 @@
 package se.sandos.android.delayed.scrape;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
-
-import org.apache.commons.lang.StringEscapeUtils;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-
 import android.util.Log;
 
 /**
- * Helpers for scraping simple HTML pages.
+ * Base class for scrapers
  * @author John Bäckstrand
  *
  */
-public class Scraper {
-	public final static String BASE_URL = "http://m.banverket.se/trafik/(111111111111111111111111)/WapPages/";
-	public final static String Tag = "Scraper";
-	
-	public static class Nameurl {
-		public String name;
-		public String url;
-		public Nameurl(String n, String u) { name = n; url = u; }
-	}
+public abstract class Scraper<T, U> {
+	private static final int MAX_DELAY = 1000*60*5;
+	private static final int MIN_DELAY = 1000;
+	private int retryDelay = MIN_DELAY;
 
-	public abstract static class Job<T> implements Runnable
+	private static final int DEFAULT_RETRIES = 2;
+	
+	private static final String Tag = "Scraper"; 
+	
+	protected ScrapeListener<T, U> mListener = null;
+	
+	/**
+	 * Handler to be run on any result
+	 */
+	public void setScrapeListener(ScrapeListener<T, U> listener)
 	{
-		protected T value;
-		
-		public abstract void run();
+		this.mListener = listener;
 	}
 	
-	public static void queueForParse(final String relativeUrl, final Job<List<Nameurl>> job)
+	public abstract void scrapeImpl() throws Exception;
+	
+	public void scrape()
 	{
-		ScrapePool.addJob(new Job<List<Nameurl>>(){
-			@Override
-			public void run() {
-				job.value = parseTrainPage(relativeUrl);
-				job.run();
-			}
-		});
+		scrape(DEFAULT_RETRIES);
 	}
 	
 	/**
-	 * Parse stations. End station specifically.
-	 * @param relativeUrl
+	 * Scrape, with retries
 	 */
-	private static List<Nameurl> parseTrainPage(String relativeUrl)
+	public void scrape(int retries)
 	{
-		String cut = relativeUrl.substring(relativeUrl.indexOf("WapPages/") + 9);
-
-		HttpClient hc = new DefaultHttpClient();
-		String url = BASE_URL + cut;
-		Log.i(Tag, "Parsing trainpage, full url: " + url);
-
-		HttpGet hg = new HttpGet(url);
-		
-		try {
-			HttpResponse hr = hc.execute(hg);
-			Log.i(Tag, "Got page: " + hr.getStatusLine());
-			InputStream is = hr.getEntity().getContent();
-			InputStreamReader isr = new InputStreamReader(is);
-			BufferedReader br = new BufferedReader(isr);
-
-			
-			List<Nameurl> names = new ArrayList<Nameurl>(40);
-			while (true) {
-				String s = br.readLine();
-				if(s == null) {
+		int r = 0;
+		retryDelay = MIN_DELAY;
+		while (true) {
+			try {
+				Log.v(Tag, "Trying to download");
+				if(r++ > retries) {
+					Log.v(Tag, "Retries exhausted, giving up: " + r);
 					break;
 				}
-				if(s.indexOf("showallstations") != -1) {
-					String uri = s.substring(9, s.lastIndexOf("\">"));
-					Log.i(Tag, "Url: " + uri);
-					
-					String stationName = s.substring(s.lastIndexOf("\">") + 2, s.length() - 8);
-					stationName = StringEscapeUtils.unescapeHtml(stationName);
-					names.add(new Nameurl(stationName, uri));
-				} else {
-					Log.i(Tag, s);
-				}
+			
+				scrapeImpl();
+				break;
+			} catch (Exception e) {
+				Log.d(Tag, "Failed scrape: " + e.getMessage(), e);
+				retryDelay();
 			}
-			Log.i(Tag, "Got names of all stations for " + cut);
-
-			return names;
-		} catch (Throwable e) {
-			String msg = e.getMessage();
-			if(msg == null) {
-				msg = "Something happened: " + e;
-			}
-			Log.w(Tag, msg);
 		}
-
-		return new LinkedList<Nameurl>();
 	}
+	
+	private void retryDelay() {
+		try {
+			Thread.sleep(retryDelay);
+		} catch (InterruptedException e1) {
+		}
+		retryDelay *= 2;
+		if (retryDelay > MAX_DELAY) {
+			retryDelay = MAX_DELAY;
+		}
+	}
+
 }

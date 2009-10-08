@@ -113,7 +113,6 @@ public class StationActivity extends ListActivity {
 					InputStreamReader isr = new InputStreamReader(is);
 					BufferedReader br = new BufferedReader(isr);
 					String s = null;
-					List<String> stations = new ArrayList<String>();
 					List<TrainEvent> events = new ArrayList<TrainEvent>(20);
 					//XXX: Move this out to scraper
 					TrainEvent te = new TrainEvent(new Station(name, url));
@@ -129,7 +128,6 @@ public class StationActivity extends ListActivity {
 							Log.i(Tag, "Sending trainevent: " + te);
 							te = new TrainEvent();
 						}
-						stations.add(unescaped);
 					}
 				} catch(Throwable e) {
 					Log.w(Tag, "Error when fetching: " + e.getMessage());

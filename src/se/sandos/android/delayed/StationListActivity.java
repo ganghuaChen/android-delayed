@@ -40,9 +40,12 @@ public class StationListActivity extends ListActivity {
 		public void handleMessage(Message msg) {
 			switch(msg.what) {
 			case MSG_COMPLETELIST:
-				setListData((StationList) msg.obj);
+				Log.v(Tag, "Got complete list");
+				dialog.dismiss();
+				//setListData((StationList) msg.obj);
 				break;
 			case MSG_PARTIAL_RESULT:
+				Log.v(Tag, "Got incomplete list");
 				addRow((Station)msg.obj);
 				break;
 			}

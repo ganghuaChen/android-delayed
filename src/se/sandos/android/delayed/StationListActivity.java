@@ -46,7 +46,9 @@ public class StationListActivity extends ListActivity {
 				break;
 			case MSG_PARTIAL_RESULT:
 				Log.v(Tag, "Got incomplete list");
-				addRow((Station)msg.obj);
+				Station s = (Station)msg.obj;
+				addRow(s);
+				Delayed.getDb(getApplicationContext()).addStation(s.getName(), s.getUrl());
 				break;
 			}
 		}
@@ -60,6 +62,10 @@ public class StationListActivity extends ListActivity {
 
 		Log.v(Tag, "Created StationList");
 
+		Delayed.getDb(getApplicationContext()).clearStations();
+		
+		Log.v(Tag, "Number of stations: " + Delayed.getDb(getApplicationContext()).getNumberOfStations());
+		
 		//Register context menu
 		registerForContextMenu(getListView());
 		

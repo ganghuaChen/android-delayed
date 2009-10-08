@@ -16,7 +16,7 @@ import se.sandos.android.delayed.db.Station;
 import android.util.Log;
 
 public class StationListScraper extends Scraper<Station, ArrayList<Station>> {
-	private static final String Tag = "StationScraper";
+	private static final String Tag = "StationListScraper";
 	
 	
 	@Override

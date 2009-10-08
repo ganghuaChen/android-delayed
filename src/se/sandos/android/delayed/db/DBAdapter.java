@@ -86,6 +86,12 @@ public class DBAdapter {
 		return db.insert(STATION_TABLE_NAME, null, cv);
 	}
 	
+	public void clearStations()
+	{
+		Cursor c = db.rawQuery("delete from " + STATION_TABLE_NAME, null);
+		c.move(1);
+	}
+	
 	public String getUrl(String stationName) 
 	{
 		Cursor c = null;

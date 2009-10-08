@@ -13,8 +13,8 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
+import se.sandos.android.delayed.TrainEvent;
 import se.sandos.android.delayed.db.Station;
-import se.sandos.android.delayed.db.StationList;
 import android.util.Log;
 
 /**
@@ -104,6 +104,19 @@ public class ScraperHelper {
 		return new LinkedList<Nameurl>();
 	}
 
+	public static void scrapeStation(String url, String name, final ScrapeListener<TrainEvent, Object> listener)
+	{
+		final Scraper<TrainEvent, Object> s = new StationScraper(url, name);
+		
+		ScrapePool.addJob(new Job<Object>(){
+			@Override
+			public void run() {
+				s.setScrapeListener(listener);
+				s.scrape();
+			}
+		});
+	}
+	
 	public static void scrapeStations(final ScrapeListener<Station, ArrayList<Station>> notify)
 	{
 		final Scraper<Station, ArrayList<Station>> s = new StationListScraper();

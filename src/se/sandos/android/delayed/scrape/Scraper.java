@@ -42,7 +42,7 @@ public abstract class Scraper<T, U> {
 		retryDelay = MIN_DELAY;
 		while (true) {
 			try {
-				Log.v(Tag, "Trying to download");
+				Log.v(Tag, "Trying to download, we are " + getClass());
 				if(r++ > retries) {
 					Log.v(Tag, "Retries exhausted, giving up: " + r);
 					break;

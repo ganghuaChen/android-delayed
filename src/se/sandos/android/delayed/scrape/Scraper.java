@@ -53,6 +53,9 @@ public abstract class Scraper<T, U> {
 			} catch (Exception e) {
 				Log.d(Tag, "Failed scrape: " + e.getMessage(), e);
 				retryDelay();
+				if(mListener != null) {
+					mListener.onRestart();
+				}
 			}
 		}
 	}

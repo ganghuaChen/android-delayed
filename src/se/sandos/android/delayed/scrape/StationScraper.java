@@ -21,11 +21,9 @@ import se.sandos.android.delayed.TrainEvent;
 import se.sandos.android.delayed.db.Station;
 import se.sandos.android.delayed.scrape.ScraperHelper.Job;
 import se.sandos.android.delayed.scrape.ScraperHelper.Nameurl;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 
-public class StationScraper extends Scraper<TrainEvent, Object> {
+public class StationScraper extends Scraper<TrainEvent, Object[]> {
 	private static final String Tag = "StationScraper";
 	
 	private String mName;
@@ -103,7 +101,14 @@ public class StationScraper extends Scraper<TrainEvent, Object> {
 			//Try to find it in db
 			String url = Delayed.db.getUrl(dest);
 			if(url == null) {
-				Log.w(Tag, "Could not find " + dest);
+				//Try adding " C"
+				url = Delayed.db.getUrl(dest + " C");
+				if(url == null) {
+					Log.w(Tag, "Could not find " + dest);
+					te.setAltDest(dest);
+				} else {
+					te.setDestination(new Station(dest + " C", url));
+				}
 			} else {
 				te.setDestination(new Station(dest, url));
 			}
@@ -132,12 +137,18 @@ public class StationScraper extends Scraper<TrainEvent, Object> {
 			String url = html.substring(html.indexOf("href=\"") + 6);
 			final String finalUrl = url.substring(0, url.indexOf("\""));
 			te.setUrl(finalUrl);
-			//XXX use listener
-//			ScraperHelper.queueForParse(finalUrl, new Job<List<Nameurl>>(){
-//				public void run() {
-//					handler.sendMessage(Message.obtain(handler, MSG_DEST, new Object[] {finalUrl, value}));
-//				}
-//			});
+			//XXX use listener if !foundDest
+			if(!te.hasProperDest()) {
+				Log.v(Tag, "Destination is not set, finding it");
+				ScraperHelper.queueForParse(finalUrl, new Job<List<Nameurl>>(){
+					public void run() {
+						mListener.onFinished(new Object[] {finalUrl, value});
+						//handler.sendMessage(Message.obtain(handler, MSG_DEST, new Object[] {finalUrl, value}));
+					}
+				});
+			} else {
+				Log.v(Tag, "Destination was set");
+			}
 			return false;
 		}
 		

@@ -24,7 +24,6 @@ public class StationActivity extends ListActivity {
 	private SimpleAdapter sa = null;
 	
 	private Handler mHandler = new Handler() {
-		@SuppressWarnings("unchecked")
 		public void handleMessage(final Message msg) {
 			runOnUiThread(new Runnable(){
 				public void run() {
@@ -33,6 +32,7 @@ public class StationActivity extends ListActivity {
 			});
 		}
 
+		@SuppressWarnings("unchecked")
 		private void handle(Message msg) {
 			Log.v(Tag, "Got message: " + msg.what);
 			if(msg.what == StationScraper.MSG_DEST) {
@@ -97,11 +97,11 @@ public class StationActivity extends ListActivity {
 		final String url = i.getStringExtra("url");
 		final String name = i.getStringExtra("name");
 
-		ScraperHelper.scrapeStation(url, name, new ScrapeListener<TrainEvent, Object>(){
+		ScraperHelper.scrapeStation(url, name, new ScrapeListener<TrainEvent, Object[]>(){
 
-			public void onFinished(Object result) {
-				// TODO Auto-generated method stub
-				
+			public void onFinished(Object[] result) {
+				//In this case, we "abuse" this method and use it for mending previously unknown destinations
+				mHandler.dispatchMessage(Message.obtain(mHandler, StationScraper.MSG_DEST, result));
 			}
 
 			public void onPartialResult(TrainEvent result) {
@@ -110,7 +110,6 @@ public class StationActivity extends ListActivity {
 
 			public void onRestart() {
 				// TODO Auto-generated method stub
-				
 			}
 		});
 	}

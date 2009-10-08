@@ -14,6 +14,7 @@ import se.sandos.android.delayed.db.Station;
 public class TrainEvent {
 	private final static String Tag = "TrainEvent";
 	
+	private String altDest;
 	private Station destination;
 	private Station station;
 	private int id = -1;
@@ -35,13 +36,27 @@ public class TrainEvent {
 		return id;
 	}
 	
+	public boolean hasProperDest()
+	{
+		return destination != null;
+	}
+	
 	public String getDestination()
 	{
 		if(destination != null) {
 			return destination.getName();
 		}
 		
+		if(altDest != null) {
+			return altDest;
+		}
+		
 		return " -- ";
+	}
+	
+	public void setAltDest(String name)
+	{
+		altDest = name;
 	}
 	
 	public String getTrack()

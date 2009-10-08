@@ -104,9 +104,9 @@ public class ScraperHelper {
 		return new LinkedList<Nameurl>();
 	}
 
-	public static void scrapeStation(String url, String name, final ScrapeListener<TrainEvent, Object> listener)
+	public static void scrapeStation(String url, String name, final ScrapeListener<TrainEvent, Object[]> listener)
 	{
-		final Scraper<TrainEvent, Object> s = new StationScraper(url, name);
+		final Scraper<TrainEvent, Object[]> s = new StationScraper(url, name);
 		
 		ScrapePool.addJob(new Job<Object>(){
 			@Override

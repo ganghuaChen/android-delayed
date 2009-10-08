@@ -15,7 +15,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import se.sandos.android.delayed.db.Station;
 import android.util.Log;
 
-public class StationScraper extends Scraper<Station, ArrayList<Station>> {
+public class StationListScraper extends Scraper<Station, ArrayList<Station>> {
 	private static final String Tag = "StationScraper";
 	
 	

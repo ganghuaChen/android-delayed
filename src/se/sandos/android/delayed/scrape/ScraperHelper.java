@@ -106,7 +106,7 @@ public class ScraperHelper {
 
 	public static void scrapeStations(final ScrapeListener<Station, ArrayList<Station>> notify)
 	{
-		final Scraper<Station, ArrayList<Station>> s = new StationScraper();
+		final Scraper<Station, ArrayList<Station>> s = new StationListScraper();
 		
 		ScrapePool.addJob(new Job<Object>(){
 			@Override

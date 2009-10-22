@@ -48,7 +48,7 @@ public class StationListScraper extends Scraper<Station, ArrayList<Station>> {
 		while ((s = br.readLine()) != null) {
 			if (s.contains("station=")) {
 				try {
-					// We should probably store the entire URL?
+					// store the entire URL, almost
 					String station = s.substring(s.indexOf("\">") + 2, s
 							.indexOf("</a>"));
 					station = StringEscapeUtils.unescapeHtml(station);
@@ -56,21 +56,19 @@ public class StationListScraper extends Scraper<Station, ArrayList<Station>> {
 							.indexOf("\">"));
 					urlid = URLDecoder.decode(urlid);
 					Log.i(Tag, "Stationurl: " + urlid + " name: " + station);
-					//XXX use scrapelistener
-					//db.addStation(station, urlid);
 					if(mListener != null) {
 						mListener.onPartialResult(new Station(station, urlid));
 					}
-					stations.add(new Station(station, urlid));
+					Station add = new Station(station, urlid);
+					stations.add(add);
+					Log.v(Tag, "added station: " + add);
 				} catch (Throwable e) {
 					Log.w(Tag, "Could not decode: " + s + " " + e.getMessage());
 				}
 			}
 		}
-		//XXX use scrapelistener
-		// Done, signal this
-		//Message done = Message.obtain(mHandler, 0, stations);
-		//mHandler.sendMessage(done);
+		
+		//Send full list to listener
 		if(mListener != null) {
 			mListener.onFinished(stations);
 		}

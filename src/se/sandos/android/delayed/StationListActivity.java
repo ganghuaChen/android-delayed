@@ -2,22 +2,22 @@ package se.sandos.android.delayed;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import se.sandos.android.delayed.db.DBAdapter;
 import se.sandos.android.delayed.db.Station;
 import se.sandos.android.delayed.db.StationList;
 import se.sandos.android.delayed.scrape.ScrapeListener;
 import se.sandos.android.delayed.scrape.ScraperHelper;
 import android.app.ListActivity;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.ContextMenu;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ContextMenu.ContextMenuInfo;
@@ -34,21 +34,30 @@ public class StationListActivity extends ListActivity {
 	private List<Map<String, String>> content = null;
 	private SimpleAdapter sa = null;
 	
-	private ProgressDialog dialog = null;
+	private boolean hasSeenIncomplete = false;
 	
 	Handler mHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			switch(msg.what) {
 			case MSG_COMPLETELIST:
 				Log.v(Tag, "Got complete list");
-				dialog.dismiss();
-				//setListData((StationList) msg.obj);
+				//dialog.dismiss();
+				if(!hasSeenIncomplete) {
+					setList((StationList) msg.obj);
+				}
 				break;
 			case MSG_PARTIAL_RESULT:
+				hasSeenIncomplete = true;
 				Log.v(Tag, "Got incomplete list");
 				Station s = (Station)msg.obj;
 				addRow(s);
-				Delayed.getDb(getApplicationContext()).addStation(s.getName(), s.getUrl());
+				DBAdapter db = Delayed.getDb(getApplicationContext());
+				long status = db.addStation(s.getName(), s.getUrl());
+				if(status == -1) {
+					Log.v(Tag, "Error inserting");
+				} else {
+					Log.v(Tag, "Success inserting " + db.getNumberOfStations() + " " + db);
+				}
 				break;
 			}
 		}
@@ -62,33 +71,80 @@ public class StationListActivity extends ListActivity {
 
 		Log.v(Tag, "Created StationList");
 
-		Delayed.getDb(getApplicationContext()).clearStations();
-		
-		Log.v(Tag, "Number of stations: " + Delayed.getDb(getApplicationContext()).getNumberOfStations());
-		
 		//Register context menu
 		registerForContextMenu(getListView());
 		
-		Bundle extras = getIntent().getExtras();
-		if(extras == null) {
-			Log.i(Tag, "Extras are null!");
-			dialog = ProgressDialog.show(this, "Progress", "Downloading list of stations");
+		fetchStations();
+	}
+
+	private void fetchStations() {
+		DBAdapter db = Delayed.getDb(getApplicationContext());
+		
+		if(db.getNumberOfStations() == 0) {
+			Log.v(Tag, "Downloading");
+			//dialog = ProgressDialog.show(this, "Progress", "Downloading list of stations");
 			ScraperHelper.scrapeStations(new ScrapeListener<Station, ArrayList<Station>>(){
 				public void onFinished(ArrayList<Station> sl) {
 					mHandler.dispatchMessage(Message.obtain(mHandler, MSG_COMPLETELIST, new StationList(sl)));
 				}
-
+	
 				public void onPartialResult(Station result) {
 					mHandler.dispatchMessage(Message.obtain(mHandler, MSG_PARTIAL_RESULT, result));
 				}
-
+	
 				public void onRestart() {
+					clearList();
 				}
 			});
-			return;
+		} else {
+			Log.v(Tag, "Fetching from db");
+			StationList sl = db.getStations();
+			mHandler.dispatchMessage(Message.obtain(mHandler, MSG_COMPLETELIST, sl));
 		}
 	}
 
+	private void setList(final StationList sl)
+	{
+		runOnUiThread(new Runnable(){
+			public void run() {
+				if(content == null) {
+					content = new ArrayList<Map<String, String>>();
+				}
+
+				
+				for(Station station : sl.getList()) {
+					Map<String, String> m = new HashMap<String, String>();
+					m.put("name", station.getName());
+					content.add(m);
+				}
+				
+				if(sa == null) {
+					sa = new SimpleAdapter(getApplicationContext(), content, R.layout.stationrow, new String[]{"name"}, new int[]{R.id.TextView01});
+					setListAdapter(sa);
+				}
+				
+				sa.notifyDataSetChanged();
+			}
+		});
+	}
+	
+	private void clearList()
+	{
+		runOnUiThread(new Runnable(){
+			public void run() {
+				content.clear();
+				
+				if(sa == null) {
+					sa = new SimpleAdapter(getApplicationContext(), content, R.layout.stationrow, new String[]{"name"}, new int[]{R.id.TextView01});
+					setListAdapter(sa);
+				}
+				
+				sa.notifyDataSetInvalidated();
+				sa.notifyDataSetChanged();
+			}
+		});
+	}
+	
 	private void addRow(final Station station)
 	{
 		runOnUiThread(new Runnable(){
@@ -110,33 +166,25 @@ public class StationListActivity extends ListActivity {
 			}
 		});
 	}
-	private void setListData(final StationList sl) {
-		runOnUiThread(new Runnable(){
-			public void run() {
-				if(content == null) {
-					content = new ArrayList<Map<String, String>>();
-				}
-				
-				content.clear();
-				for(Station s : sl.getList()) {
-					Map<String, String> m = new HashMap<String, String>();
-					m.put("name", s.getName());
-					content.add(m);
-					Delayed.getDb(getApplicationContext()).addStation(s.getName(), s.getUrl());
-				}
-				
-				if(sa == null) {
-					sa = new SimpleAdapter(getApplicationContext(), content, R.layout.stationrow, new String[]{"name"}, new int[]{R.id.TextView01});
-					setListAdapter(sa);
-					
-				}
-				
-				sa.notifyDataSetChanged();
-				
-				dialog.dismiss();
-			}
-		});
+	
+	public boolean onCreateOptionsMenu(Menu menu)
+	{
+		menu.add(0, 1, 0, "Ladda på nytt");
 		
+		return true;
+	}
+	
+	public boolean onOptionsItemSelected(MenuItem mi)
+	{
+		if(mi.getItemId() == 1) {
+			//Do sth
+			Log.v(Tag, "Clearing db");
+			Delayed.getDb(getApplicationContext()).clearStations();
+			clearList();
+			fetchStations();
+		}
+		
+		return true;
 	}
 	
 	public void onCreateContextMenu(ContextMenu menu, View v, ContextMenuInfo cmi)
@@ -161,11 +209,7 @@ public class StationListActivity extends ListActivity {
 				url = Delayed.db.getUrl(stationName);
 			}
 			
-			Intent i = new Intent("se.sandos.android.delayed.Station", null, getApplicationContext(), StationActivity.class);
-			i.putExtra("stationname", stationName);
-			i.putExtra("url", url);
-			Log.i(Tag, "Url: " + url + " Name: " + stationName);
-			startActivity(i);
+			gotoStation(stationName, url);
 			return true;
 		}
 		return false;
@@ -185,11 +229,15 @@ public class StationListActivity extends ListActivity {
 			url = Delayed.db.getUrl(stationName);
 		}
 
+		gotoStation(stationName, url);
+
+	}
+
+	private void gotoStation(String stationName, String url) {
 		Intent i = new Intent("se.sandos.android.delayed.Station", null, getApplicationContext(), StationActivity.class);
 		i.putExtra("stationname", stationName);
 		i.putExtra("url", url);
 		Log.i(Tag, "Url: " + url + " Name: " + stationName);
 		startActivity(i);
-
 	}
 }

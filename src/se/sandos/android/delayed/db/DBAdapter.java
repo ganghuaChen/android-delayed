@@ -52,6 +52,9 @@ public class DBAdapter {
 	{
 		Log.i(Tag, "opening db");
 		db = helper.getWritableDatabase();
+		Log.v(Tag, "Number of stations: " + getNumberOfStations());
+		
+		
 		return this;
 	}
 	
@@ -83,7 +86,13 @@ public class DBAdapter {
 		ContentValues cv = new ContentValues();
 		cv.put(STATION_KEY_NAME, name);
 		cv.put(STATION_KEY_URLID, urlid);
-		return db.insert(STATION_TABLE_NAME, null, cv);
+		
+		long status = db.insert(STATION_TABLE_NAME, null, cv);
+		
+		Log.v(Tag, "Path to db: " + db.getPath() + " " + db.getSyncedTables().size());
+		
+		
+		return status;
 	}
 	
 	public void clearStations()

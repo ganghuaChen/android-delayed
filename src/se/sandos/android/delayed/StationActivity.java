@@ -15,6 +15,8 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.SimpleAdapter;
 
 public class StationActivity extends ListActivity {
@@ -22,6 +24,10 @@ public class StationActivity extends ListActivity {
 
 	private List<Map<String, String>> listContent = null;
 	private SimpleAdapter sa = null;
+	
+	//These are passed to use on creation
+	private String url;
+	private String name;
 	
 	private Handler mHandler = new Handler() {
 		public void handleMessage(final Message msg) {
@@ -68,16 +74,17 @@ public class StationActivity extends ListActivity {
 			Log.i(Tag, "Adding " + te.toString());
 			m.put("name", te.toString());
 			m.put("track", "Track: " + te.getTrack());
-			m.put("number", "  Train #: " + Integer.toString(te.getNumber()));
+			m.put("number", "Train #: " + Integer.toString(te.getNumber()));
 			m.put("destination", te.getDestination());
 			m.put("url", te.getUrl());
+			m.put("delayed", te.getDelayed());
 			Log.v(Tag, "Te: " + m);
 			listContent.add(m);
 			
 			if(sa == null) {
 				sa = new SimpleAdapter(getApplicationContext(), listContent, R.layout.traineventrow, 
-						new String[]{"name", "destination", "track", "number"},
-						new int[]{R.id.TeTime, R.id.TeDestination, R.id.TeTrack, R.id.TeNumber});
+						new String[]{"name", "destination", "track", "number", "delayed"},
+						new int[]{R.id.TeTime, R.id.TeDestination, R.id.TeTrack, R.id.TeNumber, R.id.TeDelayed});
 
 				setListAdapter(sa);
 			}
@@ -94,8 +101,15 @@ public class StationActivity extends ListActivity {
 		setContentView(R.layout.liststations);
 
 		Intent i = getIntent();
-		final String url = i.getStringExtra("url");
-		final String name = i.getStringExtra("name");
+		this.url = i.getStringExtra("url");
+		this.name = i.getStringExtra("name");
+		
+		fetchList();
+	}
+
+	private void fetchList() {
+		final String url = this.url;
+		final String name = this.name;
 
 		ScraperHelper.scrapeStation(url, name, new ScrapeListener<TrainEvent, Object[]>(){
 
@@ -113,4 +127,39 @@ public class StationActivity extends ListActivity {
 			}
 		});
 	}
+	
+	public boolean onCreateOptionsMenu(Menu menu)
+	{
+		menu.add(0, 1, 0, "Ladda på nytt");
+		
+		return true;
+	}
+	
+	private void clearList()
+	{
+		runOnUiThread(new Runnable(){
+			public void run() {
+				listContent.clear();
+				
+				if(sa == null) {
+					sa = new SimpleAdapter(getApplicationContext(), listContent, R.layout.stationrow, new String[]{"name"}, new int[]{R.id.TextView01});
+					setListAdapter(sa);
+				}
+				
+				sa.notifyDataSetInvalidated();
+			}
+		});
+	}
+
+	
+	public boolean onOptionsItemSelected(MenuItem mi)
+	{
+		if(mi.getItemId() == 1) {
+			clearList();
+			fetchList();
+		}
+		
+		return true;
+	}
+
 }

@@ -83,13 +83,8 @@ public class StationScraper extends Scraper<TrainEvent, Object[]> {
 			hasHandled = true;
 			delimiterSeen = true;
 			String arrival = html.substring(0, html.indexOf(" "));
-			DateFormat df = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT, java.util.Locale.GERMANY);
 			Date dd = null;
-			try {
-				dd = df.parse(arrival);
-			} catch (ParseException e) {
-				Log.i(Tag, "Exception parsing date: " + e.getMessage());
-			}
+			dd = parseTime(arrival);
 			te.setArrival(dd);
 			//Log.i(Tag, "Header for train time: " + dd);
 			
@@ -157,11 +152,30 @@ public class StationScraper extends Scraper<TrainEvent, Object[]> {
 			return false;
 		}
 
+		if(html.startsWith("Beräknas ")) {
+			String delayed = html.substring(9);
+			Date dd = parseTime(delayed);
+			te.setDelayed(dd);
+			Log.v(Tag, "Setting delayed arrival to " + dd);
+		}
+		
 		if(!hasHandled) {
 			Log.v(Tag, "not handled: " + html);
 		}
 		
 		return false;
+	}
+
+	private Date parseTime(String arrival) {
+		DateFormat df = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT, java.util.Locale.GERMANY);
+		Date dd = null;
+		try {
+			dd = df.parse(arrival);
+		} catch (ParseException e) {
+			Log.i(Tag, "Exception parsing date: " + e.getMessage());
+		}
+		
+		return dd;
 	}
 
 }

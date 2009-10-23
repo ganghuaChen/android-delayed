@@ -20,6 +20,7 @@ public class TrainEvent {
 	private int id = -1;
 	private String track;
 	private Date arrival;
+	private Date delayed;
 	private Date departure;
 	private DateFormat df = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT, java.util.Locale.GERMANY);
 	private String url;
@@ -68,6 +69,23 @@ public class TrainEvent {
 		return "-";
 	}
 	
+	public Date getDelayedDate() {
+		return this.delayed;
+	}
+	
+	public Date getArrivalDate() {
+		return this.arrival;
+	}
+	
+	public String getDelayed()
+	{
+		StringBuffer sb = new StringBuffer();
+		if(delayed != null) {
+			sb.append(df.format(delayed));
+		}
+		return sb.toString();
+	}
+	
 	public TrainEvent(Station s)
 	{
 		station = s;
@@ -80,6 +98,10 @@ public class TrainEvent {
 
 	public void setArrival(Date arrival) {
 		this.arrival = arrival;
+	}
+
+	public void setDelayed(Date delayed) {
+		this.delayed = delayed;
 	}
 	
 	public void setDestination(Station dest) {

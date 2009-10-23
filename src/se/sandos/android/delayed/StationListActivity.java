@@ -140,7 +140,6 @@ public class StationListActivity extends ListActivity {
 				}
 				
 				sa.notifyDataSetInvalidated();
-				sa.notifyDataSetChanged();
 			}
 		});
 	}

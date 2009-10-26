@@ -142,7 +142,7 @@ public class StationActivity extends ListActivity {
 				listContent.clear();
 				
 				if(sa == null) {
-					sa = new SimpleAdapter(getApplicationContext(), listContent, R.layout.stationrow, new String[]{"name"}, new int[]{R.id.TextView01});
+					sa = new SimpleAdapter(getApplicationContext(), listContent, R.layout.stationrow, new String[]{"name"}, new int[]{R.id.StationName});
 					setListAdapter(sa);
 				}
 				

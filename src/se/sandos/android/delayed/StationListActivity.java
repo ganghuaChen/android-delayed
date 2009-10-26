@@ -119,7 +119,7 @@ public class StationListActivity extends ListActivity {
 				}
 				
 				if(sa == null) {
-					sa = new SimpleAdapter(getApplicationContext(), content, R.layout.stationrow, new String[]{"name"}, new int[]{R.id.TextView01});
+					sa = new SimpleAdapter(getApplicationContext(), content, R.layout.stationrow, new String[]{"name"}, new int[]{R.id.StationName});
 					setListAdapter(sa);
 				}
 				
@@ -135,7 +135,7 @@ public class StationListActivity extends ListActivity {
 				content.clear();
 				
 				if(sa == null) {
-					sa = new SimpleAdapter(getApplicationContext(), content, R.layout.stationrow, new String[]{"name"}, new int[]{R.id.TextView01});
+					sa = new SimpleAdapter(getApplicationContext(), content, R.layout.stationrow, new String[]{"name"}, new int[]{R.id.StationName});
 					setListAdapter(sa);
 				}
 				
@@ -157,7 +157,7 @@ public class StationListActivity extends ListActivity {
 				content.add(m);
 				
 				if(sa == null) {
-					sa = new SimpleAdapter(getApplicationContext(), content, R.layout.stationrow, new String[]{"name"}, new int[]{R.id.TextView01});
+					sa = new SimpleAdapter(getApplicationContext(), content, R.layout.stationrow, new String[]{"name"}, new int[]{R.id.StationName});
 					setListAdapter(sa);
 				}
 				

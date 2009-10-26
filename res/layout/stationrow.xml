@@ -5,5 +5,5 @@
     android:layout_height="fill_parent"
     >
 
-<TextView android:text="TextView01" android:id="@+id/TextView01" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textStyle="bold" android:textSize="22sp"></TextView>
+<TextView android:text="TextView01" android:layout_width="wrap_content" android:layout_height="wrap_content" android:textStyle="bold" android:textSize="22sp" android:id="@+id/StationName"></TextView>
 </LinearLayout>

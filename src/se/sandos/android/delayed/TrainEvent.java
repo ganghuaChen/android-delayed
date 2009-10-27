@@ -24,6 +24,17 @@ public class TrainEvent {
 	private Date departure;
 	private DateFormat df = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT, java.util.Locale.GERMANY);
 	private String url;
+	private StringBuffer sb;
+	
+	
+	
+	public StringBuffer getStringBuffer()
+	{
+		if(sb == null) {
+			sb = new StringBuffer();
+		}
+		return sb;
+	}
 	
 	private boolean delimiterSeen = false;
 	private boolean done = false;
@@ -58,6 +69,25 @@ public class TrainEvent {
 	public void setAltDest(String name)
 	{
 		altDest = name;
+	}
+	
+	public boolean hasTrack()
+	{
+		return track != null;
+	}
+	
+	public boolean hasExtra()
+	{
+		return (sb != null && sb.toString().length() > 0);
+	}
+	
+	public String getExtra()
+	{
+		if(sb == null) {
+			sb = new StringBuffer();
+		}
+		
+		return sb.toString();
 	}
 	
 	public String getTrack()

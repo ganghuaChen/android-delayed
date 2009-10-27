@@ -21,4 +21,6 @@
 	
 	
 	
+
+<TextView android:layout_height="wrap_content" android:text="Inställt" android:id="@+id/TeExtra" android:layout_width="fill_parent"></TextView>
 </LinearLayout>

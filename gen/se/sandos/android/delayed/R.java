@@ -18,10 +18,11 @@ public final class R {
         public static final int StationName=0x7f060001;
         public static final int TeDelayed=0x7f060006;
         public static final int TeDestination=0x7f060003;
+        public static final int TeExtra=0x7f060007;
         public static final int TeNumber=0x7f060005;
         public static final int TeTime=0x7f060002;
         public static final int TeTrack=0x7f060004;
-        public static final int WidgetText=0x7f060007;
+        public static final int WidgetText=0x7f060008;
     }
     public static final class layout {
         public static final int liststations=0x7f030000;

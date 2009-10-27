@@ -17,7 +17,9 @@ import android.os.Message;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.SimpleAdapter;
+import android.widget.TextView;
 
 public class StationActivity extends ListActivity {
 	private static final String Tag = "StationActivity";
@@ -78,14 +80,39 @@ public class StationActivity extends ListActivity {
 			m.put("destination", te.getDestination());
 			m.put("url", te.getUrl());
 			m.put("delayed", te.getDelayed());
+			m.put("extra", te.getExtra());
 			Log.v(Tag, "Te: " + m);
 			listContent.add(m);
 			
 			if(sa == null) {
-				sa = new SimpleAdapter(getApplicationContext(), listContent, R.layout.traineventrow, 
-						new String[]{"name", "destination", "track", "number", "delayed"},
-						new int[]{R.id.TeTime, R.id.TeDestination, R.id.TeTrack, R.id.TeNumber, R.id.TeDelayed});
+				
+				SimpleAdapter.ViewBinder vb = new SimpleAdapter.ViewBinder(){
 
+					public boolean setViewValue(View view, Object data,
+							String textRepresentation) {
+						Log.v(Tag, "View: " + view + " Data: " + data);
+						TextView tv = (TextView) view;
+						
+						//if(tv.getText().equals("Inställt")) {
+						if(tv.getId() == R.id.TeExtra) {
+							Log.v(Tag, "found");
+							if(((String)data).length() == 0) {
+								tv.setVisibility(View.INVISIBLE);
+								tv.setHeight(0);
+							}
+						} else {
+							tv.setText((String)data);
+						}
+						return true;
+					}
+				};
+				
+				sa = new SimpleAdapter(getApplicationContext(), listContent, R.layout.traineventrow, 
+						new String[]{"name", "destination", "track", "number", "delayed", "extra"},
+						new int[]{R.id.TeTime, R.id.TeDestination, R.id.TeTrack, R.id.TeNumber, R.id.TeDelayed, R.id.TeExtra});
+
+				sa.setViewBinder(vb);
+				
 				setListAdapter(sa);
 			}
 			

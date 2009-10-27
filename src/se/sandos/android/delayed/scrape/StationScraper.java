@@ -107,14 +107,19 @@ public class StationScraper extends Scraper<TrainEvent, Object[]> {
 			} else {
 				te.setDestination(new Station(dest, url));
 			}
-			
+			return false;
 		}
 		
 		if(html.endsWith("-<br>")) {
 			if(delimiterSeen) {
+				StringBuffer sb = te.getStringBuffer();
+				if(sb != null && sb.length() != 0) {
+					Log.v(Tag, "EXTRA DATA: " + te.getStringBuffer().toString());
+				}
 				return true;
 			}
 			delimiterSeen = true;
+			return false;
 		}
 		
 		if(!delimiterSeen) {
@@ -157,10 +162,15 @@ public class StationScraper extends Scraper<TrainEvent, Object[]> {
 			Date dd = parseTime(delayed);
 			te.setDelayed(dd);
 			Log.v(Tag, "Setting delayed arrival to " + dd);
+			return false;
 		}
 		
 		if(!hasHandled) {
 			Log.v(Tag, "not handled: " + html);
+		}
+		
+		if(!te.hasTrack() && delimiterSeen) {
+			te.getStringBuffer().append(html);
 		}
 		
 		return false;

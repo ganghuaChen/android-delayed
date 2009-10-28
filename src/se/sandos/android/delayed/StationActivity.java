@@ -85,20 +85,16 @@ public class StationActivity extends ListActivity {
 			listContent.add(m);
 			
 			if(sa == null) {
-				
 				SimpleAdapter.ViewBinder vb = new SimpleAdapter.ViewBinder(){
 
 					public boolean setViewValue(View view, Object data,
 							String textRepresentation) {
-						Log.v(Tag, "View: " + view + " Data: " + data);
 						TextView tv = (TextView) view;
 						
-						//if(tv.getText().equals("Inställt")) {
-						if(tv.getId() == R.id.TeExtra) {
+						if(tv.getId() == R.id.Extra) {
 							Log.v(Tag, "found");
 							if(((String)data).length() == 0) {
-								tv.setVisibility(View.INVISIBLE);
-								tv.setHeight(0);
+								tv.setVisibility(View.GONE);
 							}
 						} else {
 							tv.setText((String)data);
@@ -107,9 +103,9 @@ public class StationActivity extends ListActivity {
 					}
 				};
 				
-				sa = new SimpleAdapter(getApplicationContext(), listContent, R.layout.traineventrow, 
+				sa = new SimpleAdapter(getApplicationContext(), listContent, R.layout.eventrow, 
 						new String[]{"name", "destination", "track", "number", "delayed", "extra"},
-						new int[]{R.id.TeTime, R.id.TeDestination, R.id.TeTrack, R.id.TeNumber, R.id.TeDelayed, R.id.TeExtra});
+						new int[]{R.id.Time, R.id.Destination, R.id.Track, R.id.TNumber, R.id.Delayed, R.id.Extra});
 
 				sa.setViewBinder(vb);
 				
@@ -120,7 +116,7 @@ public class StationActivity extends ListActivity {
 			Log.i(Tag, "got mesg");
 		}
 	};
-
+	
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);

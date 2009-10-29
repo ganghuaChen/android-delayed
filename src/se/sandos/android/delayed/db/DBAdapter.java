@@ -52,7 +52,19 @@ public class DBAdapter {
 	    "station, time, track, number, delay, extra, timestamp)";
     
     //Trainevents are identified by train and station? Time, track, delay, extra is mutable.
-    public long addTrainEvent(String station, Date time, String track, int number, Date delay, String extra)
+    public long addTrainEvent(final String station, final Date time, final String track, final int number, final Date delay, final String extra)
+    {
+    	new Thread() {
+    		public void run() {
+    			addTrainEventImpl(station, time, track, number, delay, extra);
+    		}
+    	}.start();
+    	
+    	return -1;
+    }
+    
+    //Trainevents are identified by train and station? Time, track, delay, extra is mutable.
+    public long addTrainEventImpl(String station, Date time, String track, int number, Date delay, String extra)
     {
     	Log.v(Tag, "Add " + station + " " + time);
     	
@@ -62,7 +74,7 @@ public class DBAdapter {
     		Log.v(Tag, "Found already!");
     		return -1;
     	}
-    	
+
     	Log.v(Tag, "Took " + (System.currentTimeMillis() - t));
     	t = System.currentTimeMillis();
     	

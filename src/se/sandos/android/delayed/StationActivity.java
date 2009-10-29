@@ -44,7 +44,6 @@ public class StationActivity extends ListActivity {
 		private void handle(Message msg) {
 			Log.v(Tag, "Got message: " + msg.what);
 			if(msg.what == StationScraper.MSG_DEST) {
-				
 				//Got a proper destination for some particular train. Mend.
 				Object[] vals = (Object[]) msg.obj;
 				List<Nameurl> stations = (List<Nameurl>) vals[1];
@@ -86,7 +85,9 @@ public class StationActivity extends ListActivity {
 			
 			Delayed.getDb(getApplicationContext()).addTrainEvent(te.getStation().getName(), te.getArrivalDate(), te.getTrack(), te.getNumber(), te.getDelayedDate(), te.getExtra());
 			
+			boolean needInvalidate = false;
 			if(sa == null) {
+				needInvalidate = true;
 				SimpleAdapter.ViewBinder vb = new SimpleAdapter.ViewBinder(){
 
 					public boolean setViewValue(View view, Object data,
@@ -94,7 +95,6 @@ public class StationActivity extends ListActivity {
 						TextView tv = (TextView) view;
 						
 						if(tv.getId() == R.id.Extra) {
-							Log.v(Tag, "found");
 							if(((String)data).length() == 0) {
 								tv.setVisibility(View.GONE);
 							}
@@ -114,7 +114,11 @@ public class StationActivity extends ListActivity {
 				setListAdapter(sa);
 			}
 			
-			sa.notifyDataSetChanged();
+			if(!needInvalidate) {
+				sa.notifyDataSetChanged();
+			} else {
+				sa.notifyDataSetInvalidated();
+			}
 			Log.i(Tag, "got mesg");
 		}
 	};

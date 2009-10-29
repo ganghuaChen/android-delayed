@@ -3,10 +3,10 @@
   xmlns:android="http://schemas.android.com/apk/res/android"
   android:layout_width="fill_parent"
   android:layout_height="wrap_content">
-<TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/Time" android:text="09:34" android:textSize="32sp"></TextView>
+<TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/Time" android:text="09:34" android:textSize="32sp" android:textStyle="bold"></TextView>
 <TextView android:layout_below="@+id/Time" android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/Extra" android:text="Inställt"></TextView><TextView android:layout_toRightOf="@+id/Time" android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/Destination" android:textSize="16sp" android:layout_marginLeft="2px" android:text="Destination sasdasdsd as      as sd"></TextView>
 <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:layout_alignParentBottom="true" android:layout_toRightOf="@+id/Time" android:textSize="10sp" android:text="Track: 3a" android:layout_below="@+id/Destination" android:id="@+id/Track" android:layout_marginLeft="2px"></TextView>
 <TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:textSize="10sp" android:text="Train#: 3421" android:layout_below="@+id/Destination" android:id="@+id/TNumber" android:layout_toRightOf="@+id/Track" android:layout_marginLeft="2px"></TextView>
-<TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/Delayed" android:text="09:55" android:textSize="32sp" android:layout_alignParentRight="true" android:textColor="#ff0000" android:layout_marginRight="4px" android:shadowRadius="2" android:shadowColor="#000000" android:shadowDy="1" android:shadowDx="1"></TextView>
+<TextView android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/Delayed" android:text="09:55" android:textSize="32sp" android:layout_alignParentRight="true" android:textColor="#ff0000" android:layout_marginRight="4px" android:shadowRadius="2" android:shadowColor="#000000" android:shadowDy="1" android:shadowDx="1" android:textStyle="bold"></TextView>
 
 </RelativeLayout>

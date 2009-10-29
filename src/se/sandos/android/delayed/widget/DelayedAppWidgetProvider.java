@@ -15,9 +15,10 @@ public class DelayedAppWidgetProvider extends AppWidgetProvider {
 
 		 RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.widget);
 		 rv.setTextViewText(R.id.WidgetText, "majs " + System.currentTimeMillis());
-		 
-//		 for(int i=0; i<appWidgetIds.length; i++) {
-//			 Log.v(Tag, "Updating id " + appWidgetIds[i]);
-//		 }
+
+		 for(int i=0; i<appWidgetIds.length; i++) {
+			 Log.v(Tag, "Updating id " + appWidgetIds[i]);
+			 appWidgetManager.updateAppWidget(appWidgetIds[i], rv);
+		 }
 	 }
 }

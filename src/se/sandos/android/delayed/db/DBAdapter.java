@@ -1,8 +1,13 @@
 package se.sandos.android.delayed.db;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
+import se.sandos.android.delayed.TrainEvent;
+import se.sandos.android.delayed.scrape.StationScraper;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -14,7 +19,6 @@ import android.util.Log;
 
 public class DBAdapter {
 	private final static String Tag = "DBAdapter";
-	private final Context context;
 	
 	private final static String DATABASE_NAME = "delayed";
 	private final static int DATABASE_VERSION = 1;
@@ -24,27 +28,98 @@ public class DBAdapter {
 	private static final String STATION_KEY_URLID = "urlid";
 	
 	private static final String TRAIN_TABLE_NAME = "trains";
-	
+
 	private static final String TRAINEVENT_TABLE_NAME = "trainevents";
+
+	private static final String TRAINEVENT_KEY_TIME = "time";
+	private static final String TRAINEVENT_KEY_STATION = "station";
+	private static final String TRAINEVENT_KEY_TRACK = "track";
+	private static final String TRAINEVENT_KEY_NUMBER = "number";
+	private static final String TRAINEVENT_KEY_DELAY = "delay";
+	private static final String TRAINEVENT_KEY_EXTRA = "extra";
+	private static final String TRAINEVENT_KEY_TIMESTAMP = "timestamp";
+	
+	private DateFormat df = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT, java.util.Locale.GERMANY);
 	
     private static final String DATABASE_CREATE =
         "create table stations (_id integer primary key autoincrement, " +
-        "name text not null, urlid text not null);" + 
+        "name text not null, urlid text not null)";
+    private static final String DATABASE_CREATE_2 =  
         "create table trains (_id integer primary key autoincrement, " + 
-        "track, number, destination, time);" + 
+        "track, number, destination, time)";
+    private static  final String DATABASE_CREATE_3 =
 	    "create table trainevents(_id integer primary key autoincrement, " + 
-	    "station, time, track, number);";
+	    "station, time, track, number, delay, extra, timestamp)";
     
-    
-    //Trains are identified by number
-    //Trainevents are identified by train and station? Time, track is mutable.
+    //Trainevents are identified by train and station? Time, track, delay, extra is mutable.
+    public long addTrainEvent(String station, Date time, String track, int number, Date delay, String extra)
+    {
+    	Log.v(Tag, "Add " + station + " " + time);
+    	
+    	long t = System.currentTimeMillis();
+    	if(getTrainEvent(station, number) != null) {
+        	Log.v(Tag, "Took3 " + (System.currentTimeMillis() - t));
+    		Log.v(Tag, "Found already!");
+    		return -1;
+    	}
+    	
+    	Log.v(Tag, "Took " + (System.currentTimeMillis() - t));
+    	t = System.currentTimeMillis();
+    	
+		ContentValues cv = new ContentValues();
+		cv.put(TRAINEVENT_KEY_STATION, station);
+		cv.put(TRAINEVENT_KEY_TIME, df.format(time));
+		cv.put(TRAINEVENT_KEY_TRACK, track);
+		cv.put(TRAINEVENT_KEY_NUMBER, number);
+		if(delay != null) {
+			cv.put(TRAINEVENT_KEY_DELAY, df.format(delay));
+		} else {
+			cv.putNull(TRAINEVENT_KEY_DELAY);
+		}
+		cv.put(TRAINEVENT_KEY_EXTRA, extra);
+		cv.put(TRAINEVENT_KEY_TIMESTAMP, new Date().toString());
+		
+		long status = db.insert(TRAINEVENT_TABLE_NAME, null, cv);
 
+		Log.v(Tag, "Took2 " + (System.currentTimeMillis() - t));
+		
+		return status;
+    }
+    
+    public TrainEvent getTrainEvent(String station, int number)
+    {
+    	if(station == null) {
+    		return  null;
+    	}
+    	
+    	Log.v(Tag, "Trying to find trainevent " + station + " " + number);
+    	//Cursor c = db.rawQuery("select time, extra, delay from trainevents where station = ? and number = " + Integer.toString(number), new String[]{station});
+		Cursor c = db.query(TRAINEVENT_TABLE_NAME,
+			new String[] { 	TRAINEVENT_KEY_TIME, 
+							TRAINEVENT_KEY_EXTRA,
+							TRAINEVENT_KEY_DELAY }, 
+			TRAINEVENT_KEY_NUMBER + "=" + number + " AND " + TRAINEVENT_KEY_STATION + "= ?", 
+			new String[]{station} , null, null, null);
+    	Log.v(Tag, "Numresults: " + c.getCount());
+    	c.move(1);
+		if(!c.isAfterLast() && !c.isBeforeFirst())
+		{
+			TrainEvent te = new TrainEvent(null);
+			te.setArrival(StationScraper.parseTime(c.getString(1)));
+			
+			return te;
+		}
+
+		Log.v(Tag, "Found none");
+
+		return null;
+    }
+    
 	private DBHelper helper = null;
 	private SQLiteDatabase db = null;
 	
 	public DBAdapter(Context ctx)
 	{
-		this.context = ctx;
 		helper = new DBHelper(ctx);
 	}
 	
@@ -52,8 +127,6 @@ public class DBAdapter {
 	{
 		Log.i(Tag, "opening db");
 		db = helper.getWritableDatabase();
-		Log.v(Tag, "Number of stations: " + getNumberOfStations());
-		
 		
 		return this;
 	}
@@ -88,9 +161,6 @@ public class DBAdapter {
 		cv.put(STATION_KEY_URLID, urlid);
 		
 		long status = db.insert(STATION_TABLE_NAME, null, cv);
-		
-		Log.v(Tag, "Path to db: " + db.getPath() + " " + db.getSyncedTables().size());
-		
 		
 		return status;
 	}
@@ -148,6 +218,8 @@ public class DBAdapter {
 		public void onCreate(SQLiteDatabase db)
 		{
             db.execSQL(DATABASE_CREATE);
+            db.execSQL(DATABASE_CREATE_2);
+            db.execSQL(DATABASE_CREATE_3);
 		}
 
 		@Override

@@ -234,7 +234,7 @@ public class StationListActivity extends ListActivity {
 
 	private void gotoStation(String stationName, String url) {
 		Intent i = new Intent("se.sandos.android.delayed.Station", null, getApplicationContext(), StationActivity.class);
-		i.putExtra("stationname", stationName);
+		i.putExtra("name", stationName);
 		i.putExtra("url", url);
 		Log.i(Tag, "Url: " + url + " Name: " + stationName);
 		startActivity(i);

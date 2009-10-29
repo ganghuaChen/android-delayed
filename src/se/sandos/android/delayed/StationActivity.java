@@ -84,6 +84,8 @@ public class StationActivity extends ListActivity {
 			Log.v(Tag, "Te: " + m);
 			listContent.add(m);
 			
+			Delayed.getDb(getApplicationContext()).addTrainEvent(te.getStation().getName(), te.getArrivalDate(), te.getTrack(), te.getNumber(), te.getDelayedDate(), te.getExtra());
+			
 			if(sa == null) {
 				SimpleAdapter.ViewBinder vb = new SimpleAdapter.ViewBinder(){
 
@@ -131,6 +133,7 @@ public class StationActivity extends ListActivity {
 	}
 
 	private void fetchList() {
+		Log.v(Tag, "Name of station: " + name);
 		final String url = this.url;
 		final String name = this.name;
 
@@ -160,18 +163,20 @@ public class StationActivity extends ListActivity {
 	
 	private void clearList()
 	{
-		runOnUiThread(new Runnable(){
-			public void run() {
-				listContent.clear();
-				
-				if(sa == null) {
-					sa = new SimpleAdapter(getApplicationContext(), listContent, R.layout.stationrow, new String[]{"name"}, new int[]{R.id.StationName});
-					setListAdapter(sa);
+		if(listContent != null) {
+			runOnUiThread(new Runnable(){
+				public void run() {
+					listContent.clear();
+					
+					if(sa == null) {
+						sa = new SimpleAdapter(getApplicationContext(), listContent, R.layout.stationrow, new String[]{"name"}, new int[]{R.id.StationName});
+						setListAdapter(sa);
+					}
+					
+					sa.notifyDataSetInvalidated();
 				}
-				
-				sa.notifyDataSetInvalidated();
-			}
-		});
+			});
+		}
 	}
 
 	

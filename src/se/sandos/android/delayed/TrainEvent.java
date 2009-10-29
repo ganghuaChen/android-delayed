@@ -17,6 +17,7 @@ public class TrainEvent {
 	private String altDest;
 	private Station destination;
 	private Station station;
+
 	private int id = -1;
 	private String track;
 	private Date arrival;
@@ -25,8 +26,6 @@ public class TrainEvent {
 	private DateFormat df = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT, java.util.Locale.GERMANY);
 	private String url;
 	private StringBuffer sb;
-	
-	
 	
 	public StringBuffer getStringBuffer()
 	{
@@ -38,10 +37,6 @@ public class TrainEvent {
 	
 	private boolean delimiterSeen = false;
 	private boolean done = false;
-	
-	public TrainEvent()
-	{
-	}
 	
 	public int getNumber()
 	{
@@ -165,6 +160,10 @@ public class TrainEvent {
 			sb.append(df.format(arrival));
 		}
 		return sb.toString();
+	}
+
+	public Station getStation() {
+		return station;
 	}
 
 }

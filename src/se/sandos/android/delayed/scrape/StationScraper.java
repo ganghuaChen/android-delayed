@@ -65,7 +65,7 @@ public class StationScraper extends Scraper<TrainEvent, Object[]> {
 				events.add(te);
 				
 				if(mListener != null) {
-	 				Log.v(Tag, "Sending trainevent: " + te);
+	 				Log.v(Tag, "Sending trainevent: " + te + " " + te.getStation().getName());
 					mListener.onPartialResult(te);
 				} else {
 					Log.w(Tag, "Parsing, but nobody listening?");
@@ -176,7 +176,7 @@ public class StationScraper extends Scraper<TrainEvent, Object[]> {
 		return false;
 	}
 
-	private Date parseTime(String arrival) {
+	public static Date parseTime(String arrival) {
 		DateFormat df = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT, java.util.Locale.GERMANY);
 		Date dd = null;
 		try {

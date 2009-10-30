@@ -3,8 +3,10 @@ package se.sandos.android.delayed.db;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import se.sandos.android.delayed.TrainEvent;
 import se.sandos.android.delayed.scrape.ScrapePool;
@@ -52,35 +54,40 @@ public class DBAdapter {
 	    "create table trainevents(_id integer primary key autoincrement, " + 
 	    "station, time, track, number, delay, extra, timestamp)";
     
-    //Trainevents are identified by train and station? Time, track, delay, extra is mutable.
-    public long addTrainEvent(final String station, final Date time, final String track, final int number, final Date delay, final String extra)
-    {
+
+	public void addTrainEvents(final List<TrainEvent> trainevents) {
     	ScrapePool.addJob(new Runnable(){
     		public void run()
     		{
     			Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-    			addTrainEventImpl(station, time, track, number, delay, extra);
+    			long s = System.currentTimeMillis();
+    			
+    			String station = trainevents.get(0).getStation().getName();
+    			int[] numbers = new int[trainevents.size()];
+    			int index = 0;
+    			for(TrainEvent te : trainevents) {
+    				numbers[index++] = te.getNumber();
+    			}
+    			TrainEvent[] events = getTrainEvent(station, numbers);
+    			
+    			Set<Integer> e = new HashSet<Integer>();
+    			for(int i=0; i<events.length; i++) {
+    				e.add(Integer.valueOf(events[i].getNumber()));
+    			}
+    
+    			for(TrainEvent te : trainevents) {
+    				if(!e.contains(Integer.valueOf(te.getNumber()))) {
+    					addTrainEventImpl(te.getStation().getName(), te.getArrivalDate(), te.getTrack(), te.getNumber(), te.getDelayedDate(), te.getExtra());
+    				}
+    			}
+    			Log.v(Tag, "Took " + (System.currentTimeMillis()-s));
     		}
     	});
-    	
-    	return -1;
-    }
+	}
     
     //Trainevents are identified by train and station? Time, track, delay, extra is mutable.
     public long addTrainEventImpl(String station, Date time, String track, int number, Date delay, String extra)
     {
-    	Log.v(Tag, "Add " + station + " " + time);
-    	
-    	long t = System.currentTimeMillis();
-    	if(getTrainEvent(station, number) != null) {
-        	Log.v(Tag, "Took3 " + (System.currentTimeMillis() - t));
-    		Log.v(Tag, "Found already!");
-    		return -1;
-    	}
-
-    	Log.v(Tag, "Took " + (System.currentTimeMillis() - t));
-    	t = System.currentTimeMillis();
-    	
 		ContentValues cv = new ContentValues();
 		cv.put(TRAINEVENT_KEY_STATION, station);
 		cv.put(TRAINEVENT_KEY_TIME, df.format(time));
@@ -96,40 +103,59 @@ public class DBAdapter {
 		
 		long status = db.insert(TRAINEVENT_TABLE_NAME, null, cv);
 
-		Log.v(Tag, "Took2 " + (System.currentTimeMillis() - t));
-		
 		return status;
     }
     
-    public TrainEvent getTrainEvent(String station, int number)
+    public TrainEvent[] getTrainEvent(String station, int[] numbers)
     {
     	if(station == null) {
     		return  null;
     	}
     	
-    	Log.v(Tag, "Trying to find trainevent " + station + " " + number);
+    	//Log.v(Tag, "Trying to find trainevent " + station + " " + number);
     	//Cursor c = db.rawQuery("select time, extra, delay from trainevents where station = ? and number = " + Integer.toString(number), new String[]{station});
 		Cursor c = db.query(TRAINEVENT_TABLE_NAME,
 			new String[] { 	TRAINEVENT_KEY_TIME, 
 							TRAINEVENT_KEY_EXTRA,
-							TRAINEVENT_KEY_DELAY }, 
-			TRAINEVENT_KEY_NUMBER + "=" + number + " AND " + TRAINEVENT_KEY_STATION + "= ?", 
+							TRAINEVENT_KEY_DELAY, 
+							TRAINEVENT_KEY_NUMBER}, 
+			TRAINEVENT_KEY_NUMBER + " IN(" + expand(numbers) + ") AND " + TRAINEVENT_KEY_STATION + "= ?", 
 			new String[]{station} , null, null, null);
-    	Log.v(Tag, "Numresults: " + c.getCount());
-    	c.move(1);
+		c.move(1);
+    	TrainEvent[] events = new TrainEvent[c.getCount()];
 		if(!c.isAfterLast() && !c.isBeforeFirst())
 		{
-			TrainEvent te = new TrainEvent(null);
-			te.setArrival(StationScraper.parseTime(c.getString(1)));
+			int index = 0;
+			while(!c.isAfterLast()) {
+				TrainEvent te = new TrainEvent(null);
+				te.setArrival(StationScraper.parseTime(c.getString(0)));
+				te.setId(c.getInt(3));
+				events[index++] = te;
+				c.move(1);
+			}
+			
 			c.close();
-			return te;
+			return events;
 		}
 
 		Log.v(Tag, "Found none");
 		c.close();
-		return null;
+		return new TrainEvent[0];
     }
     
+	private String expand(int[] numbers) {
+		StringBuffer sb = new StringBuffer();
+		
+		for(int i=0; i<numbers.length; i++) {
+			sb.append(numbers[i]);
+			if(i < (numbers.length - 1)) {
+				sb.append(", ");
+			}
+		}
+		
+		return sb.toString();
+	}
+
 	private DBHelper helper = null;
 	private SQLiteDatabase db = null;
 	
@@ -184,6 +210,7 @@ public class DBAdapter {
 	{
 		Cursor c = db.rawQuery("delete from " + STATION_TABLE_NAME, null);
 		c.move(1);
+		c.close();
 	}
 	
 	public String getUrl(String stationName) 
@@ -242,4 +269,5 @@ public class DBAdapter {
 		}
 		
 	}
+
 }

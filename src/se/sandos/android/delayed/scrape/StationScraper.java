@@ -74,6 +74,9 @@ public class StationScraper extends Scraper<TrainEvent, Object[]> {
 				te = new TrainEvent(new Station(mName, mUrl));
 			}
 		}
+		if(mListener != null) {
+			mListener.onFinished(null);
+		}
 	}
 	
 	public boolean parse(TrainEvent te, final String html)

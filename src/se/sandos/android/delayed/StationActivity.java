@@ -31,6 +31,8 @@ public class StationActivity extends ListActivity {
 	private String url;
 	private String name;
 	
+	private List<TrainEvent> trainevents = new ArrayList<TrainEvent>();
+	
 	private Handler mHandler = new Handler() {
 		public void handleMessage(final Message msg) {
 			runOnUiThread(new Runnable(){
@@ -67,6 +69,8 @@ public class StationActivity extends ListActivity {
 			
 			TrainEvent te  = (TrainEvent) msg.obj;
 			
+			trainevents.add(te);
+			
 			if(listContent == null) {
 				listContent = new ArrayList<Map<String, String>>();
 			}
@@ -82,8 +86,6 @@ public class StationActivity extends ListActivity {
 			m.put("extra", te.getExtra());
 			Log.v(Tag, "Te: " + m);
 			listContent.add(m);
-			
-			Delayed.getDb(getApplicationContext()).addTrainEvent(te.getStation().getName(), te.getArrivalDate(), te.getTrack(), te.getNumber(), te.getDelayedDate(), te.getExtra());
 			
 			boolean needInvalidate = false;
 			if(sa == null) {
@@ -144,8 +146,14 @@ public class StationActivity extends ListActivity {
 		ScraperHelper.scrapeStation(url, name, new ScrapeListener<TrainEvent, Object[]>(){
 
 			public void onFinished(Object[] result) {
-				//In this case, we "abuse" this method and use it for mending previously unknown destinations
-				mHandler.dispatchMessage(Message.obtain(mHandler, StationScraper.MSG_DEST, result));
+				if(result == null) {
+					//this actually means finished!
+					Delayed.getDb(getApplicationContext()).addTrainEvents(trainevents);
+					//Delayed.getDb(getApplicationContext()).addTrainEvent(te.getStation().getName(), te.getArrivalDate(), te.getTrack(), te.getNumber(), te.getDelayedDate(), te.getExtra());
+				} else {
+					//In this case, we "abuse" this method and use it for mending previously unknown destinations
+					mHandler.dispatchMessage(Message.obtain(mHandler, StationScraper.MSG_DEST, result));
+				}
 			}
 
 			public void onPartialResult(TrainEvent result) {
@@ -154,6 +162,7 @@ public class StationActivity extends ListActivity {
 
 			public void onRestart() {
 				// TODO Auto-generated method stub
+				trainevents.clear();
 			}
 		});
 	}

@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import se.sandos.android.delayed.TrainEvent;
+import se.sandos.android.delayed.scrape.ScrapePool;
 import se.sandos.android.delayed.scrape.StationScraper;
 import android.content.ContentValues;
 import android.content.Context;
@@ -54,11 +55,13 @@ public class DBAdapter {
     //Trainevents are identified by train and station? Time, track, delay, extra is mutable.
     public long addTrainEvent(final String station, final Date time, final String track, final int number, final Date delay, final String extra)
     {
-    	new Thread() {
-    		public void run() {
+    	ScrapePool.addJob(new Runnable(){
+    		public void run()
+    		{
+    			Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
     			addTrainEventImpl(station, time, track, number, delay, extra);
     		}
-    	}.start();
+    	});
     	
     	return -1;
     }
@@ -118,12 +121,12 @@ public class DBAdapter {
 		{
 			TrainEvent te = new TrainEvent(null);
 			te.setArrival(StationScraper.parseTime(c.getString(1)));
-			
+			c.close();
 			return te;
 		}
 
 		Log.v(Tag, "Found none");
-
+		c.close();
 		return null;
     }
     

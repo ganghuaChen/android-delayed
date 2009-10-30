@@ -38,6 +38,7 @@ public abstract class Scraper<T, U> {
 	 */
 	public void scrape(int retries)
 	{
+		Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
 		int r = 0;
 		retryDelay = MIN_DELAY;
 		while (true) {

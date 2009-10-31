@@ -20,6 +20,11 @@
 				<action android:name="se.sandos.android.delayed.Station"></action>
 			</intent-filter>
 		</activity>
+		<activity android:name="se.sandos.android.delayed.prefs.PreferencesActivity">
+			<intent-filter>
+				<action android:name="se.sandos.android.delayed.Prefs"></action>
+			</intent-filter>
+		</activity>
 		<receiver android:name="se.sandos.android.delayed.widget.DelayedAppWidgetProvider" android:label="XXX">
 			<intent-filter>
 				<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />

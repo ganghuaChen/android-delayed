@@ -8,10 +8,13 @@ import java.util.Map;
 import se.sandos.android.delayed.db.DBAdapter;
 import se.sandos.android.delayed.db.Station;
 import se.sandos.android.delayed.db.StationList;
+import se.sandos.android.delayed.prefs.PreferencesActivity;
 import se.sandos.android.delayed.scrape.ScrapeListener;
 import se.sandos.android.delayed.scrape.ScraperHelper;
 import android.app.ListActivity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -169,6 +172,7 @@ public class StationListActivity extends ListActivity {
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
 		menu.add(0, 1, 0, "Ladda på nytt");
+		menu.add(0, 2, 0, "Inställningar");
 		
 		return true;
 	}
@@ -176,11 +180,17 @@ public class StationListActivity extends ListActivity {
 	public boolean onOptionsItemSelected(MenuItem mi)
 	{
 		if(mi.getItemId() == 1) {
-			//Do sth
 			Log.v(Tag, "Clearing db");
 			Delayed.getDb(getApplicationContext()).clearStations();
 			clearList();
 			fetchStations();
+			
+			return true;
+		}
+		
+		if(mi.getItemId() == 2) {
+			Intent i = new Intent("se.sandos.android.delayed.Prefs", null, getApplicationContext(), PreferencesActivity.class);
+			startActivity(i);
 		}
 		
 		return true;
@@ -197,6 +207,24 @@ public class StationListActivity extends ListActivity {
 	@SuppressWarnings("unchecked")
 	public boolean onContextItemSelected(MenuItem mi)
 	{
+		if(mi.getTitle().equals("Lägg till som favorit")) {
+			AdapterContextMenuInfo cmi = (AdapterContextMenuInfo) mi.getMenuInfo();
+			Map<String, String> m = (Map) getListView().getAdapter().getItem(cmi.position);
+
+			String stationName = m.get("name");
+			String url = null;
+			if(Delayed.db != null) {
+				url = Delayed.db.getUrl(stationName);
+			}
+			
+			SharedPreferences sp = getApplicationContext().getSharedPreferences("delayedfilter", Context.MODE_WORLD_READABLE);
+			sp.edit().putString("favoriteUrl", url);
+			sp.edit().putString("favoriteName", stationName);
+			sp.edit().commit();
+			
+			
+		}
+		
 		if(mi.getTitle().equals("Kolla tidtabell")) {
 			
 			AdapterContextMenuInfo cmi = (AdapterContextMenuInfo) mi.getMenuInfo();

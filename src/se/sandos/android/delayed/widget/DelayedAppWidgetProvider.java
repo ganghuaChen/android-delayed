@@ -33,6 +33,10 @@ public class DelayedAppWidgetProvider extends AppWidgetProvider
         String url = sp.getString(PreferencesActivity.PREFS_FAV_URL, null);
         String name = sp.getString(PreferencesActivity.PREFS_FAV_NAME, null);
 
+        if(name == null || url == null) {
+            return;
+        }
+        
         long lastUp = sp.getLong("lastUpdateForStation" + name, -1);
         // Update from DB, if it is updated recently enough
         if (lastUpdate == -1 || lastUp > lastUpdate) {

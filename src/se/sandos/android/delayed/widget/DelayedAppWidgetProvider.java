@@ -46,7 +46,8 @@ public class DelayedAppWidgetProvider extends AppWidgetProvider
             
             List<TrainEvent> events = Delayed.getDb(context).getStationEvents(name);
             int index = 0;
-            List<TrainEvent> important = events.subList(events.size() - 6, events.size());
+            int startIndex = Math.max(0, events.size() - 6);
+            List<TrainEvent> important = events.subList(startIndex, events.size());
             for (TrainEvent te : important) {
                 Log.v(Tag, "Got te: " + te);
                 if (index <= 5) {
@@ -62,6 +63,11 @@ public class DelayedAppWidgetProvider extends AppWidgetProvider
                     rv.setTextViewText(getWidgetId(index, "WidgetTime"), te.toString());
                 }
                 index++;
+            }
+            
+            for(;index<=5;index++) {
+                rv.setTextViewText(getWidgetId(index, "WidgetDelay"), "");
+                rv.setTextViewText(getWidgetId(index, "WidgetTime"), "");
             }
 
         }

@@ -12,17 +12,17 @@ import se.sandos.android.delayed.db.Station;
  *
  */
 public class TrainEvent {
-	private final static String Tag = "TrainEvent";
+	//private final static String Tag = "TrainEvent";
 	
 	private String altDest;
 	private Station destination;
 	private Station station;
 
-	private int id = -1;
+	private int number = -1;
 	private String track;
-	private Date arrival;
-	private Date delayed;
 	private Date departure;
+	private Date delayed;
+	//private Date arrival;
 	private DateFormat df = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT, java.util.Locale.GERMANY);
 	private String url;
 	private StringBuffer sb;
@@ -35,12 +35,9 @@ public class TrainEvent {
 		return sb;
 	}
 	
-	private boolean delimiterSeen = false;
-	private boolean done = false;
-	
 	public int getNumber()
 	{
-		return id;
+		return number;
 	}
 	
 	public boolean hasProperDest()
@@ -98,8 +95,8 @@ public class TrainEvent {
 		return this.delayed;
 	}
 	
-	public Date getArrivalDate() {
-		return this.arrival;
+	public Date getDepartureDate() {
+		return this.departure;
 	}
 	
 	public String getDelayed()
@@ -121,8 +118,8 @@ public class TrainEvent {
 		return url;
 	}
 
-	public void setArrival(Date arrival) {
-		this.arrival = arrival;
+	public void setDeparture(Date departure) {
+		this.departure = departure;
 	}
 
 	public void setDelayed(Date delayed) {
@@ -133,9 +130,9 @@ public class TrainEvent {
 		destination = dest;
 	}
 	
-	public void setId(int id)
+	public void setNumber(int id)
 	{
-		this.id = id;
+		this.number = id;
 	}
 	
 	public void setUrl(String url)
@@ -148,16 +145,11 @@ public class TrainEvent {
 		this.track = track;
 	}
 	
-	public boolean isParsed()
-	{
-		return done;
-	}
-	
 	public String toString()
 	{
 		StringBuffer sb = new StringBuffer();
-		if(arrival != null) {
-			sb.append(df.format(arrival));
+		if(departure != null) {
+			sb.append(df.format(departure));
 		}
 		return sb.toString();
 	}

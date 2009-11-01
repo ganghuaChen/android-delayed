@@ -7,6 +7,7 @@ import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -28,6 +29,9 @@ public class StationScraper extends Scraper<TrainEvent, Object[]> {
 	
 	private String mName;
 	private String mUrl;
+	
+    private static final DateFormat df = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT, java.util.Locale.GERMANY);
+
 	
 	private boolean delimiterSeen = false;
 
@@ -88,7 +92,7 @@ public class StationScraper extends Scraper<TrainEvent, Object[]> {
 			String arrival = html.substring(0, html.indexOf(" "));
 			Date dd = null;
 			dd = parseTime(arrival);
-			te.setArrival(dd);
+			te.setDeparture(dd);
 			//Log.i(Tag, "Header for train time: " + dd);
 			
 			//also parse destination
@@ -135,7 +139,7 @@ public class StationScraper extends Scraper<TrainEvent, Object[]> {
 			String d = html.substring(startNr);
 			int endNr = d.indexOf("</a>");
 			d = d.substring(0, endNr);
-			te.setId(Integer.valueOf(d));
+			te.setNumber(Integer.valueOf(d));
 			
 			String url = html.substring(html.indexOf("href=\"") + 6);
 			final String finalUrl = url.substring(0, url.indexOf("\""));
@@ -179,16 +183,52 @@ public class StationScraper extends Scraper<TrainEvent, Object[]> {
 		return false;
 	}
 
+	/**
+	 * Parse time on the format "07:28" with some fuzz: assume all times are +/- 2 hours, including around midnight!  
+	 * @param arrival
+	 * @return
+	 */
 	public static Date parseTime(String arrival) {
-		DateFormat df = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT, java.util.Locale.GERMANY);
+	    long l = System.currentTimeMillis();
+		Calendar cal = Calendar.getInstance();
 		Date dd = null;
 		try {
 			dd = df.parse(arrival);
 		} catch (ParseException e) {
 			Log.i(Tag, "Exception parsing date: " + e.getMessage());
 		}
+		long s = System.currentTimeMillis();
+		Log.v(Tag, "Took1: " + (s-l));
 		
-		return dd;
+		Calendar d = Calendar.getInstance();
+		d.setTime(dd);
+        cal.set(Calendar.HOUR_OF_DAY, d.get(Calendar.HOUR_OF_DAY));
+        cal.set(Calendar.MINUTE, d.get(Calendar.MINUTE));
+        l = System.currentTimeMillis();
+        Log.v(Tag, "Took2: " + (l-s));
+        
+        //Compare
+        long diff = d.getTimeInMillis() - cal.getTimeInMillis(); 
+        
+        if(diff > 3600000 * 2) {
+            //Need to add or subtract one day
+            if(diff < 0) { 
+                cal.add(Calendar.DAY_OF_YEAR, -1);
+            } else {
+                cal.add(Calendar.DAY_OF_YEAR, 1);
+            }
+            Log.v(Tag, "Fixed day of time: " + cal.toString());
+        }
+		
+        s=System.currentTimeMillis();
+
+        //EXTREMELY SLOW. Do not uncomment?
+        //Log.w(Tag, "parsed time: " + cal.getTime());
+        
+        Date ret = cal.getTime();
+        Log.v(Tag, "Took3: " + (s-l));
+        
+		return ret;
 	}
 
 }

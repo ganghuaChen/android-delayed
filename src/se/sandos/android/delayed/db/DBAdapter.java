@@ -3,6 +3,7 @@ package se.sandos.android.delayed.db;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -80,12 +81,14 @@ public class DBAdapter {
     				e.add(Integer.valueOf(events[i].getNumber()));
     			}
     
+    			int count=0;
     			for(TrainEvent te : trainevents) {
     				if(!e.contains(Integer.valueOf(te.getNumber()))) {
-    					addTrainEventImpl(te.getStation().getName(), te.getArrivalDate(), te.getTrack(), te.getNumber(), te.getDelayedDate(), te.getExtra());
+    				    count++;
+    					addTrainEventImpl(te.getStation().getName(), te.getDepartureDate(), te.getTrack(), te.getNumber(), te.getDelayedDate(), te.getExtra());
     				}
     			}
-    			Log.v(Tag, "Took " + (System.currentTimeMillis()-s));
+    			Log.v(Tag, "Took " + (System.currentTimeMillis()-s) + " for " + count);
     		}
     	});
 	}
@@ -108,11 +111,18 @@ public class DBAdapter {
                 null, 
                 null);
         c.move(1);
+        Calendar cal = Calendar.getInstance();
+        String cald = cal.getTime().toString();
+        //-6 minute fuzz, arbitrary value for now
+        cal.add(Calendar.MINUTE, -6);
+        
+        Log.v(Tag, "Number of events in db: " + c.getCount());
         if (!c.isAfterLast() && !c.isBeforeFirst()) {
             while (!c.isAfterLast()) {
+                Log.v(Tag, "Looping in getTrainEvents");
                 TrainEvent te = new TrainEvent(null);
-                te.setArrival(StationScraper.parseTime(c.getString(0)));
-                te.setId(c.getInt(3));
+                te.setDeparture(StationScraper.parseTime(c.getString(0)));
+                te.setNumber(c.getInt(3));
                 String delayTimeString = c.getString(2);
                 if(delayTimeString != null) {
                     te.setDelayed(StationScraper.parseTime(c.getString(2)));
@@ -123,7 +133,20 @@ public class DBAdapter {
                     sb.setLength(0);
                     sb.append(c.getString(1));
                 }
-                res.add(te);
+
+                //Log.v(Tag, "Comparing " + te.getDepartureDate() + " " + cald);
+                long now = cal.getTimeInMillis();
+                long comp = te.getDepartureDate().getTime();
+                if(now < comp) {
+                    Log.v(Tag, "Before!");
+                }
+                //Calendar.before is broken??? Does not work for me anyway...
+                if(cal.getTimeInMillis() < te.getDepartureDate().getTime()) {
+                    if((te.getDelayedDate() == null || cal.getTimeInMillis() < te.getDelayedDate().getTime())){
+                        res.add(te);
+                    }
+                }
+                
                 c.move(1);
             }
 
@@ -177,8 +200,8 @@ public class DBAdapter {
 			int index = 0;
 			while(!c.isAfterLast()) {
 				TrainEvent te = new TrainEvent(null);
-				te.setArrival(StationScraper.parseTime(c.getString(0)));
-				te.setId(c.getInt(3));
+				te.setDeparture(StationScraper.parseTime(c.getString(0)));
+				te.setNumber(c.getInt(3));
 				events[index++] = te;
 				c.move(1);
 			}

@@ -96,6 +96,9 @@ public class StationActivity extends ListActivity {
 						if(tv.getId() == R.id.Extra) {
 							if(((String)data).length() == 0) {
 								tv.setVisibility(View.GONE);
+							} else {
+	                            tv.setText((String)data);
+                                tv.setVisibility(View.VISIBLE);
 							}
 						} else {
 							tv.setText((String)data);

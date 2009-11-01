@@ -44,7 +44,6 @@ public class StationActivity extends ListActivity {
 
 		@SuppressWarnings("unchecked")
 		private void handle(Message msg) {
-			Log.v(Tag, "Got message: " + msg.what);
 			if(msg.what == StationScraper.MSG_DEST) {
 				//Got a proper destination for some particular train. Mend.
 				Object[] vals = (Object[]) msg.obj;
@@ -76,7 +75,6 @@ public class StationActivity extends ListActivity {
 			}
 			
 			Map<String, String> m = new HashMap<String, String>();
-			Log.i(Tag, "Adding " + te.toString());
 			m.put("name", te.toString());
 			m.put("track", "Track: " + te.getTrack());
 			m.put("number", "Train #: " + Integer.toString(te.getNumber()));
@@ -84,7 +82,6 @@ public class StationActivity extends ListActivity {
 			m.put("url", te.getUrl());
 			m.put("delayed", te.getDelayed());
 			m.put("extra", te.getExtra());
-			Log.v(Tag, "Te: " + m);
 			listContent.add(m);
 			
 			boolean needInvalidate = false;
@@ -121,7 +118,6 @@ public class StationActivity extends ListActivity {
 			} else {
 				sa.notifyDataSetInvalidated();
 			}
-			Log.i(Tag, "got mesg");
 		}
 	};
 	
@@ -134,12 +130,23 @@ public class StationActivity extends ListActivity {
 		Intent i = getIntent();
 		this.url = i.getStringExtra("url");
 		this.name = i.getStringExtra("name");
+
+		setTitle("Delayed: " + name);
+		
+		Log.v(Tag, "Created stationact: " + name + " " + url + " " + this);
 		
 		fetchList();
 	}
 
+	@Override
+	public void onNewIntent(Intent intent)
+	{
+	    //This probably means the user used a launcher shortcut
+	    Log.v(Tag, "Reintenting");
+	}
+	
 	private void fetchList() {
-		Log.v(Tag, "Name of station: " + name);
+		Log.v(Tag, "Name of station: " + name + " " + url);
 		final String url = this.url;
 		final String name = this.name;
 

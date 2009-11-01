@@ -15,6 +15,7 @@ import android.app.ListActivity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -217,12 +218,14 @@ public class StationListActivity extends ListActivity {
 				url = Delayed.db.getUrl(stationName);
 			}
 			
-			SharedPreferences sp = getApplicationContext().getSharedPreferences("delayedfilter", Context.MODE_WORLD_READABLE);
-			sp.edit().putString("favoriteUrl", url);
-			sp.edit().putString("favoriteName", stationName);
-			sp.edit().commit();
-			
-			
+			SharedPreferences sp = getApplicationContext().getSharedPreferences(PreferencesActivity.PREFS_KEY, Context.MODE_APPEND | Context.MODE_PRIVATE);
+			Log.v(Tag, "Setting favorite: " + sp);
+			Editor editor = sp.edit();
+			editor.putString(PreferencesActivity.PREFS_FAV_URL, url);
+			editor.putString(PreferencesActivity.PREFS_FAV_NAME, stationName);
+			if(!editor.commit()) {
+			    Log.w(Tag, "Failed to commit!");
+			}
 		}
 		
 		if(mi.getTitle().equals("Kolla tidtabell")) {

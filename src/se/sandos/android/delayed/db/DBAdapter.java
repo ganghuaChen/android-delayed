@@ -2,6 +2,7 @@ package se.sandos.android.delayed.db;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -56,7 +57,11 @@ public class DBAdapter {
     
 
 	public void addTrainEvents(final List<TrainEvent> trainevents) {
-    	ScrapePool.addJob(new Runnable(){
+    	if(trainevents.size() == 0) {
+    	    return;
+    	}
+	    
+	    ScrapePool.addJob(new Runnable(){
     		public void run()
     		{
     			Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
@@ -85,6 +90,50 @@ public class DBAdapter {
     	});
 	}
     
+	/**
+	 * Return all trainevents for this station. Culling?
+	 * 
+	 * @param station
+	 * @return
+	 */
+    public List<TrainEvent> getStationEvents(String station)
+    {
+        ArrayList<TrainEvent> res = new ArrayList<TrainEvent>(100);
+
+        Cursor c = db.query(TRAINEVENT_TABLE_NAME, 
+                new String[] { TRAINEVENT_KEY_TIME, TRAINEVENT_KEY_EXTRA, TRAINEVENT_KEY_DELAY, TRAINEVENT_KEY_NUMBER }, 
+                TRAINEVENT_KEY_STATION + "= ?", 
+                new String[] { station }, 
+                null, 
+                null, 
+                null);
+        c.move(1);
+        if (!c.isAfterLast() && !c.isBeforeFirst()) {
+            while (!c.isAfterLast()) {
+                TrainEvent te = new TrainEvent(null);
+                te.setArrival(StationScraper.parseTime(c.getString(0)));
+                te.setId(c.getInt(3));
+                String delayTimeString = c.getString(2);
+                if(delayTimeString != null) {
+                    te.setDelayed(StationScraper.parseTime(c.getString(2)));
+                }
+                String extra = c.getString(1);
+                if(extra != null) {
+                    StringBuffer sb = te.getStringBuffer();
+                    sb.setLength(0);
+                    sb.append(c.getString(1));
+                }
+                res.add(te);
+                c.move(1);
+            }
+
+            c.close();
+            return res;
+        }
+
+        return new ArrayList<TrainEvent>();
+    }
+	
     //Trainevents are identified by train and station? Time, track, delay, extra is mutable.
     public long addTrainEventImpl(String station, Date time, String track, int number, Date delay, String extra)
     {

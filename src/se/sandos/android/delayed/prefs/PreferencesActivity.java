@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.TextView;
 
 /**
@@ -13,17 +14,21 @@ import android.widget.TextView;
  *
  */
 public class PreferencesActivity extends Activity {
-	@Override
+    private final static String Tag = "PreferencesActivity";
+
+    public static final String PREFS_FAV_NAME = "favoriteName";
+    public static final String PREFS_FAV_URL = "favoriteUrl";
+    public static final String PREFS_KEY = "delayedfilter";
+
+    @Override
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
 		
 		setContentView(R.layout.prefs);
 		
-		SharedPreferences sp = getApplicationContext().getSharedPreferences("delayedfilter", Context.MODE_WORLD_READABLE);
+		SharedPreferences sp = getApplicationContext().getSharedPreferences(PREFS_KEY, Context.MODE_APPEND | Context.MODE_PRIVATE);
 		TextView tv = (TextView) findViewById(R.id.FavoriteStation);
-		tv.setText(sp.getString("favoriteName", "NA"));
-
-
+		tv.setText(sp.getString(PREFS_FAV_NAME, "NA"));
 	}
 }

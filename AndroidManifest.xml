@@ -31,6 +31,26 @@
 			</intent-filter>
 			<meta-data android:name="android.appwidget.provider" android:resource="@xml/appwidget" />
 		</receiver>
+
+	<!--  Launcher shortcuts -->
+	<activity android:name="LauncherShortcuts" android:label="@string/shortcuts">
+		<intent-filter>
+			<action android:name="android.intent.action.MAIN" />
+			<category android:name="android.intent.category.SAMPLE_CODE" />
+		</intent-filter>
+
+	</activity>
+
+	<activity-alias android:name="CreateShortcuts"
+		android:targetActivity="LauncherShortcuts" android:label="@string/sample_shortcuts">
+
+		<intent-filter>
+			<action android:name="android.intent.action.CREATE_SHORTCUT" />
+			<category android:name="android.intent.category.DEFAULT" />
+		</intent-filter>
+
+	</activity-alias>
+		
 	</application>
 	<uses-permission android:name="android.permission.INTERNET" />
 	<uses-sdk android:minSdkVersion="3"/>

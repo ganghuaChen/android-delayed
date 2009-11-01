@@ -40,6 +40,9 @@ public class StationListActivity extends ListActivity {
 	
 	private boolean hasSeenIncomplete = false;
 	
+	//Choose station only, for home screen shortcuts
+	private boolean chooser = false;
+	
 	Handler mHandler = new Handler() {
 		public void handleMessage(Message msg) {
 			switch(msg.what) {
@@ -71,12 +74,18 @@ public class StationListActivity extends ListActivity {
 	{
 		super.onCreate(savedInstanceState);
 		
+		if(getIntent().getExtras() != null && getIntent().getExtras().containsKey("chooser")) {
+		    chooser = true;
+		}
+		
 		setContentView(R.layout.liststations);
 
-		Log.v(Tag, "Created StationList");
+		Log.v(Tag, "Created StationList ");
 
 		//Register context menu
-		registerForContextMenu(getListView());
+		if(!chooser) {
+		    registerForContextMenu(getListView());
+		}
 		
 		fetchStations();
 	}
@@ -259,7 +268,16 @@ public class StationListActivity extends ListActivity {
 			url = Delayed.db.getUrl(stationName);
 		}
 
-		gotoStation(stationName, url);
+        if (chooser) {
+            Intent i = new Intent("se.sandos.android.delayed.Station", null, getApplicationContext(), StationActivity.class);
+            i.putExtra("name", stationName);
+            i.putExtra("url", url);
+            setResult(1, i);
+            finish();
+            return;
+        } else {	        
+            gotoStation(stationName, url);
+        }
 
 	}
 

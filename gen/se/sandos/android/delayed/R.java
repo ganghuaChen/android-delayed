@@ -20,11 +20,23 @@ public final class R {
         public static final int FavoriteStation=0x7f060008;
         public static final int FavoritesLabel=0x7f060007;
         public static final int ProgressBar01=0x7f060006;
+        public static final int RelativeLayout01=0x7f06000a;
         public static final int StationName=0x7f060009;
         public static final int TNumber=0x7f060004;
         public static final int Time=0x7f060000;
         public static final int Track=0x7f060003;
-        public static final int WidgetText=0x7f06000a;
+        public static final int WidgetDelay0=0x7f06000c;
+        public static final int WidgetDelay1=0x7f06000e;
+        public static final int WidgetDelay2=0x7f060010;
+        public static final int WidgetDelay3=0x7f060012;
+        public static final int WidgetDelay4=0x7f060014;
+        public static final int WidgetDelay5=0x7f060016;
+        public static final int WidgetTime0=0x7f06000b;
+        public static final int WidgetTime1=0x7f06000d;
+        public static final int WidgetTime2=0x7f06000f;
+        public static final int WidgetTime3=0x7f060011;
+        public static final int WidgetTime4=0x7f060013;
+        public static final int WidgetTime5=0x7f060015;
     }
     public static final class layout {
         public static final int eventrow=0x7f030000;

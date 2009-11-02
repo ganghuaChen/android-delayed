@@ -19,6 +19,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 import se.sandos.android.delayed.Delayed;
 import se.sandos.android.delayed.TrainEvent;
+import se.sandos.android.delayed.db.DBAdapter;
 import se.sandos.android.delayed.db.Station;
 import se.sandos.android.delayed.scrape.ScraperHelper.Job;
 import se.sandos.android.delayed.scrape.ScraperHelper.Nameurl;
@@ -190,7 +191,8 @@ public class StationScraper extends Scraper<TrainEvent, Object[]> {
 	 */
 	public static Date parseTime(String arrival) {
 	    long l = System.currentTimeMillis();
-		Calendar cal = Calendar.getInstance();
+        Calendar now = Calendar.getInstance();
+        Calendar correctitem = Calendar.getInstance();
 		Date dd = null;
 		try {
 			dd = df.parse(arrival);
@@ -199,33 +201,34 @@ public class StationScraper extends Scraper<TrainEvent, Object[]> {
 		}
 		long s = System.currentTimeMillis();
 		Log.v(Tag, "Took1: " + (s-l));
+
+		{
+    		Calendar item = Calendar.getInstance();
+    		item.setTime(dd);
+    		
+    		correctitem.set(Calendar.HOUR_OF_DAY, item.get(Calendar.HOUR_OF_DAY));
+            correctitem.set(Calendar.MINUTE, item.get(Calendar.MINUTE));
+		}
 		
-		Calendar d = Calendar.getInstance();
-		d.setTime(dd);
-        cal.set(Calendar.HOUR_OF_DAY, d.get(Calendar.HOUR_OF_DAY));
-        cal.set(Calendar.MINUTE, d.get(Calendar.MINUTE));
         l = System.currentTimeMillis();
         Log.v(Tag, "Took2: " + (l-s));
         
         //Compare
-        long diff = d.getTimeInMillis() - cal.getTimeInMillis(); 
+        long diff = correctitem.getTimeInMillis() - now.getTimeInMillis(); 
         
+        Log.v(Tag, "Now: " + DBAdapter.SIMPLE_DATEFORMATTER.format(now.getTime()));
         if(diff > 3600000 * 2) {
-            //Need to add or subtract one day
-            if(diff < 0) { 
-                cal.add(Calendar.DAY_OF_YEAR, -1);
-            } else {
-                cal.add(Calendar.DAY_OF_YEAR, 1);
-            }
-            Log.v(Tag, "Fixed day of time: " + cal.toString());
+            //Need to add one day
+            now.add(Calendar.DAY_OF_YEAR, 1);
+            Log.v(Tag, "Fixed day of time, too big diff: " + DBAdapter.SIMPLE_DATEFORMATTER.format(correctitem.getTime()));
+        } else if(diff < -(3600000 * 2)) {
+            now.add(Calendar.DAY_OF_YEAR, -1);
+            Log.v(Tag, "Fixed day of time, too small diff: " + DBAdapter.SIMPLE_DATEFORMATTER.format(correctitem.getTime()));
         }
 		
         s=System.currentTimeMillis();
 
-        //EXTREMELY SLOW. Do not uncomment?
-        //Log.w(Tag, "parsed time: " + cal.getTime());
-        
-        Date ret = cal.getTime();
+        Date ret = correctitem.getTime();
         Log.v(Tag, "Took3: " + (s-l));
         
 		return ret;

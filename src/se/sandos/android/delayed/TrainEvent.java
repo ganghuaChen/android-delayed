@@ -118,13 +118,23 @@ public class TrainEvent {
 		return url;
 	}
 
-	public void setDeparture(Date departure) {
-		this.departure = departure;
+	public void setDeparture(Long departure) {
+		this.departure = new Date(departure);
 	}
 
+    public void setDeparture(Date departure)
+    {
+        this.departure = departure;
+    }
+	
 	public void setDelayed(Date delayed) {
 		this.delayed = delayed;
 	}
+
+    public void setDelayed(Long delayed)
+    {
+        this.delayed = new Date(delayed);
+    }
 	
 	public void setDestination(Station dest) {
 		destination = dest;

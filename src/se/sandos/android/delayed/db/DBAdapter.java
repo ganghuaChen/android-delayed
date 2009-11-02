@@ -45,6 +45,7 @@ public class DBAdapter {
 	private static final String TRAINEVENT_KEY_TIMESTAMP = "timestamp";
 	
 	private DateFormat df = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT, java.util.Locale.GERMANY);
+    public static final DateFormat SIMPLE_DATEFORMATTER = SimpleDateFormat.getDateTimeInstance();
 	
     private static final String DATABASE_CREATE =
         "create table stations (_id integer primary key autoincrement, " +
@@ -104,7 +105,7 @@ public class DBAdapter {
         ArrayList<TrainEvent> res = new ArrayList<TrainEvent>(100);
 
         Cursor c = db.query(TRAINEVENT_TABLE_NAME, 
-                new String[] { TRAINEVENT_KEY_TIME, TRAINEVENT_KEY_EXTRA, TRAINEVENT_KEY_DELAY, TRAINEVENT_KEY_NUMBER }, 
+                new String[] { TRAINEVENT_KEY_TIME, TRAINEVENT_KEY_EXTRA, TRAINEVENT_KEY_DELAY, TRAINEVENT_KEY_NUMBER, "_id"}, 
                 TRAINEVENT_KEY_STATION + "= ?", 
                 new String[] { station }, 
                 null, 
@@ -121,14 +122,12 @@ public class DBAdapter {
             while (!c.isAfterLast()) {
                 Log.v(Tag, "Looping in getTrainEvents");
                 TrainEvent te = new TrainEvent(null);
-                te.setDeparture(StationScraper.parseTime(c.getString(0)));
+                te.setDeparture(c.getLong(0));
                 te.setNumber(c.getInt(3));
-                String delayTimeString = c.getString(2);
-                if(delayTimeString != null) {
-                    te.setDelayed(StationScraper.parseTime(c.getString(2)));
+                if(!c.isNull(2)) {
+                    te.setDelayed(c.getLong(2));
                 }
-                String extra = c.getString(1);
-                if(extra != null) {
+                if(!c.isNull(1)) {
                     StringBuffer sb = te.getStringBuffer();
                     sb.setLength(0);
                     sb.append(c.getString(1));
@@ -136,15 +135,19 @@ public class DBAdapter {
 
                 //Log.v(Tag, "Comparing " + te.getDepartureDate() + " " + cald);
                 long now = cal.getTimeInMillis();
-                long comp = te.getDepartureDate().getTime();
-                if(now < comp) {
+                long item = c.getLong(0);
+                Log.v(Tag, "Long: " + item + " " + SIMPLE_DATEFORMATTER.format(te.getDepartureDate()) + " " + cal.getTimeInMillis());
+
+                if(now < item) {
                     Log.v(Tag, "Before!");
                 }
                 //Calendar.before is broken??? Does not work for me anyway...
-                if(cal.getTimeInMillis() < te.getDepartureDate().getTime()) {
-                    if((te.getDelayedDate() == null || cal.getTimeInMillis() < te.getDelayedDate().getTime())){
-                        res.add(te);
-                    }
+                if(now < item && (te.getDelayedDate() == null || now < te.getDelayedDate().getTime())){
+                    res.add(te);
+                } else {
+                    //Remove it
+                    Log.v(Tag, "Removing " + (now-item) + " " + SIMPLE_DATEFORMATTER.format(te.getDepartureDate()) + " " + SIMPLE_DATEFORMATTER.format(new Date(now)));
+                    db.execSQL("delete from trainevents where _id = " + c.getInt(4), new Object[0]);
                 }
                 
                 c.move(1);
@@ -162,11 +165,11 @@ public class DBAdapter {
     {
 		ContentValues cv = new ContentValues();
 		cv.put(TRAINEVENT_KEY_STATION, station);
-		cv.put(TRAINEVENT_KEY_TIME, df.format(time));
+		cv.put(TRAINEVENT_KEY_TIME, time.getTime());
 		cv.put(TRAINEVENT_KEY_TRACK, track);
 		cv.put(TRAINEVENT_KEY_NUMBER, number);
 		if(delay != null) {
-			cv.put(TRAINEVENT_KEY_DELAY, df.format(delay));
+			cv.put(TRAINEVENT_KEY_DELAY, delay.getTime());
 		} else {
 			cv.putNull(TRAINEVENT_KEY_DELAY);
 		}
@@ -200,7 +203,7 @@ public class DBAdapter {
 			int index = 0;
 			while(!c.isAfterLast()) {
 				TrainEvent te = new TrainEvent(null);
-				te.setDeparture(StationScraper.parseTime(c.getString(0)));
+				te.setDeparture(c.getLong(0));
 				te.setNumber(c.getInt(3));
 				events[index++] = te;
 				c.move(1);

@@ -33,6 +33,8 @@ public class DelayedAppWidgetProvider extends AppWidgetProvider
         String url = sp.getString(PreferencesActivity.PREFS_FAV_URL, null);
         String name = sp.getString(PreferencesActivity.PREFS_FAV_NAME, null);
 
+        Log.v(Tag, "URl/name: " + name + "/" + url);
+        
         if(name == null || url == null) {
             return;
         }
@@ -46,11 +48,9 @@ public class DelayedAppWidgetProvider extends AppWidgetProvider
             
             List<TrainEvent> events = Delayed.getDb(context).getStationEvents(name);
             int index = 0;
-            int startIndex = Math.max(0, events.size() - 6);
-            List<TrainEvent> important = events.subList(startIndex, events.size());
-            for (TrainEvent te : important) {
+            for (TrainEvent te : events) {
                 Log.v(Tag, "Got te: " + te);
-                if (index <= 5) {
+                if (index <= 4) {
                     Log.v(Tag, "Setting text: " + index);
                     
                     String delay = te.getDelayed();
@@ -72,18 +72,18 @@ public class DelayedAppWidgetProvider extends AppWidgetProvider
 
         }
 
+        Intent intent = new Intent("se.sandos.android.delayed.Station", null, context, StationActivity.class);
+        intent.putExtra("name", name);
+        intent.putExtra("url", url);
+        
+        PendingIntent pi = PendingIntent.getActivity(context, 0, intent, 0);
+        for(int j=0; j<=5; j++) {
+            rv.setOnClickPendingIntent(getWidgetId(j, "WidgetTime"), pi);
+            rv.setOnClickPendingIntent(getWidgetId(j, "WidgetDelay"), pi);
+        }
+        
         for (int i = 0; i < appWidgetIds.length; i++) {
             Log.v(Tag, "Updating id " + appWidgetIds[i]);
-            
-            Intent intent = new Intent("se.sandos.android.delayed.Station", null, context, StationActivity.class);
-            intent.putExtra("name", name);
-            intent.putExtra("url", url);
-            
-            PendingIntent pi = PendingIntent.getActivity(context, 0, intent, 0);
-            for(int j=0; j<=5; j++) {
-                rv.setOnClickPendingIntent(getWidgetId(j, "WidgetTime"), pi);
-                rv.setOnClickPendingIntent(getWidgetId(j, "WidgetDelay"), pi);
-            }
             
             appWidgetManager.updateAppWidget(appWidgetIds[i], rv);
         }

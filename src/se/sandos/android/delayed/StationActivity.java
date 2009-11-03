@@ -155,6 +155,8 @@ public class StationActivity extends ListActivity {
 	public void onNewIntent(Intent intent)
 	{
 	    //This probably means the user used a launcher shortcut
+		//Only if we set ourselves to singletask/singletop
+		//We want one activity per station, really.
 	    Log.v(Tag, "Reintenting");
 	}
 	
@@ -188,7 +190,6 @@ public class StationActivity extends ListActivity {
 			}
 
 			public void onRestart() {
-				// TODO Auto-generated method stub
 				trainevents.clear();
 			}
 		});

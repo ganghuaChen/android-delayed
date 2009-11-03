@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import se.sandos.android.delayed.db.DBAdapter;
 import se.sandos.android.delayed.scrape.ScrapeListener;
 import se.sandos.android.delayed.scrape.ScraperHelper;
 import se.sandos.android.delayed.scrape.StationScraper;
@@ -149,6 +150,8 @@ public class StationActivity extends ListActivity {
 	}
 	
 	private void fetchList() {
+		Delayed.getDb(getApplicationContext());
+		
 		Log.v(Tag, "Name of station: " + name + " " + url);
 		final String url = this.url;
 		final String name = this.name;

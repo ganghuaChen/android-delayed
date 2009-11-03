@@ -76,6 +76,8 @@ public class DelayedAppWidgetProvider extends AppWidgetProvider
         intent.putExtra("name", name);
         intent.putExtra("url", url);
         
+        Log.v(Tag, "Setting pending intent to name" + name);
+        
         PendingIntent pi = PendingIntent.getActivity(context, 0, intent, 0);
         for(int j=0; j<=5; j++) {
             rv.setOnClickPendingIntent(getWidgetId(j, "WidgetTime"), pi);

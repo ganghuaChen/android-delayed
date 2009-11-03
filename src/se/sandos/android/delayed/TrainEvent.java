@@ -4,7 +4,10 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import android.util.Log;
+
 import se.sandos.android.delayed.db.Station;
+import se.sandos.android.delayed.scrape.StationScraper;
 
 /**
  * Arrival/departure from one particular station
@@ -12,7 +15,7 @@ import se.sandos.android.delayed.db.Station;
  *
  */
 public class TrainEvent {
-	//private final static String Tag = "TrainEvent";
+	private final static String Tag = "TrainEvent";
 	
 	private String altDest;
 	private Station destination;
@@ -166,6 +169,22 @@ public class TrainEvent {
 
 	public Station getStation() {
 		return station;
+	}
+
+	public void setDestinationFromString(String dest) {
+		String url = Delayed.db.getUrl(dest);
+		if(url == null) {
+			//Try adding " C"
+			url = Delayed.db.getUrl(dest + " C");
+			if(url == null) {
+				Log.w(Tag, "Could not find " + dest);
+				setAltDest(dest);
+			} else {
+				setDestination(new Station(dest + " C", url));
+			}
+		} else {
+			setDestination(new Station(dest, url));
+		}
 	}
 
 }

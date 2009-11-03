@@ -51,15 +51,15 @@ public class StationActivity extends ListActivity {
 				if(stations.size() > 0) {
 					Nameurl nu  = stations.get(stations.size()-1);
 
-					Log.i(Tag, "We got an end destination with value " + nu.name);
+					Log.i(Tag, "We got an end destination with value " + nu.name + " and name " + vals[0]);
 
 					for(Map<String, String> v : listContent) {
-						String url = v.get("url");
-						if(url != null && url.equals(vals[0])) {
-							Log.i(Tag, "found match: " + vals[0]);
+						String name = v.get("destination");
+						if(name != null && name.equals(vals[0])) {
+							Log.i(Tag, "found match: " + vals[0] + " " + nu.name);
 							v.put("destination", nu.name);
 							sa.notifyDataSetChanged();
-						}
+						} 
 					}
 				}
 				

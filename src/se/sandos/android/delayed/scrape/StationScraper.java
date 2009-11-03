@@ -9,7 +9,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.http.HttpResponse;
@@ -17,7 +21,6 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
-import se.sandos.android.delayed.Delayed;
 import se.sandos.android.delayed.TrainEvent;
 import se.sandos.android.delayed.db.DBAdapter;
 import se.sandos.android.delayed.db.Station;
@@ -33,7 +36,8 @@ public class StationScraper extends Scraper<TrainEvent, Object[]> {
 	
     private static final DateFormat df = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT, java.util.Locale.GERMANY);
 
-	
+    private static final Map<String, String> nameMap = new HashMap<String, String>();
+    
 	private boolean delimiterSeen = false;
 
 	public final static int MSG_DEST = 1;
@@ -102,19 +106,7 @@ public class StationScraper extends Scraper<TrainEvent, Object[]> {
 			Log.v(Tag, "Dest: " + dest);
 			
 			//Try to find it in db
-			String url = Delayed.db.getUrl(dest);
-			if(url == null) {
-				//Try adding " C"
-				url = Delayed.db.getUrl(dest + " C");
-				if(url == null) {
-					Log.w(Tag, "Could not find " + dest);
-					te.setAltDest(dest);
-				} else {
-					te.setDestination(new Station(dest + " C", url));
-				}
-			} else {
-				te.setDestination(new Station(dest, url));
-			}
+			te.setDestinationFromString(dest);
 			return false;
 		}
 		
@@ -145,15 +137,30 @@ public class StationScraper extends Scraper<TrainEvent, Object[]> {
 			String url = html.substring(html.indexOf("href=\"") + 6);
 			final String finalUrl = url.substring(0, url.indexOf("\""));
 			te.setUrl(finalUrl);
+			final String name = te.getDestination();
 			//XXX use listener if !foundDest
 			if(!te.hasProperDest()) {
-				Log.v(Tag, "Destination is not set, finding it");
-				ScraperHelper.queueForParse(finalUrl, new Job<List<Nameurl>>(){
-					public void run() {
-						mListener.onFinished(new Object[] {finalUrl, value});
-						//handler.sendMessage(Message.obtain(handler, MSG_DEST, new Object[] {finalUrl, value}));
+				if(nameMap.containsKey(name)) {
+					//No need to redo this...
+					Log.v(Tag, "Not redoing namemap scraping");
+
+					if(nameMap.get(name) != null) {
+						te.setDestinationFromString(nameMap.get(name));
 					}
-				});
+				} else {
+					Log.v(Tag, "Destination is not set, finding it");
+					nameMap.put(name, null);
+					ScraperHelper.queueForParse(finalUrl, new Job<List<Nameurl>>(){
+						public void run() {
+							mListener.onFinished(new Object[] {name, value});
+							//handler.sendMessage(Message.obtain(handler, MSG_DEST, new Object[] {finalUrl, value}));
+
+							if(value.size() > 0) {
+								nameMap.put(name, value.get(value.size()-1).name);
+							}
+						}
+					});
+				}
 			} else {
 				Log.v(Tag, "Destination was set");
 			}

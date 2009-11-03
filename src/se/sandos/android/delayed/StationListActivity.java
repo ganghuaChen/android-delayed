@@ -97,6 +97,10 @@ public class StationListActivity extends ListActivity {
 			Log.v(Tag, "Downloading");
 			//dialog = ProgressDialog.show(this, "Progress", "Downloading list of stations");
 			ScraperHelper.scrapeStations(new ScrapeListener<Station, ArrayList<Station>>(){
+				public void onStatus(String status) {
+					
+				}
+				
 				public void onFinished(ArrayList<Station> sl) {
 					mHandler.dispatchMessage(Message.obtain(mHandler, MSG_COMPLETELIST, new StationList(sl)));
 				}

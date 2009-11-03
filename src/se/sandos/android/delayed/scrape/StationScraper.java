@@ -10,10 +10,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.http.HttpResponse;
@@ -60,6 +58,7 @@ public class StationScraper extends Scraper<TrainEvent, Object[]> {
 		Log.i(Tag, "fetching http");
 		HttpResponse hr = hc.execute(hg);
 		Log.i(Tag, "Got page: " + hr.getStatusLine());
+		mListener.onStatus("got page, status " + hr.getStatusLine());
 		InputStream is = hr.getEntity().getContent();
 		InputStreamReader isr = new InputStreamReader(is);
 		BufferedReader br = new BufferedReader(isr);
@@ -68,7 +67,9 @@ public class StationScraper extends Scraper<TrainEvent, Object[]> {
 		//XXX: Move this out to scraper
 		TrainEvent te = new TrainEvent(new Station(mName, mUrl));
 		delimiterSeen = false;
+		int line = 0;
 		while ((s = br.readLine()) != null) {
+			mListener.onStatus("pl: " + line++);
 			String unescaped = StringEscapeUtils.unescapeHtml(s);
 			if(parse(te, unescaped)) {
 				events.add(te);

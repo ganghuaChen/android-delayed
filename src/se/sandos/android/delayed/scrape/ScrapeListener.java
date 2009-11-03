@@ -1,6 +1,8 @@
 package se.sandos.android.delayed.scrape;
 
 public interface ScrapeListener<T, U> {
+	public static final int MSG_STATUS = 10;
+	
 	/**
 	 * Partial result from scrape
 	 * @param result
@@ -18,4 +20,10 @@ public interface ScrapeListener<T, U> {
 	 * @param result
 	 */
 	public void onFinished(U result);
+	
+	/**
+	 * A status message about progress
+	 * @param status
+	 */
+	public void onStatus(String status);
 }

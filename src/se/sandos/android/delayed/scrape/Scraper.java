@@ -55,6 +55,7 @@ public abstract class Scraper<T, U> {
 				Log.d(Tag, "Failed scrape: " + e.getMessage(), e);
 				retryDelay();
 				if(mListener != null) {
+					mListener.onStatus(e.getMessage() + " retry:" + r + "/" + retries);
 					mListener.onRestart();
 				}
 			}

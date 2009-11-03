@@ -65,6 +65,15 @@ public class StationActivity extends ListActivity {
 				}
 				
 				return;
+			} 
+			
+			if(msg.what == ScrapeListener.MSG_STATUS) {
+				StringBuffer sb = new StringBuffer();
+				sb.append("Delayed: ").append(name).append(" ");
+				sb.append(msg.obj);
+				setTitle(sb.toString());
+				
+				return;
 			}
 			
 			TrainEvent te  = (TrainEvent) msg.obj;
@@ -157,12 +166,17 @@ public class StationActivity extends ListActivity {
 		final String name = this.name;
 
 		ScraperHelper.scrapeStation(url, name, new ScrapeListener<TrainEvent, Object[]>(){
-
+			public void onStatus(String status) {
+				mHandler.dispatchMessage(Message.obtain(mHandler, ScrapeListener.MSG_STATUS, status));
+			}
+			
 			public void onFinished(Object[] result) {
 				if(result == null) {
 					//this actually means finished!
 					Delayed.getDb(getApplicationContext()).addTrainEvents(trainevents);
-					//Delayed.getDb(getApplicationContext()).addTrainEvent(te.getStation().getName(), te.getArrivalDate(), te.getTrack(), te.getNumber(), te.getDelayedDate(), te.getExtra());
+
+					//Send ourselves a status-message
+					mHandler.dispatchMessage(Message.obtain(mHandler, ScrapeListener.MSG_STATUS, "done"));
 				} else {
 					//In this case, we "abuse" this method and use it for mending previously unknown destinations
 					mHandler.dispatchMessage(Message.obtain(mHandler, StationScraper.MSG_DEST, result));

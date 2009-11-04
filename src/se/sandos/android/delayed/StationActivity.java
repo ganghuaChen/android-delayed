@@ -26,6 +26,8 @@ import android.widget.TextView;
 public class StationActivity extends ListActivity {
 	private static final String Tag = "StationActivity";
 
+	private static final boolean TRACE = false;
+	
 	private List<Map<String, String>> listContent = null;
 	private SimpleAdapter sa = null;
 	
@@ -99,6 +101,10 @@ public class StationActivity extends ListActivity {
 		setTitle("Delayed: " + name);
 		
 		Log.v(Tag, "Created stationact: " + name + " " + url + " " + this);
+
+		if(TRACE) {
+		    Debug.startMethodTracing("list");
+		}
 		
 		fetchList();
 	}
@@ -229,6 +235,10 @@ public class StationActivity extends ListActivity {
 
 					//Send ourselves a status-message
 					mHandler.dispatchMessage(Message.obtain(mHandler, ScrapeListener.MSG_STATUS, "done"));
+					
+					if(TRACE) {
+					    Debug.stopMethodTracing();
+					}
 				} else {
 					//In this case, we "abuse" this method and use it for mending previously unknown destinations
 					mHandler.dispatchMessage(Message.obtain(mHandler, StationScraper.MSG_DEST, result));

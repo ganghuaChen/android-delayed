@@ -24,7 +24,7 @@ public class TrainEvent {
 	private Date departure;
 	private Date delayed;
 	//private Date arrival;
-	private DateFormat df = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT, java.util.Locale.GERMANY);
+	private static DateFormat df = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT, java.util.Locale.GERMANY);
 	private String url;
 	private StringBuffer sb;
 	

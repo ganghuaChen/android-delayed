@@ -78,60 +78,11 @@ public class StationActivity extends ListActivity {
 			
 			TrainEvent te  = (TrainEvent) msg.obj;
 			
-			trainevents.add(te);
-			
-			if(listContent == null) {
-				listContent = new ArrayList<Map<String, String>>();
-			}
-			
-			Map<String, String> m = new HashMap<String, String>();
-			m.put("name", te.toString());
-			m.put("track", "Track: " + te.getTrack());
-			m.put("number", "Train #: " + Integer.toString(te.getNumber()));
-			m.put("destination", te.getDestination());
-			m.put("url", te.getUrl());
-			m.put("delayed", te.getDelayed());
-			m.put("extra", te.getExtra());
-			listContent.add(m);
-			
-			boolean needInvalidate = false;
-			if(sa == null) {
-				needInvalidate = true;
-				SimpleAdapter.ViewBinder vb = new SimpleAdapter.ViewBinder(){
-
-					public boolean setViewValue(View view, Object data,
-							String textRepresentation) {
-						TextView tv = (TextView) view;
-						
-						if(tv.getId() == R.id.Extra) {
-							if(((String)data).length() == 0) {
-								tv.setVisibility(View.GONE);
-							} else {
-	                            tv.setText((String)data);
-                                tv.setVisibility(View.VISIBLE);
-							}
-						} else {
-							tv.setText((String)data);
-						}
-						return true;
-					}
-				};
-				
-				sa = new SimpleAdapter(getApplicationContext(), listContent, R.layout.eventrow, 
-						new String[]{"name", "destination", "track", "number", "delayed", "extra"},
-						new int[]{R.id.Time, R.id.Destination, R.id.Track, R.id.TNumber, R.id.Delayed, R.id.Extra});
-
-				sa.setViewBinder(vb);
-				
-				setListAdapter(sa);
-			}
-			
-			if(!needInvalidate) {
-				sa.notifyDataSetChanged();
-			} else {
-				sa.notifyDataSetInvalidated();
-			}
+			List<TrainEvent> evs = new ArrayList<TrainEvent>();
+			evs.add(te);
+			addEvents(evs);
 		}
+
 	};
 	
 	public void onCreate(Bundle savedInstanceState)
@@ -151,6 +102,95 @@ public class StationActivity extends ListActivity {
 		fetchList();
 	}
 
+	private void addEvents(List<TrainEvent> events) {
+		
+		if(listContent == null) {
+			listContent = new ArrayList<Map<String, String>>();
+		}
+		
+		boolean needInvalidate = false;
+		for(TrainEvent te : events) {
+			if(existsAndUpdate(te)) {
+				needInvalidate = true;
+				continue;
+			}
+			
+			trainevents.add(te);
+			Map<String, String> m = new HashMap<String, String>();
+			m.put("name", te.toString());
+			m.put("track", "Track: " + te.getTrack());
+			m.put("number", "Train #: " + Integer.toString(te.getNumber()));
+			m.put("destination", te.getDestination());
+			m.put("url", te.getUrl());
+			m.put("delayed", te.getDelayed());
+			m.put("extra", te.getExtra());
+			listContent.add(m);
+		}
+		
+		if(sa == null) {
+			needInvalidate = true;
+			SimpleAdapter.ViewBinder vb = new SimpleAdapter.ViewBinder(){
+
+				public boolean setViewValue(View view, Object data,
+						String textRepresentation) {
+					TextView tv = (TextView) view;
+					
+					if(tv.getId() == R.id.Extra) {
+						if(((String)data).length() == 0) {
+							tv.setVisibility(View.GONE);
+						} else {
+                            tv.setText((String)data);
+                            tv.setVisibility(View.VISIBLE);
+						}
+					} else {
+						tv.setText((String)data);
+					}
+					return true;
+				}
+			};
+			
+			sa = new SimpleAdapter(getApplicationContext(), listContent, R.layout.eventrow, 
+					new String[]{"name", "destination", "track", "number", "delayed", "extra"},
+					new int[]{R.id.Time, R.id.Destination, R.id.Track, R.id.TNumber, R.id.Delayed, R.id.Extra});
+
+			sa.setViewBinder(vb);
+			
+			setListAdapter(sa);
+		}
+		
+		if(!needInvalidate) {
+			sa.notifyDataSetChanged();
+		} else {
+			sa.notifyDataSetInvalidated();
+		}
+	}
+
+	
+	private boolean existsAndUpdate(TrainEvent te) {
+		if(listContent == null || listContent.size() == 0) {
+			return false;
+		}
+		
+		for(Map<String, String> m : listContent) {
+			if(m.get("number").equals("Train #: " + Integer.toString(te.getNumber()))) {
+				//Update
+				String delayed = m.get("delayed");
+				if(!delayed.equals(te.getDelayed())) {
+					m.put("delayed", te.getDelayed());
+				}
+				
+				String extra = m.get("extra");
+				if(!extra.equals(te.getExtra())) {
+					m.put("extra", te.getExtra());
+				}
+				
+				return true;
+			} 
+		}
+		
+		return false;
+	}
+
 	@Override
 	public void onNewIntent(Intent intent)
 	{
@@ -161,12 +201,22 @@ public class StationActivity extends ListActivity {
 	}
 	
 	private void fetchList() {
-		Delayed.getDb(getApplicationContext());
+		DBAdapter db = Delayed.getDb(getApplicationContext());
 		
 		Log.v(Tag, "Name of station: " + name + " " + url);
 		final String url = this.url;
 		final String name = this.name;
 
+		
+		if(listContent == null || listContent.size() == 0) {
+			//Fetch from db
+			List<TrainEvent> events = db.getStationEvents(name);
+			
+			addEvents(events);
+			trainevents.clear();
+		}
+		
+		
 		ScraperHelper.scrapeStation(url, name, new ScrapeListener<TrainEvent, Object[]>(){
 			public void onStatus(String status) {
 				mHandler.dispatchMessage(Message.obtain(mHandler, ScrapeListener.MSG_STATUS, status));

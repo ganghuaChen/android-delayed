@@ -4,10 +4,8 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-import android.util.Log;
-
 import se.sandos.android.delayed.db.Station;
-import se.sandos.android.delayed.scrape.StationScraper;
+import android.util.Log;
 
 /**
  * Arrival/departure from one particular station

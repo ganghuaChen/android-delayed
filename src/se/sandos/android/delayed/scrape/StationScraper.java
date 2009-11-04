@@ -177,7 +177,7 @@ public class StationScraper extends Scraper<TrainEvent, Object[]> {
 			String delayed = html.substring(9);
 			Date dd = parseTime(delayed);
 			te.setDelayed(dd);
-			Log.v(Tag, "Setting delayed arrival to " + dd);
+			//Log.v(Tag, "Setting delayed arrival to " + dd);
 			return false;
 		}
 		
@@ -198,7 +198,6 @@ public class StationScraper extends Scraper<TrainEvent, Object[]> {
 	 * @return
 	 */
 	public static Date parseTime(String arrival) {
-	    long l = System.currentTimeMillis();
         Calendar now = Calendar.getInstance();
         Calendar correctitem = Calendar.getInstance();
 		Date dd = null;
@@ -207,8 +206,6 @@ public class StationScraper extends Scraper<TrainEvent, Object[]> {
 		} catch (ParseException e) {
 			Log.i(Tag, "Exception parsing date: " + e.getMessage());
 		}
-		long s = System.currentTimeMillis();
-		Log.v(Tag, "Took1: " + (s-l));
 
 		{
     		Calendar item = Calendar.getInstance();
@@ -218,26 +215,20 @@ public class StationScraper extends Scraper<TrainEvent, Object[]> {
             correctitem.set(Calendar.MINUTE, item.get(Calendar.MINUTE));
 		}
 		
-        l = System.currentTimeMillis();
-        Log.v(Tag, "Took2: " + (l-s));
-        
         //Compare
         long diff = correctitem.getTimeInMillis() - now.getTimeInMillis(); 
         
-        Log.v(Tag, "Now: " + DBAdapter.SIMPLE_DATEFORMATTER.format(now.getTime()));
+        //Log.v(Tag, "Now: " + DBAdapter.SIMPLE_DATEFORMATTER.format(now.getTime()));
         if(diff > 3600000 * 2) {
             //Need to add one day
             now.add(Calendar.DAY_OF_YEAR, 1);
-            Log.v(Tag, "Fixed day of time, too big diff: " + DBAdapter.SIMPLE_DATEFORMATTER.format(correctitem.getTime()));
+            //Log.v(Tag, "Fixed day of time, too big diff: " + DBAdapter.SIMPLE_DATEFORMATTER.format(correctitem.getTime()));
         } else if(diff < -(3600000 * 2)) {
             now.add(Calendar.DAY_OF_YEAR, -1);
-            Log.v(Tag, "Fixed day of time, too small diff: " + DBAdapter.SIMPLE_DATEFORMATTER.format(correctitem.getTime()));
+            //Log.v(Tag, "Fixed day of time, too small diff: " + DBAdapter.SIMPLE_DATEFORMATTER.format(correctitem.getTime()));
         }
 		
-        s=System.currentTimeMillis();
-
         Date ret = correctitem.getTime();
-        Log.v(Tag, "Took3: " + (s-l));
         
 		return ret;
 	}

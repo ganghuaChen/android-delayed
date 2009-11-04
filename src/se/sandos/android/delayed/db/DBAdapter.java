@@ -117,7 +117,7 @@ public class DBAdapter {
                 null);
         c.move(1);
         Calendar cal = Calendar.getInstance();
-        String cald = cal.getTime().toString();
+        //String cald = SIMPLE_DATEFORMATTER.format(cal);
         //-6 minute fuzz, arbitrary value for now
         cal.add(Calendar.MINUTE, -6);
         
@@ -146,17 +146,17 @@ public class DBAdapter {
                 //Log.v(Tag, "Comparing " + te.getDepartureDate() + " " + cald);
                 long now = cal.getTimeInMillis();
                 long item = c.getLong(0);
-                Log.v(Tag, "Long: " + item + " " + SIMPLE_DATEFORMATTER.format(te.getDepartureDate()) + " " + cal.getTimeInMillis());
+                //Log.v(Tag, "Long: " + item + " " + SIMPLE_DATEFORMATTER.format(te.getDepartureDate()) + " " + cal.getTimeInMillis());
 
-                if(now < item) {
-                    Log.v(Tag, "Before!");
-                }
+//                if(now < item) {
+//                    Log.v(Tag, "Before!");
+//                }
                 //Calendar.before is broken??? Does not work for me anyway...
                 if(now < item && (te.getDelayedDate() == null || now < te.getDelayedDate().getTime())){
                     res.add(te);
                 } else {
                     //Remove it
-                    Log.v(Tag, "Removing " + (now-item) + " " + SIMPLE_DATEFORMATTER.format(te.getDepartureDate()) + " " + SIMPLE_DATEFORMATTER.format(new Date(now)));
+                    //Log.v(Tag, "Removing " + (now-item) + " " + SIMPLE_DATEFORMATTER.format(te.getDepartureDate()) + " " + SIMPLE_DATEFORMATTER.format(new Date(now)));
                     db.execSQL("delete from trainevents where _id = " + c.getInt(4), new Object[0]);
                 }
                 

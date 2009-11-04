@@ -43,6 +43,7 @@ public class DBAdapter {
 	private static final String TRAINEVENT_KEY_DELAY = "delay";
 	private static final String TRAINEVENT_KEY_EXTRA = "extra";
 	private static final String TRAINEVENT_KEY_TIMESTAMP = "timestamp";
+	private static final String TRAINEVENT_KEY_DESTINATION = "destination";
 	
 	private DateFormat df = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT, java.util.Locale.GERMANY);
     public static final DateFormat SIMPLE_DATEFORMATTER = SimpleDateFormat.getDateTimeInstance();
@@ -55,11 +56,11 @@ public class DBAdapter {
         "track, number, destination, time)";
     private static  final String DATABASE_CREATE_3 =
 	    "create table trainevents(_id integer primary key autoincrement, " + 
-	    "station, time, track, number, delay, extra, timestamp)";
+	    "station, time, track, number, delay, extra, timestamp, destination)";
     
 
 	public void addTrainEvents(final List<TrainEvent> trainevents) {
-    	if(trainevents.size() == 0) {
+    	if(trainevents == null || trainevents.size() == 0) {
     	    return;
     	}
 	    
@@ -68,7 +69,7 @@ public class DBAdapter {
     		{
     			Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
     			long s = System.currentTimeMillis();
-    			
+
     			String station = trainevents.get(0).getStation().getName();
     			int[] numbers = new int[trainevents.size()];
     			int index = 0;
@@ -86,7 +87,7 @@ public class DBAdapter {
     			for(TrainEvent te : trainevents) {
     				if(!e.contains(Integer.valueOf(te.getNumber()))) {
     				    count++;
-    					addTrainEventImpl(te.getStation().getName(), te.getDepartureDate(), te.getTrack(), te.getNumber(), te.getDelayedDate(), te.getExtra());
+    					addTrainEventImpl(te.getStation().getName(), te.getDepartureDate(), te.getTrack(), te.getNumber(), te.getDelayedDate(), te.getExtra(), te.getDestination());
     				}
     			}
     			Log.v(Tag, "Took " + (System.currentTimeMillis()-s) + " for " + count);
@@ -105,8 +106,11 @@ public class DBAdapter {
         ArrayList<TrainEvent> res = new ArrayList<TrainEvent>(100);
 
         Cursor c = db.query(TRAINEVENT_TABLE_NAME, 
-                new String[] { TRAINEVENT_KEY_TIME, TRAINEVENT_KEY_EXTRA, TRAINEVENT_KEY_DELAY, TRAINEVENT_KEY_NUMBER, "_id"}, 
-                TRAINEVENT_KEY_STATION + "= ?", 
+ new String[] {
+				TRAINEVENT_KEY_TIME, TRAINEVENT_KEY_EXTRA,
+				TRAINEVENT_KEY_DELAY, TRAINEVENT_KEY_NUMBER, "_id",
+				TRAINEVENT_KEY_DESTINATION, TRAINEVENT_KEY_TRACK },
+				TRAINEVENT_KEY_STATION + "= ?", 
                 new String[] { station }, 
                 null, 
                 null, 
@@ -131,6 +135,12 @@ public class DBAdapter {
                     StringBuffer sb = te.getStringBuffer();
                     sb.setLength(0);
                     sb.append(c.getString(1));
+                }
+                if(!c.isNull(5)) {
+                	te.setDestinationFromString(c.getString(5));
+                }
+                if(!c.isNull(6)) {
+                	te.setTrack(c.getString(6));
                 }
 
                 //Log.v(Tag, "Comparing " + te.getDepartureDate() + " " + cald);
@@ -161,7 +171,7 @@ public class DBAdapter {
     }
 	
     //Trainevents are identified by train and station? Time, track, delay, extra is mutable.
-    public long addTrainEventImpl(String station, Date time, String track, int number, Date delay, String extra)
+    public long addTrainEventImpl(String station, Date time, String track, int number, Date delay, String extra, String destination)
     {
 		ContentValues cv = new ContentValues();
 		cv.put(TRAINEVENT_KEY_STATION, station);
@@ -175,6 +185,7 @@ public class DBAdapter {
 		}
 		cv.put(TRAINEVENT_KEY_EXTRA, extra);
 		cv.put(TRAINEVENT_KEY_TIMESTAMP, new Date().toString());
+		cv.put(TRAINEVENT_KEY_DESTINATION, destination);
 		
 		long status = db.insert(TRAINEVENT_TABLE_NAME, null, cv);
 
@@ -193,7 +204,8 @@ public class DBAdapter {
 			new String[] { 	TRAINEVENT_KEY_TIME, 
 							TRAINEVENT_KEY_EXTRA,
 							TRAINEVENT_KEY_DELAY, 
-							TRAINEVENT_KEY_NUMBER}, 
+							TRAINEVENT_KEY_NUMBER, 
+							TRAINEVENT_KEY_DESTINATION}, 
 			TRAINEVENT_KEY_NUMBER + " IN(" + expand(numbers) + ") AND " + TRAINEVENT_KEY_STATION + "= ?", 
 			new String[]{station} , null, null, null);
 		c.move(1);
@@ -205,6 +217,7 @@ public class DBAdapter {
 				TrainEvent te = new TrainEvent(null);
 				te.setDeparture(c.getLong(0));
 				te.setNumber(c.getInt(3));
+				te.setDestinationFromString(c.getString(4));
 				events[index++] = te;
 				c.move(1);
 			}

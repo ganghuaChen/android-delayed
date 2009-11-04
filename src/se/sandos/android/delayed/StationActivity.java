@@ -13,6 +13,7 @@ import se.sandos.android.delayed.scrape.ScraperHelper.Nameurl;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Debug;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
@@ -207,7 +208,6 @@ public class StationActivity extends ListActivity {
 		final String url = this.url;
 		final String name = this.name;
 
-		
 		if(listContent == null || listContent.size() == 0) {
 			//Fetch from db
 			List<TrainEvent> events = db.getStationEvents(name);
@@ -247,7 +247,8 @@ public class StationActivity extends ListActivity {
 	
 	public boolean onCreateOptionsMenu(Menu menu)
 	{
-		menu.add(0, 1, 0, "Ladda på nytt");
+        menu.add(0, 1, 0, "Ladda om");
+        menu.add(0, 2, 0, "Välj station");
 		
 		return true;
 	}
@@ -270,13 +271,18 @@ public class StationActivity extends ListActivity {
 		}
 	}
 
-	
 	public boolean onOptionsItemSelected(MenuItem mi)
 	{
 		if(mi.getItemId() == 1) {
 			clearList();
 			fetchList();
+			return true;
 		}
+		
+        if(mi.getItemId() == 2) {
+            Intent intent = new Intent("se.sandos.android.delayed.StationList", null, getApplicationContext(), StationListActivity.class);
+            startActivity(intent);
+        }
 		
 		return true;
 	}

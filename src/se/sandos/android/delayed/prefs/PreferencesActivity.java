@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.TextView;
 
 /**
@@ -30,5 +29,7 @@ public class PreferencesActivity extends Activity {
 		SharedPreferences sp = getApplicationContext().getSharedPreferences(PREFS_KEY, Context.MODE_APPEND | Context.MODE_PRIVATE);
 		TextView tv = (TextView) findViewById(R.id.FavoriteStation);
 		tv.setText(sp.getString(PREFS_FAV_NAME, "NA"));
+		
+		
 	}
 }

@@ -103,26 +103,23 @@ public class DBAdapter {
     	});
 	}
     
-	/**
-	 * Return all trainevents for this station. Culling?
-	 * 
-	 * @param station
-	 * @return
-	 */
+    /**
+     * Return all trainevents for this station. Culling?
+     * 
+     * @param station
+     * @return
+     */
     public List<TrainEvent> getStationEvents(String station)
     {
         ArrayList<TrainEvent> res = new ArrayList<TrainEvent>(100);
 
         Cursor c = db.query(TRAINEVENT_TABLE_NAME, 
- new String[] {
-				TRAINEVENT_KEY_TIME, TRAINEVENT_KEY_EXTRA,
-				TRAINEVENT_KEY_DELAY, TRAINEVENT_KEY_NUMBER, "_id",
-				TRAINEVENT_KEY_DESTINATION, TRAINEVENT_KEY_TRACK },
-				TRAINEVENT_KEY_STATION + "= ?", 
-                new String[] { station }, 
-                null, 
-                null, 
-                null);
+            new String[] {
+                TRAINEVENT_KEY_TIME, TRAINEVENT_KEY_EXTRA,
+                TRAINEVENT_KEY_DELAY, TRAINEVENT_KEY_NUMBER, "_id",
+                TRAINEVENT_KEY_DESTINATION, TRAINEVENT_KEY_TRACK },
+                TRAINEVENT_KEY_STATION + "= ?", new String[] { station }, null,
+                null, null);
         c.move(1);
         Calendar cal = Calendar.getInstance();
         //String cald = SIMPLE_DATEFORMATTER.format(cal);

@@ -12,7 +12,6 @@ import java.util.Set;
 
 import se.sandos.android.delayed.TrainEvent;
 import se.sandos.android.delayed.scrape.ScrapePool;
-import se.sandos.android.delayed.scrape.StationScraper;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -20,10 +19,13 @@ import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
+import android.os.Debug;
 import android.util.Log;
 
 public class DBAdapter {
 	private final static String Tag = "DBAdapter";
+	
+	private final static boolean TRACE = false;
 	
 	private final static String DATABASE_NAME = "delayed";
 	private final static int DATABASE_VERSION = 1;
@@ -67,6 +69,9 @@ public class DBAdapter {
 	    ScrapePool.addJob(new Runnable(){
     		public void run()
     		{
+    			if(TRACE) {
+    				Debug.startMethodTracing("dbstore");
+    			}
     			Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
     			long s = System.currentTimeMillis();
 
@@ -89,6 +94,9 @@ public class DBAdapter {
     				    count++;
     					addTrainEventImpl(te.getStation().getName(), te.getDepartureDate(), te.getTrack(), te.getNumber(), te.getDelayedDate(), te.getExtra(), te.getDestination());
     				}
+    			}
+    			if(TRACE) {
+    				Debug.stopMethodTracing();
     			}
     			Log.v(Tag, "Took " + (System.currentTimeMillis()-s) + " for " + count);
     		}
@@ -124,7 +132,6 @@ public class DBAdapter {
         Log.v(Tag, "Number of events in db: " + c.getCount());
         if (!c.isAfterLast() && !c.isBeforeFirst()) {
             while (!c.isAfterLast()) {
-                Log.v(Tag, "Looping in getTrainEvents");
                 TrainEvent te = new TrainEvent(null);
                 te.setDeparture(c.getLong(0));
                 te.setNumber(c.getInt(3));
@@ -184,7 +191,7 @@ public class DBAdapter {
 			cv.putNull(TRAINEVENT_KEY_DELAY);
 		}
 		cv.put(TRAINEVENT_KEY_EXTRA, extra);
-		cv.put(TRAINEVENT_KEY_TIMESTAMP, new Date().toString());
+		cv.put(TRAINEVENT_KEY_TIMESTAMP, System.currentTimeMillis());
 		cv.put(TRAINEVENT_KEY_DESTINATION, destination);
 		
 		long status = db.insert(TRAINEVENT_TABLE_NAME, null, cv);

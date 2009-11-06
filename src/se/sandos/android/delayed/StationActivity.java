@@ -313,5 +313,4 @@ public class StationActivity extends ListActivity {
         
         return true;
     }
-
 }

@@ -47,7 +47,6 @@ public class DBAdapter {
 	private static final String TRAINEVENT_KEY_TIMESTAMP = "timestamp";
 	private static final String TRAINEVENT_KEY_DESTINATION = "destination";
 	
-	private DateFormat df = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT, java.util.Locale.GERMANY);
     public static final DateFormat SIMPLE_DATEFORMATTER = SimpleDateFormat.getDateTimeInstance();
 	
     private static final String DATABASE_CREATE =
@@ -55,10 +54,13 @@ public class DBAdapter {
         "name text not null, urlid text not null)";
     private static final String DATABASE_CREATE_2 =  
         "create table trains (_id integer primary key autoincrement, " + 
-        "track, number, destination, time)";
+        "number, destination)";
     private static  final String DATABASE_CREATE_3 =
 	    "create table trainevents(_id integer primary key autoincrement, " + 
 	    "station, time, track, number, delay, extra, timestamp, destination)";
+    private static  final String DATABASE_CREATE_4 =
+        "create table eventlog(_id integer primary key autoincrement, " + 
+        "timestamp, type, text)";
     
 
 	public void addTrainEvents(final List<TrainEvent> trainevents) {
@@ -354,6 +356,7 @@ public class DBAdapter {
             db.execSQL(DATABASE_CREATE);
             db.execSQL(DATABASE_CREATE_2);
             db.execSQL(DATABASE_CREATE_3);
+            db.execSQL(DATABASE_CREATE_4);
 		}
 
 		@Override

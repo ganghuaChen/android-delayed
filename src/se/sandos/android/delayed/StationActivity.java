@@ -1,6 +1,8 @@
 package se.sandos.android.delayed;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,7 +10,6 @@ import java.util.Map;
 import se.sandos.android.delayed.db.DBAdapter;
 import se.sandos.android.delayed.prefs.PreferencesActivity;
 import se.sandos.android.delayed.scrape.ScrapeListener;
-import se.sandos.android.delayed.scrape.ScrapeService;
 import se.sandos.android.delayed.scrape.ScraperHelper;
 import se.sandos.android.delayed.scrape.StationScraper;
 import se.sandos.android.delayed.scrape.ScraperHelper.Nameurl;
@@ -132,6 +133,7 @@ public class StationActivity extends ListActivity {
             m.put("url", te.getUrl());
             m.put("delayed", te.getDelayed());
             m.put("extra", te.getExtra());
+            m.put("time", Long.toString(te.getDepartureDate().getTime()));
             listContent.add(m);
         }
 
@@ -164,7 +166,17 @@ public class StationActivity extends ListActivity {
 
             setListAdapter(sa);
         }
-
+        
+        Collections.sort(listContent, new Comparator<Map<String, String>>(){
+            public int compare(Map<String, String> object1, Map<String, String> object2) {
+                long time1 = Long.valueOf(object1.get("time")).longValue();
+                long time2 = Long.valueOf(object2.get("time")).longValue();
+                
+                if(time1 < time2) { return -1; }
+                if(time1 > time2) { return 1; }
+                return 0;
+            }
+        });
         if (!needInvalidate) {
             sa.notifyDataSetChanged();
         } else {
@@ -301,5 +313,4 @@ public class StationActivity extends ListActivity {
         
         return true;
     }
-
 }

@@ -6,7 +6,9 @@ import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
+import android.os.PowerManager;
 import android.os.SystemClock;
+import android.os.PowerManager.WakeLock;
 import android.util.Log;
 
 public class ScrapeService extends Service {
@@ -29,11 +31,19 @@ public class ScrapeService extends Service {
     @Override
     public void onStart(Intent intent, int startid)
     {
-        Log.v(Tag, "onStart, missed: " + intent.getIntExtra(Intent.EXTRA_ALARM_COUNT, 0));
+        PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+        PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Delayed service");
+        wl.acquire();
         
-        setAlarm(getApplicationContext());
-        
-        stopSelf();
+        try {
+            Log.v(Tag, "onStart, missed: " + intent.getIntExtra(Intent.EXTRA_ALARM_COUNT, 0));
+            
+            setAlarm(getApplicationContext());
+            
+            stopSelf();
+        } finally {
+            wl.release();
+        }
     }
 
     public static void setAlarm(Context ctx)

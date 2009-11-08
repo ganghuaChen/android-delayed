@@ -8,6 +8,7 @@ import java.util.Map;
 import se.sandos.android.delayed.db.DBAdapter;
 import se.sandos.android.delayed.db.Station;
 import se.sandos.android.delayed.db.StationList;
+import se.sandos.android.delayed.prefs.IntentTest;
 import se.sandos.android.delayed.prefs.PreferencesActivity;
 import se.sandos.android.delayed.scrape.ScrapeListener;
 import se.sandos.android.delayed.scrape.ScrapeService;
@@ -78,6 +79,8 @@ public class StationListActivity extends ListActivity {
 		if(getIntent().getExtras() != null && getIntent().getExtras().containsKey("chooser")) {
 		    chooser = true;
 		}
+		
+		IntentTest.test(getApplicationContext());
 		
 		setContentView(R.layout.liststations);
 

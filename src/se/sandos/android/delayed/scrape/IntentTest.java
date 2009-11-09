@@ -1,15 +1,16 @@
 package se.sandos.android.delayed.scrape;
 
-import java.util.Iterator;
 import java.util.List;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.util.Log;
 
 public class IntentTest
@@ -37,16 +38,21 @@ public class IntentTest
         
         for(ResolveInfo ri : l) {
             Log.v(Tag, ri.toString() + " " + ri.getClass() + " " + ri.activityInfo + " " + ri.serviceInfo);
-            if(ri.filter != null) {
-                for(Iterator<String> i = ri.filter.actionsIterator();i.hasNext();) {
-                    String n = i.next();
-                    Log.v(Tag, "action: " + n);
-                }
-            }
             if(ri.activityInfo != null) {
                 ActivityInfo ai = ri.activityInfo;
                 Log.v(Tag, "" + ai.name + " " + ai.processName + " " + ai.packageName);
+                Log.v(Tag, "Label: " + ctx.getResources().getString(ai.labelRes));
                 
+                try {
+                    //ComponentName cn = new ComponentName(ai.packageName, ai.name);
+                    ComponentName cn = new ComponentName(ctx, OnBoot.class);
+                    ComponentName cn2 = new ComponentName("se.sandos.android.delayed", "se.sandos.android.delayed.scrape.OnBoot");
+                    Log.v(Tag, "Cool: " + cn + " " + cn2);
+                    ActivityInfo aii = ctx.getPackageManager().getReceiverInfo(cn, PackageManager.GET_META_DATA);
+                    Log.v(Tag, "Got more info: " + aii.metaData.getString("Label"));
+                } catch (NameNotFoundException e) {
+                    Log.v(Tag, e.toString());
+                }
                 if(ai.name.indexOf("sandos") != -1) {
                     Intent in = new Intent();
                     in.setAction(SCHEDULER_ACTION);

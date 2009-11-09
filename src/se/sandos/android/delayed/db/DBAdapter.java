@@ -63,7 +63,10 @@ public class DBAdapter {
         "timestamp, type, text)";
     
 
-	public void addTrainEvents(final List<TrainEvent> trainevents) {
+	public void addTrainEvents(final List<TrainEvent> l) {
+	    //(Shallow) Copy the list to avoid ConcurrentModificationException
+	    final List<TrainEvent> trainevents = new ArrayList<TrainEvent>(l);
+	    
     	if(trainevents == null || trainevents.size() == 0) {
     	    return;
     	}

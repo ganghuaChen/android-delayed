@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.os.SystemClock;
-import android.os.PowerManager.WakeLock;
 import android.util.Log;
 
 public class ScrapeService extends Service {
@@ -38,7 +37,9 @@ public class ScrapeService extends Service {
         try {
             Log.v(Tag, "onStart, missed: " + intent.getIntExtra(Intent.EXTRA_ALARM_COUNT, 0));
             
-            setAlarm(getApplicationContext());
+            
+            
+            setAlarm(getApplicationContext(), 60*15);
             
             stopSelf();
         } finally {
@@ -46,7 +47,12 @@ public class ScrapeService extends Service {
         }
     }
 
-    public static void setAlarm(Context ctx)
+    /**
+     * 
+     * @param ctx
+     * @param delay Delay in seconds until next wakeup
+     */
+    public static void setAlarm(Context ctx, int delay)
     {
         Log.v(Tag, "Setting up alarm");
         AlarmManager mgr = (AlarmManager) ctx.getSystemService(ALARM_SERVICE);
@@ -55,6 +61,6 @@ public class ScrapeService extends Service {
         Intent i = new Intent();
         i.setAction("se.sandos.android.delayed.scrape.Service");
         PendingIntent pi = PendingIntent.getService(ctx, 1, i, PendingIntent.FLAG_ONE_SHOT);
-        mgr.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + 60000 * 15, pi);
+        mgr.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + delay * 1000, pi);
     }
 }

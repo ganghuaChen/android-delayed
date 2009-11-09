@@ -8,8 +8,8 @@ import java.util.Map;
 import se.sandos.android.delayed.db.DBAdapter;
 import se.sandos.android.delayed.db.Station;
 import se.sandos.android.delayed.db.StationList;
-import se.sandos.android.delayed.prefs.IntentTest;
 import se.sandos.android.delayed.prefs.PreferencesActivity;
+import se.sandos.android.delayed.scrape.IntentTest;
 import se.sandos.android.delayed.scrape.ScrapeListener;
 import se.sandos.android.delayed.scrape.ScrapeService;
 import se.sandos.android.delayed.scrape.ScraperHelper;
@@ -86,7 +86,7 @@ public class StationListActivity extends ListActivity {
 
 		Log.v(Tag, "Created StationList ");
 
-        ScrapeService.setAlarm(getApplicationContext());
+        ScrapeService.setAlarm(getApplicationContext(), 60*15);
         
 		//Register context menu
 		if(!chooser) {

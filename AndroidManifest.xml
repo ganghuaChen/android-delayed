@@ -38,7 +38,6 @@
 				<action android:name="android.intent.action.BOOT_COMPLETED" />
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
-            <meta-data android:name="Label" android:value="majs"/>
 		</receiver>
 
 		<service android:name=".scrape.ScrapeService">
@@ -52,6 +51,14 @@
             <intent-filter>
                 <action android:name="se.sandos.android.delayed.Scheduler" />
             </intent-filter>
+            <meta-data android:name="label" android:value="Schedules every 5 minutes"/>
+        </receiver>
+
+        <receiver android:name=".scrape.scheduler.Interval">
+            <intent-filter>
+                <action android:name="se.sandos.android.delayed.Scheduler" />
+            </intent-filter>
+            <meta-data android:name="label" android:value="Interval scheduler"/>
         </receiver>
 
 

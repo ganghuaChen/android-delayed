@@ -26,7 +26,7 @@ public class PreferencesActivity extends Activity {
 		
 		setContentView(R.layout.prefs);
 		
-		SharedPreferences sp = getApplicationContext().getSharedPreferences(PREFS_KEY, Context.MODE_APPEND | Context.MODE_PRIVATE);
+		SharedPreferences sp = getApplicationContext().getSharedPreferences(PREFS_KEY, Context.MODE_PRIVATE);
 		TextView tv = (TextView) findViewById(R.id.FavoriteStation);
 		tv.setText(sp.getString(PREFS_FAV_NAME, "NA"));
 		

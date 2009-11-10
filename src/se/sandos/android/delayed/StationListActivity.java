@@ -80,10 +80,10 @@ public class StationListActivity extends ListActivity {
 		    chooser = true;
 		}
 		
-		IntentTest.test(getApplicationContext());
-		
 		setContentView(R.layout.liststations);
 
+		getListView().setFastScrollEnabled(true);
+		
 		Log.v(Tag, "Created StationList ");
 
         ScrapeService.setAlarm(getApplicationContext(), 60*15);
@@ -133,7 +133,6 @@ public class StationListActivity extends ListActivity {
 				if(content == null) {
 					content = new ArrayList<Map<String, String>>();
 				}
-
 				
 				for(Station station : sl.getList()) {
 					Map<String, String> m = new HashMap<String, String>();

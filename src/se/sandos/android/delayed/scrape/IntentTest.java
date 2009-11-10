@@ -11,6 +11,7 @@ import android.content.pm.ActivityInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.sax.StartElementListener;
 import android.util.Log;
 
 public class IntentTest
@@ -32,13 +33,13 @@ public class IntentTest
         return l;
     }
     
-    public static void test(Context ctx)
+    public static void test(final Context ctx)
     {
         List<ResolveInfo> l = getSchedulerList(ctx);
         
         for(ResolveInfo ri : l) {
             if(ri.activityInfo != null) {
-                ActivityInfo ai = ri.activityInfo;
+                final ActivityInfo ai = ri.activityInfo;
                 
                 try {
                     ComponentName cn = new ComponentName(ai.packageName, ai.name);
@@ -50,19 +51,38 @@ public class IntentTest
                     Log.v(Tag, e.toString());
                 }
                 if(ai.name.indexOf("sandos") != -1) {
-                    Intent in = new Intent();
-                    in.setAction(SCHEDULER_ACTION);
-                    in.setComponent(new ComponentName(ai.packageName, ai.name));
-
                     BroadcastReceiver br = new BroadcastReceiver() {
                         @Override
                         public void onReceive(Context context, Intent intent) {
                             Log.v(Tag, "" + getResultExtras(true).getInt("delay"));
                         }
                     };
-                    ctx.sendOrderedBroadcast(in, null, br, null, Activity.RESULT_OK, null, null);
+
+                    sendBroadcast(ctx, ai, SCHEDULER_ACTION, br);
+
+                    BroadcastReceiver br2 = new BroadcastReceiver() {
+                        @Override
+                        public void onReceive(Context context, Intent intent) {
+                            String cl = getResultExtras(true).getString("activity");
+                            Log.v(Tag, "ACTIVITY: " + cl);
+                            if(cl != null) {
+                                Intent in = new Intent();
+                                in.setComponent(new ComponentName(ai.packageName, cl));
+                                ctx.startActivity(in);
+                            }
+                        }
+                    };
+                    sendBroadcast(ctx, ai, SCHEDULER_SETTINGS, br2);
                 }
             }
         }
+    }
+
+    private static void sendBroadcast(Context ctx, ActivityInfo ai, String action, BroadcastReceiver receiver) {
+        Intent in = new Intent();
+        in.setAction(action);
+        in.setComponent(new ComponentName(ai.packageName, ai.name));
+
+        ctx.sendOrderedBroadcast(in, null, receiver, null, Activity.RESULT_OK, null, null);
     }
 }

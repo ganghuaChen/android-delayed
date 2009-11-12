@@ -80,6 +80,9 @@ public class StationListActivity extends ListActivity {
 		    chooser = true;
 		}
 		
+		
+		//IntentTest.test(getApplicationContext());
+		
 		setContentView(R.layout.liststations);
 
 		getListView().setFastScrollEnabled(true);

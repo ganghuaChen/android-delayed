@@ -13,7 +13,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.ResolveInfo;
-import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -78,13 +77,23 @@ public class PreferencesActivity extends Activity {
             m.put("enabled", new Boolean(false));
             listContent.add(m);
         }
+
+        for(ResolveInfo ri : l) {
+            ActivityInfo ai = ri.activityInfo;
+            HashMap<String, Object> m = new HashMap<String, Object>();
+            m.put("name", IntentTest.getLabel(getApplicationContext(), ai));
+            m.put("pkg", ai.packageName);
+            m.put("class", ai.name);
+            m.put("enabled", new Boolean(false));
+            listContent.add(m);
+        }
+
         
         final List<HashMap<String, Object>> ll = listContent;
         
         SimpleAdapter.ViewBinder vb = new SimpleAdapter.ViewBinder() {
             public boolean setViewValue(View view, Object data, String textRepresentation) {
                 CheckedTextView tv = (CheckedTextView) view;
-
                 if (tv.getId() == R.id.SchedulerName) {
                     String t = "x";
                     for(HashMap<String, Object> m : ll) {
@@ -98,7 +107,7 @@ public class PreferencesActivity extends Activity {
                         tv.setTextColor(0xff334455);
                     } else {
                         tv.setBackgroundColor(0xff000000);
-                        tv.setTextColor(0xff445566);
+                        tv.setTextColor(0xffffffff);
                     }
                 } else {
                     tv.setText((String) data);
@@ -117,16 +126,13 @@ public class PreferencesActivity extends Activity {
 
             @SuppressWarnings("unchecked")
             public void onItemClick(AdapterView<?> l, View view, int pos, long id) {
-                Object o = l.getAdapter().getItem(pos);
-                Map<String, String> m = (Map) o;
+                HashMap<String, String> m = (HashMap) sa.getItem(pos);
 
                 CheckedTextView child = (CheckedTextView) view.findViewById(R.id.SchedulerName);
-                Log.v(Tag, "Child: " + child + " " + pos + " " + lv.getCheckedItemPosition() + " " + lv.getChoiceMode() + " " + view);
-                String n = m.get("name");
-                String end = n.substring(n.length()-1);
-                Log.v(Tag, "End: " + end + " n; " + n);
-                child.setChecked(true);
-                sa.notifyDataSetChanged();
+                Log.v(Tag, "Child: " + child + " " + pos + " " + lv.getCheckedItemPosition() + " " + lv.getChoiceMode() + " " + view + " " + id);
+                child.toggle();
+                //sa.notifyDataSetChanged();
+                //lv.invalidate();
                 IntentTest.startSchedulerActivity(getApplicationContext(), mHandler, m.get("pkg"), m.get("class"));
             }
 		});

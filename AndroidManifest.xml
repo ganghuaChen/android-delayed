@@ -51,7 +51,7 @@
             <intent-filter>
                 <action android:name="se.sandos.android.delayed.Scheduler" />
             </intent-filter>
-            <meta-data android:name="label" android:value="Schedules every 5 minutes"/>
+            <meta-data android:name="label" android:value="Every 5 mins"/>
         </receiver>
 
         <receiver android:name=".scrape.scheduler.Interval">
@@ -61,6 +61,11 @@
             <meta-data android:name="label" android:value="Interval scheduler"/>
         </receiver>
 
+        <activity android:name=".scrape.scheduler.IntervalActivity">
+            <intent-filter>
+                <action android:name="se.sandos.android.delayed.SchedulerSettings"></action>
+            </intent-filter>
+        </activity>
 
 		<!--  Launcher shortcuts -->
 		<activity android:name="LauncherShortcuts" android:label="@string/shortcuts">

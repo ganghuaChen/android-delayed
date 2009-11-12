@@ -28,7 +28,8 @@ public class Interval extends BroadcastReceiver {
         
         if(intent.getAction().equals(IntentTest.SCHEDULER_SETTINGS)) {
             Bundle b = new Bundle();
-            b.putString("activity", "se.sandos.android.delayed.scrape.schedule.IntervalActivity");
+            b.putString("activity", "se.sandos.android.delayed.scrape.scheduler.IntervalActivity");
+            b.putString("pkg", "se.sandos.android.delayed");
             setResult(0, "Success", b);
             return;
         }

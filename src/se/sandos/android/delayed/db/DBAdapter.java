@@ -34,7 +34,7 @@ public class DBAdapter {
 	private static final String STATION_KEY_NAME = "name";
 	private static final String STATION_KEY_URLID = "urlid";
 	
-	private static final String TRAIN_TABLE_NAME = "trains";
+	//private static final String TRAIN_TABLE_NAME = "trains";
 
 	private static final String TRAINEVENT_TABLE_NAME = "trainevents";
 

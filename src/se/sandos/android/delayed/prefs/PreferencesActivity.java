@@ -3,14 +3,11 @@ package se.sandos.android.delayed.prefs;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import se.sandos.android.delayed.R;
 import se.sandos.android.delayed.scrape.IntentTest;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.pm.ResolveInfo;
 import android.os.Bundle;
@@ -33,10 +30,6 @@ import android.widget.AdapterView.OnItemClickListener;
 public class PreferencesActivity extends Activity {
     private final static String Tag = "PreferencesActivity";
 
-    public static final String PREFS_FAV_NAME = "favoriteName";
-    public static final String PREFS_FAV_URL = "favoriteUrl";
-    public static final String PREFS_KEY = "delayedfilter";
-
     private Handler mHandler = new Handler() {
         public void handleMessage(final Message msg) {
             startActivity((Intent)msg.obj);
@@ -50,13 +43,10 @@ public class PreferencesActivity extends Activity {
 		
 		setContentView(R.layout.prefs);
 		
-		SharedPreferences sp = getApplicationContext().getSharedPreferences(PREFS_KEY, Context.MODE_PRIVATE);
 		TextView tv = (TextView) findViewById(R.id.FavoriteStation);
-		tv.setText(sp.getString(PREFS_FAV_NAME, "NA"));
-		
+		tv.setText(Prefs.getSetting(getApplicationContext(), Prefs.PREFS_FAV_NAME, "NA"));
 		
 		setList();
-		
 	}
 
     private void setList() {

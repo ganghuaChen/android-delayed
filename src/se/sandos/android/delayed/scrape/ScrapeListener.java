@@ -26,4 +26,9 @@ public interface ScrapeListener<T, U> {
 	 * @param status
 	 */
 	public void onStatus(String status);
+	
+	/**
+	 * Called when the scrape runs out of retries, and fails completely
+	 */
+	public void onFail();
 }

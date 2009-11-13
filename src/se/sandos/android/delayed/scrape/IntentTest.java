@@ -34,7 +34,7 @@ public class IntentTest
         return l;
     }
     
-    public static void startSchedulerActivity(final Context context, final Handler handler, String pkg, String className)
+    public static void startSchedulerActivity(final Context context, final Handler handler, String pkg, final String className)
     {
         BroadcastReceiver br = new BroadcastReceiver() {
             

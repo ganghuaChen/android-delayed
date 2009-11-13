@@ -184,6 +184,11 @@ public class StationActivity extends ListActivity {
         }
     }
 
+    /**
+     * Update our listContent model of the list
+     * @param te
+     * @return true if the trainevent existed already and was updated, false if it was not found
+     */
     private boolean existsAndUpdate(TrainEvent te) {
         if (listContent == null || listContent.size() == 0) {
             return false;
@@ -262,6 +267,8 @@ public class StationActivity extends ListActivity {
             public void onRestart() {
                 trainevents.clear();
             }
+            
+            public void onFail(){};
         });
     }
 

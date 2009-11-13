@@ -7,13 +7,12 @@ import se.sandos.android.delayed.Delayed;
 import se.sandos.android.delayed.R;
 import se.sandos.android.delayed.StationActivity;
 import se.sandos.android.delayed.TrainEvent;
-import se.sandos.android.delayed.prefs.PreferencesActivity;
+import se.sandos.android.delayed.prefs.Prefs;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.util.Log;
 import android.widget.RemoteViews;
 
@@ -29,9 +28,8 @@ public class DelayedAppWidgetProvider extends AppWidgetProvider
 
         RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.widget);
 
-        SharedPreferences sp = context.getSharedPreferences(PreferencesActivity.PREFS_KEY, Context.MODE_PRIVATE);
-        String url = sp.getString(PreferencesActivity.PREFS_FAV_URL, null);
-        String name = sp.getString(PreferencesActivity.PREFS_FAV_NAME, null);
+        String url = Prefs.getSetting(context, Prefs.PREFS_FAV_URL, null);
+        String name = Prefs.getSetting(context, Prefs.PREFS_FAV_NAME, null);
 
         Log.v(Tag, "URl/name: " + name + "/" + url);
         
@@ -39,7 +37,7 @@ public class DelayedAppWidgetProvider extends AppWidgetProvider
             return;
         }
         
-        long lastUp = sp.getLong("lastUpdateForStation" + name, -1);
+        long lastUp = Prefs.getLongSetting(context, "lastUpdateForStation" + name, -1);
         // Update from DB, if it is updated recently enough
         if (lastUpdate == -1 || lastUp > lastUpdate) {
             lastUpdate = lastUp;

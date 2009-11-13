@@ -6,9 +6,6 @@ import android.os.Bundle;
 
 public class LauncherShortcuts extends Activity
 {
-    private static final String EXTRA_KEY = "com.example.android.apis.app.LauncherShortcuts";
-
-    
     @Override
     public void onCreate(Bundle icicle)
     {

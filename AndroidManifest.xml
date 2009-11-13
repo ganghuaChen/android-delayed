@@ -40,11 +40,7 @@
 			</intent-filter>
 		</receiver>
 
-		<service android:name=".scrape.ScrapeService">
-			<intent-filter>
-				<action android:name="se.sandos.android.delayed.scrape.Service" />
-			</intent-filter>
-		</service>
+		<service android:name=".scrape.ScrapeService"/>
 
         <!-- schedulers -->
         <receiver android:name=".scrape.scheduler.Simple">

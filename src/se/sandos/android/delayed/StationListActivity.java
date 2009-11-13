@@ -9,15 +9,12 @@ import se.sandos.android.delayed.db.DBAdapter;
 import se.sandos.android.delayed.db.Station;
 import se.sandos.android.delayed.db.StationList;
 import se.sandos.android.delayed.prefs.PreferencesActivity;
-import se.sandos.android.delayed.scrape.IntentTest;
+import se.sandos.android.delayed.prefs.Prefs;
 import se.sandos.android.delayed.scrape.ScrapeListener;
 import se.sandos.android.delayed.scrape.ScrapeService;
 import se.sandos.android.delayed.scrape.ScraperHelper;
 import android.app.ListActivity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
-import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -80,7 +77,6 @@ public class StationListActivity extends ListActivity {
 		    chooser = true;
 		}
 		
-		
 		//IntentTest.test(getApplicationContext());
 		
 		setContentView(R.layout.liststations);
@@ -89,7 +85,7 @@ public class StationListActivity extends ListActivity {
 		
 		Log.v(Tag, "Created StationList ");
 
-        ScrapeService.setAlarm(getApplicationContext(), 60*15);
+        ScrapeService.setAlarm(getApplicationContext(), Prefs.getIntSetting(getApplicationContext(), Prefs.PREFS_INTERVAL, 120));
         
 		//Register context menu
 		if(!chooser) {
@@ -121,6 +117,8 @@ public class StationListActivity extends ListActivity {
 				public void onRestart() {
 					clearList();
 				}
+				
+				public void onFail(){};
 			});
 		} else {
 			Log.v(Tag, "Fetching from db");
@@ -238,15 +236,9 @@ public class StationListActivity extends ListActivity {
 			if(Delayed.db != null) {
 				url = Delayed.db.getUrl(stationName);
 			}
-			
-			SharedPreferences sp = getApplicationContext().getSharedPreferences(PreferencesActivity.PREFS_KEY, Context.MODE_APPEND | Context.MODE_PRIVATE);
-			Log.v(Tag, "Setting favorite: " + sp);
-			Editor editor = sp.edit();
-			editor.putString(PreferencesActivity.PREFS_FAV_URL, url);
-			editor.putString(PreferencesActivity.PREFS_FAV_NAME, stationName);
-			if(!editor.commit()) {
-			    Log.w(Tag, "Failed to commit!");
-			}
+
+            Prefs.setSetting(getApplicationContext(), Prefs.PREFS_FAV_URL, url);
+            Prefs.setSetting(getApplicationContext(), Prefs.PREFS_FAV_NAME, stationName);
 		}
 		
 		if(mi.getTitle().equals("Kolla tidtabell")) {

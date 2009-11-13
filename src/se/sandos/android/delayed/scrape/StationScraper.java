@@ -20,7 +20,6 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 
 import se.sandos.android.delayed.TrainEvent;
-import se.sandos.android.delayed.db.DBAdapter;
 import se.sandos.android.delayed.db.Station;
 import se.sandos.android.delayed.scrape.ScraperHelper.Job;
 import se.sandos.android.delayed.scrape.ScraperHelper.Nameurl;

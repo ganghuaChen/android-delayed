@@ -1,5 +1,11 @@
 package se.sandos.android.delayed.scrape;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import se.sandos.android.delayed.Delayed;
+import se.sandos.android.delayed.TrainEvent;
+import se.sandos.android.delayed.prefs.Prefs;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.Service;
@@ -37,9 +43,38 @@ public class ScrapeService extends Service {
         try {
             Log.v(Tag, "onStart, missed: " + intent.getIntExtra(Intent.EXTRA_ALARM_COUNT, 0));
             
+            String favName = Prefs.getSetting(getApplicationContext(), Prefs.PREFS_FAV_NAME);
+            String favURL = Prefs.getSetting(getApplicationContext(), Prefs.PREFS_FAV_URL);
             
+            if(favName != null && favURL != null) {
+                //This will spawn a new thread so that we can return quickly
+                Log.v(Tag, "Starting scrape from background service for " + favName);
+                ScraperHelper.scrapeStation(favURL, favName, new ScrapeListener<TrainEvent, Object[]>(){
+                    private List<TrainEvent> trainevents = new ArrayList<TrainEvent>();
+                    
+                    public void onFinished(Object[] result) {
+                        if (result == null) {
+                            // this actually means finished!
+                            Delayed.getDb(getApplicationContext()).addTrainEvents(trainevents);
+                        } else {
+                            //This is a fixup (destination) message
+                        }
+                    }
+
+                    public void onPartialResult(TrainEvent result) {
+                        trainevents.add(result);
+                    }
+
+                    public void onRestart() {
+                        trainevents.clear();
+                    }
+
+                    public void onStatus(String status) {}
+                    public void onFail(){}
+                });
+            }
             
-            setAlarm(getApplicationContext(), 60*15);
+            setAlarm(getApplicationContext(), Prefs.getIntSetting(getApplicationContext(), Prefs.PREFS_INTERVAL, 120));
             
             stopSelf();
         } finally {
@@ -58,9 +93,8 @@ public class ScrapeService extends Service {
         AlarmManager mgr = (AlarmManager) ctx.getSystemService(ALARM_SERVICE);
         
         //Wake us up after 15 minutes
-        Intent i = new Intent();
-        i.setAction("se.sandos.android.delayed.scrape.Service");
-        PendingIntent pi = PendingIntent.getService(ctx, 1, i, PendingIntent.FLAG_ONE_SHOT);
-        mgr.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, SystemClock.elapsedRealtime() + delay * 1000, pi);
+        Intent i = new Intent(ctx, ScrapeService.class);
+        PendingIntent pi = PendingIntent.getService(ctx, 1, i, PendingIntent.FLAG_UPDATE_CURRENT);
+        mgr.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + (delay*1000), pi);
     }
 }

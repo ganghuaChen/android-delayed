@@ -44,7 +44,7 @@ public abstract class Scraper<T, U> {
 		while (true) {
 			try {
 				Log.v(Tag, "Trying to download, we are " + getClass());
-				if(r++ >= retries) {
+				if(++r >= retries) {
 					Log.v(Tag, "Retries exhausted, giving up: " + r);
 					break;
 				}

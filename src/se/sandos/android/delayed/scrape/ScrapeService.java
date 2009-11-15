@@ -92,9 +92,23 @@ public class ScrapeService extends Service {
         Log.v(Tag, "Setting up alarm");
         AlarmManager mgr = (AlarmManager) ctx.getSystemService(ALARM_SERVICE);
         
-        //Wake us up after 15 minutes
         Intent i = new Intent(ctx, ScrapeService.class);
         PendingIntent pi = PendingIntent.getService(ctx, 1, i, PendingIntent.FLAG_UPDATE_CURRENT);
         mgr.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + (delay*1000), pi);
+    }
+    
+    public static void setAlarmWithDefaults(Context ctx) 
+    {
+        setAlarm(ctx, Prefs.getIntSetting(ctx, Prefs.PREFS_INTERVAL, 120));
+    }
+    
+    public static void removeAlarm(Context ctx)
+    {
+        Log.v(Tag, "Removing alarm");
+        AlarmManager mgr = (AlarmManager) ctx.getSystemService(ALARM_SERVICE);
+     
+        Intent i = new Intent(ctx, ScrapeService.class);
+        PendingIntent pi = PendingIntent.getService(ctx, 1, i, PendingIntent.FLAG_UPDATE_CURRENT);
+        mgr.cancel(pi);
     }
 }

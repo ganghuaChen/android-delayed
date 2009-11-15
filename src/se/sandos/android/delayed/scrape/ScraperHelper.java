@@ -15,6 +15,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 import se.sandos.android.delayed.TrainEvent;
 import se.sandos.android.delayed.db.Station;
+import android.os.PowerManager;
 import android.util.Log;
 
 /**
@@ -116,6 +117,25 @@ public class ScraperHelper {
 			}
 		});
 	}
+
+    public static void scrapeStationReleaseWakelock(String url, String name,
+            final ScrapeListener<TrainEvent, Object[]> listener, final PowerManager.WakeLock wl)
+    {
+        final Scraper<TrainEvent, Object[]> s = new StationScraper(url, name);
+
+        ScrapePool.addJob(new Job<Object>() {
+            @Override
+            public void run()
+            {
+                try {
+                    s.setScrapeListener(listener);
+                    s.scrape();
+                } finally {
+                    wl.release();
+                }
+            }
+        });
+    }
 	
 	public static void scrapeStations(final ScrapeListener<Station, ArrayList<Station>> notify)
 	{

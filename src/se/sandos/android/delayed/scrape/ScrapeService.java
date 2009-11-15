@@ -37,7 +37,7 @@ public class ScrapeService extends Service {
     public void onStart(Intent intent, int startid)
     {
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
-        PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Delayed service");
+        final PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Delayed service");
         wl.acquire();
         
         try {
@@ -49,7 +49,7 @@ public class ScrapeService extends Service {
             if(favName != null && favURL != null) {
                 //This will spawn a new thread so that we can return quickly
                 Log.v(Tag, "Starting scrape from background service for " + favName);
-                ScraperHelper.scrapeStation(favURL, favName, new ScrapeListener<TrainEvent, Object[]>(){
+                ScraperHelper.scrapeStationReleaseWakelock(favURL, favName, new ScrapeListener<TrainEvent, Object[]>(){
                     private List<TrainEvent> trainevents = new ArrayList<TrainEvent>();
                     
                     public void onFinished(Object[] result) {
@@ -71,14 +71,12 @@ public class ScrapeService extends Service {
 
                     public void onStatus(String status) {}
                     public void onFail(){}
-                });
+                }, wl);
             }
             
             setAlarm(getApplicationContext(), Prefs.getIntSetting(getApplicationContext(), Prefs.PREFS_INTERVAL, 120));
-            
-            stopSelf();
         } finally {
-            wl.release();
+            stopSelf();
         }
     }
 

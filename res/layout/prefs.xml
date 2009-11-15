@@ -13,13 +13,12 @@
 	<TextView android:layout_width="wrap_content"
 		android:layout_height="wrap_content" android:text="Västerås"
 		android:id="@+id/FavoriteStation" android:layout_toRightOf="@+id/FavoritesLabel"></TextView>
-	<TextView android:layout_width="wrap_content"
-		android:layout_below="@+id/FavoritesLabel" android:layout_height="wrap_content"
-		android:id="@+id/ListLabel" android:text="Lista över planerare"
-		android:textSize="26sp"></TextView>
+	<CheckBox android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@+id/FavoriteStation" android:text="Automatisk uppdatering" android:id="@+id/AutomaticUpdate"></CheckBox><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/ListLabel" android:text="Lista över planerare" android:textSize="26sp" android:layout_below="@+id/AutomaticUpdate"></TextView>
 	<ListView android:layout_width="wrap_content"
 		android:layout_height="wrap_content" android:layout_below="@+id/ListLabel"
 		android:id="@+id/SchedulerList" android:choiceMode="multipleChoice"></ListView>
+
+
 </RelativeLayout>
 
 </LinearLayout>

@@ -74,7 +74,9 @@ public class ScrapeService extends Service {
                 }, wl);
             }
             
-            setAlarm(getApplicationContext(), Prefs.getIntSetting(getApplicationContext(), Prefs.PREFS_INTERVAL, 120));
+            if(Prefs.isSet(getApplicationContext(), Prefs.PREFS_SERVICE_ENABLED, false)) {
+                setAlarm(getApplicationContext(), Prefs.getIntSetting(getApplicationContext(), Prefs.PREFS_INTERVAL, 120));
+            }
         } finally {
             stopSelf();
         }

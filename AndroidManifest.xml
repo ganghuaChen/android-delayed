@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	package="se.sandos.android.delayed" android:versionCode="5"
-	android:versionName="0.4">
+	package="se.sandos.android.delayed" android:versionCode="6"
+	android:versionName="0.5">
 	<application android:icon="@drawable/icon" android:label="@string/app_name">
 		<activity android:name=".StationListActivity" android:label="@string/app_name">
 			<intent-filter>
@@ -62,6 +62,23 @@
                 <action android:name="se.sandos.android.delayed.SchedulerSettings"></action>
             </intent-filter>
         </activity>
+
+        <!--  Locale plugin -->
+		<activity android:name=".prefs.locale.LocaleActivity"
+			android:label="@string/localelabel" 
+			android:icon="@drawable/icon"
+			android:exported="true">
+			<intent-filter>
+				<action android:name="com.twofortyfouram.locale.intent.action.EDIT_SETTING"></action>
+			</intent-filter>
+		</activity>
+		
+         <!-- Listen for the "fire" action-->
+         <receiver android:name=".prefs.locale.LocaleBroadcastReceiver" >
+             <intent-filter>
+                 <action android:name="com.twofortyfouram.locale.intent.action.FIRE_SETTING" />
+             </intent-filter>
+         </receiver>
 
 		<!--  Launcher shortcuts -->
 		<activity android:name="LauncherShortcuts" android:label="@string/shortcuts">

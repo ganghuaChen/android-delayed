@@ -53,12 +53,24 @@ public class Prefs {
         Log.v(Tag, "Returning int setting: " + setting + " " + r);
         return r;
     }
-
     
-    public static boolean isSet(Context ctx, String setting)
+    public static void setBooleanSetting(Context ctx, String setting, boolean value)
     {
-        String s = getSetting(ctx, setting, null);
-        return (s != null && s.equalsIgnoreCase("true"));
+        SharedPreferences sp = ctx.getSharedPreferences(PREFS_KEY, Context.MODE_PRIVATE);
+        Editor editor = sp.edit();
+        editor.putBoolean(setting, value);
+        if(!editor.commit()) {
+            Log.w(Tag, "Failed to commit!");
+        }
+        Log.v(Tag, "Setting boolean setting: " + setting + " " + value);
+    }
+
+    public static boolean isSet(Context ctx, String setting, boolean def)
+    {
+        SharedPreferences sp = ctx.getSharedPreferences(PREFS_KEY, Context.MODE_PRIVATE);
+        boolean r = sp.getBoolean(setting, def);
+        Log.v(Tag, "Returning boolean setting: " + setting + " " + r);
+        return r;
     }
     
     /**

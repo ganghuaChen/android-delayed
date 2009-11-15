@@ -16,6 +16,7 @@ import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.CheckBox;
 import android.widget.CheckedTextView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
@@ -37,6 +38,16 @@ public class PreferencesActivity extends Activity {
     };
     
     @Override
+    public void onResume()
+    {
+        super.onResume();
+        
+        CheckBox automatic = (CheckBox) findViewById(R.id.AutomaticUpdate);
+
+        automatic.setChecked(Prefs.isSet(getApplicationContext(), Prefs.PREFS_SERVICE_ENABLED, false));
+    }
+    
+    @Override
 	public void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
@@ -49,6 +60,16 @@ public class PreferencesActivity extends Activity {
 		setList();
 	}
 
+    @Override
+    public void onPause()
+    {
+        super.onPause();
+        
+        CheckBox automatic = (CheckBox) findViewById(R.id.AutomaticUpdate);
+        
+        Prefs.setBooleanSetting(getApplicationContext(), Prefs.PREFS_SERVICE_ENABLED, automatic.isChecked());
+    }
+    
     private void setList() {
         final ListView lv = (ListView) findViewById(R.id.SchedulerList);
 

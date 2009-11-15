@@ -13,7 +13,7 @@ public class OnBoot extends BroadcastReceiver
     @Override
     public void onReceive(Context context, Intent i)
     {
-        if(Prefs.isSet(context, Prefs.PREFS_SERVICE_ENABLED)) {
+        if(Prefs.isSet(context, Prefs.PREFS_SERVICE_ENABLED, false)) {
             Log.v(Tag, "Starting delayed service on boot");
             
             Intent intent = new Intent();

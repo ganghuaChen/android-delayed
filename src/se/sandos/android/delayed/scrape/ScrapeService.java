@@ -102,6 +102,12 @@ public class ScrapeService extends Service {
         setAlarm(ctx, Prefs.getIntSetting(ctx, Prefs.PREFS_INTERVAL, 120));
     }
     
+    public static void runOnceNow(Context ctx)
+    {
+        Intent i = new Intent(ctx, ScrapeService.class);
+        ctx.startService(i);
+    }
+    
     public static void removeAlarm(Context ctx)
     {
         Log.v(Tag, "Removing alarm");

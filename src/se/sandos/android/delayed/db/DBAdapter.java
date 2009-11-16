@@ -176,6 +176,7 @@ public class DBAdapter {
             return res;
         }
 
+        c.close();
         return new ArrayList<TrainEvent>();
     }
 	

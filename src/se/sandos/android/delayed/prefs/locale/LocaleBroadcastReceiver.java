@@ -25,6 +25,7 @@ public class LocaleBroadcastReceiver extends BroadcastReceiver
             if(enabled) {
                 Prefs.setBooleanSetting(context, Prefs.PREFS_SERVICE_ENABLED, true);
                 ScrapeService.setAlarmWithDefaults(context);
+                ScrapeService.runOnceNow(context);
             } else {
                 Prefs.setBooleanSetting(context, Prefs.PREFS_SERVICE_ENABLED, false);
                 ScrapeService.removeAlarm(context);

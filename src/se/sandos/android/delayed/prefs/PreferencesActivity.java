@@ -71,34 +71,19 @@ public class PreferencesActivity extends Activity {
     }
     
     private void setList() {
-        final ListView lv = (ListView) findViewById(R.id.SchedulerList);
+        final ListView lv = (ListView) findViewById(R.id.FavoriteList);
 
         lv.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
         
         List<HashMap<String, Object>> listContent = new ArrayList<HashMap<String, Object>>(10);
         
-        List<ResolveInfo> l = IntentTest.getSchedulerList(getApplicationContext());
+        List<Favorite> favs = Prefs.getFavorites(getApplicationContext());
         
-        for(ResolveInfo ri : l) {
-            ActivityInfo ai = ri.activityInfo;
+        for(Favorite f : favs) {
             HashMap<String, Object> m = new HashMap<String, Object>();
-            m.put("name", IntentTest.getLabel(getApplicationContext(), ai));
-            m.put("pkg", ai.packageName);
-            m.put("class", ai.name);
-            m.put("enabled", new Boolean(false));
+            m.put("name", f.getName());
             listContent.add(m);
         }
-
-        for(ResolveInfo ri : l) {
-            ActivityInfo ai = ri.activityInfo;
-            HashMap<String, Object> m = new HashMap<String, Object>();
-            m.put("name", IntentTest.getLabel(getApplicationContext(), ai));
-            m.put("pkg", ai.packageName);
-            m.put("class", ai.name);
-            m.put("enabled", new Boolean(false));
-            listContent.add(m);
-        }
-
         
         final List<HashMap<String, Object>> ll = listContent;
         
@@ -128,24 +113,24 @@ public class PreferencesActivity extends Activity {
         };
         
         final SimpleAdapter sa = new SimpleAdapter(getApplicationContext(), listContent, R.layout.schedulerrow,
-                new String[] { "enabled"}, new int[] { R.id.SchedulerName});
+                new String[] { "name"}, new int[] { R.id.SchedulerName});
 
-        sa.setViewBinder(vb);
+        //sa.setViewBinder(vb);
         sa.notifyDataSetInvalidated();
 		lv.setAdapter(sa);
-		lv.setOnItemClickListener(new OnItemClickListener(){
-
-            @SuppressWarnings("unchecked")
-            public void onItemClick(AdapterView<?> l, View view, int pos, long id) {
-                HashMap<String, String> m = (HashMap) sa.getItem(pos);
-
-                CheckedTextView child = (CheckedTextView) view.findViewById(R.id.SchedulerName);
-                Log.v(Tag, "Child: " + child + " " + pos + " " + lv.getCheckedItemPosition() + " " + lv.getChoiceMode() + " " + view + " " + id);
-                child.toggle();
-                //sa.notifyDataSetChanged();
-                //lv.invalidate();
-                IntentTest.startSchedulerActivity(getApplicationContext(), mHandler, m.get("pkg"), m.get("class"));
-            }
-		});
+//		lv.setOnItemClickListener(new OnItemClickListener(){
+//
+//            @SuppressWarnings("unchecked")
+//            public void onItemClick(AdapterView<?> l, View view, int pos, long id) {
+//                HashMap<String, String> m = (HashMap) sa.getItem(pos);
+//
+//                CheckedTextView child = (CheckedTextView) view.findViewById(R.id.SchedulerName);
+//                Log.v(Tag, "Child: " + child + " " + pos + " " + lv.getCheckedItemPosition() + " " + lv.getChoiceMode() + " " + view + " " + id);
+//                child.toggle();
+//                //sa.notifyDataSetChanged();
+//                //lv.invalidate();
+//                IntentTest.startSchedulerActivity(getApplicationContext(), mHandler, m.get("pkg"), m.get("class"));
+//            }
+//		});
     }
 }

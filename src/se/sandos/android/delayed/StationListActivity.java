@@ -233,13 +233,8 @@ public class StationListActivity extends ListActivity {
 			Map<String, String> m = (Map) getListView().getAdapter().getItem(cmi.position);
 
 			String stationName = m.get("name");
-			String url = null;
-			if(Delayed.db != null) {
-				url = Delayed.db.getUrl(stationName);
-			}
 
-            Prefs.setSetting(getApplicationContext(), Prefs.PREFS_FAV_URL, url);
-            Prefs.setSetting(getApplicationContext(), Prefs.PREFS_FAV_NAME, stationName);
+            Prefs.addFavorite(getApplicationContext(), stationName);
 		}
 		
 		if(mi.getTitle().equals("Kolla tidtabell")) {
@@ -283,7 +278,6 @@ public class StationListActivity extends ListActivity {
         } else {	        
             gotoStation(stationName, url);
         }
-
 	}
 
 	private void gotoStation(String stationName, String url) {

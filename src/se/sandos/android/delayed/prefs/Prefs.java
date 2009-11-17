@@ -107,7 +107,8 @@ public class Prefs {
             final String fav = PREFS_FAV_PREFIX + index++;
             if(contains(ctx, fav)) {
                 Favorite f = new Favorite();
-                f.setIndex(index);
+                f.setActive(isSet(ctx, fav, false));
+                f.setIndex(index-1);
                 f.setName(getSetting(ctx, fav + ".name"));
                 res.add(f);
             } else {
@@ -116,6 +117,17 @@ public class Prefs {
         }
         
         return res;
+    }
+    
+    public static Favorite getFavorite(Context ctx, String name)
+    {
+        for(Favorite f : getFavorites(ctx)) {
+            if(f.getName().equals(name)) {
+                return f;
+            }
+        }
+        
+        return null;
     }
     
     private static boolean hasFavorite(Context ctx, String name)

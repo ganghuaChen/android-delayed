@@ -63,6 +63,8 @@ public final class R {
         public static final int shortcuts=0x7f050002;
     }
     public static final class xml {
-        public static final int appwidget=0x7f040000;
+        public static final int appwidget11=0x7f040000;
+        public static final int appwidget21=0x7f040001;
+        public static final int appwidget41=0x7f040002;
     }
 }

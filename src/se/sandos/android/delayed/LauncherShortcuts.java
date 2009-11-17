@@ -2,6 +2,7 @@ package se.sandos.android.delayed;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 
 public class LauncherShortcuts extends Activity
@@ -18,10 +19,8 @@ public class LauncherShortcuts extends Activity
 
         if (Intent.ACTION_CREATE_SHORTCUT.equals(action)) {
             setupShortcut();
-            //finish();
             return;
         }
-
     }
     
     public void onActivityResult(int requestCode, int resultCode, Intent data)
@@ -29,11 +28,9 @@ public class LauncherShortcuts extends Activity
         if(requestCode == 0) {
 
             Intent i = new Intent("se.sandos.android.delayed.Station", null, getApplicationContext(), StationActivity.class);
-            i.putExtra("name", data.getExtras().getString("name"));
-            i.putExtra("url", data.getExtras().getString("url"));
+            i.setData(Uri.fromParts("delayed", "trainstation", data.getExtras().getString("name")));
 
             // Then, set up the container intent (the response to the caller)
-
             Intent intent = new Intent();
             intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, i);
             intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, data.getExtras().getString("name"));

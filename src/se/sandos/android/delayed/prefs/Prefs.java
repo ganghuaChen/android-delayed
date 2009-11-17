@@ -11,8 +11,6 @@ import android.util.Log;
 public class Prefs {
     private static final String Tag = "Prefs";
     
-    public static final String PREFS_FAV_NAME = "favoriteName";
-    public static final String PREFS_FAV_URL = "favoriteUrl";
     public static final String PREFS_FAV_PREFIX = "favorite";
     public static final String PREFS_KEY = "delayedfilter";
     

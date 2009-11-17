@@ -57,7 +57,7 @@ public class FavoriteActivity extends Activity {
             return;
         }
 
-        setTitle(favorite.getName());
+        setTitle("Favorit: " + favorite.getName());
         
         CheckBox cb = (CheckBox) findViewById(R.id.FavoriteEnabled);
         cb.setChecked(favorite.isActive());

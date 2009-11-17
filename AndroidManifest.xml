@@ -41,7 +41,7 @@
             </intent-filter>
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/appwidget21" />
         </receiver>
-        <receiver android:name=".widget.DelayedAppWidgetProvider21" android:label="Delayed 4x1">
+        <receiver android:name=".widget.DelayedAppWidgetProvider41" android:label="Delayed 4x1">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>

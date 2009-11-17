@@ -53,9 +53,6 @@ public class PreferencesActivity extends Activity {
 		
 		setContentView(R.layout.prefs);
 		
-		TextView tv = (TextView) findViewById(R.id.FavoriteStation);
-		tv.setText(Prefs.getSetting(getApplicationContext(), Prefs.PREFS_FAV_NAME, "NA"));
-		
 		setList();
 	}
 

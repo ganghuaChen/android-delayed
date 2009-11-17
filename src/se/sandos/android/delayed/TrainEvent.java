@@ -36,6 +36,11 @@ public class TrainEvent implements Comparable<TrainEvent> {
 		return sb;
 	}
 	
+	public void setStation(Station s)
+	{
+	    station = s;
+	}
+	
 	public int getNumber()
 	{
 		return number;

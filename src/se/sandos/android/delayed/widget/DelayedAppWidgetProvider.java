@@ -76,7 +76,6 @@ public class DelayedAppWidgetProvider extends AppWidgetProvider
         }
 
         Intent intent = new Intent("se.sandos.android.delayed.Station", null, context, StationActivity.class);
-        //intent.setData(Uri.parse("delayed://trainstations/" + name));
         intent.setData(Uri.fromParts("delayed", "trainstation", name));
         intent.putExtra("name", (String)null);
         intent.putExtra("url", (String)null);
@@ -108,5 +107,4 @@ public class DelayedAppWidgetProvider extends AppWidgetProvider
         }
         return id;
     }
-    
 }

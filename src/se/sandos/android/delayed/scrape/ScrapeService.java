@@ -5,15 +5,17 @@ import java.util.List;
 
 import se.sandos.android.delayed.Delayed;
 import se.sandos.android.delayed.TrainEvent;
+import se.sandos.android.delayed.db.DBAdapter;
+import se.sandos.android.delayed.prefs.Favorite;
 import se.sandos.android.delayed.prefs.Prefs;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
 import android.os.IBinder;
 import android.os.PowerManager;
-import android.os.SystemClock;
 import android.util.Log;
 
 public class ScrapeService extends Service {
@@ -36,6 +38,11 @@ public class ScrapeService extends Service {
     @Override
     public void onStart(Intent intent, int startid)
     {
+        if(!Prefs.isSet(getApplicationContext(), Prefs.PREFS_SERVICE_ENABLED, false)) {
+            stopSelf();
+            return;
+        }
+        
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         final PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Delayed service");
         wl.acquire();
@@ -43,43 +50,68 @@ public class ScrapeService extends Service {
         try {
             Log.v(Tag, "onStart, missed: " + intent.getIntExtra(Intent.EXTRA_ALARM_COUNT, 0));
             
-            String favName = Prefs.getSetting(getApplicationContext(), Prefs.PREFS_FAV_NAME);
-            String favURL = Prefs.getSetting(getApplicationContext(), Prefs.PREFS_FAV_URL);
+            DBAdapter db = Delayed.getDb(getApplicationContext());
             
-            if(favName != null && favURL != null) {
-                //This will spawn a new thread so that we can return quickly
-                Log.v(Tag, "Starting scrape from background service for " + favName);
-                ScraperHelper.scrapeStationReleaseWakelock(favURL, favName, new ScrapeListener<TrainEvent, Object[]>(){
-                    private List<TrainEvent> trainevents = new ArrayList<TrainEvent>();
+            List<Favorite> favorites = Prefs.getFavorites(getApplicationContext());
+            for(Favorite f : favorites) {
+                String url = db.getUrl(f.getName());
+                scrape(f.getName(), url);
+                //scheduleWidgetUpdate();
+            }
+            
+            // Schedule wakelock-release and alarm setting, this will run after any scrapes are done
+            // We want to set the alarm after the scrapes are done, to avoid over-runs from previous
+            // triggers
+            ScrapePool.addJob(new Runnable(){
+                public void run(){
+                    wl.release();
                     
-                    public void onFinished(Object[] result) {
-                        if (result == null) {
-                            // this actually means finished!
-                            Delayed.getDb(getApplicationContext()).addTrainEvents(trainevents);
-                        } else {
-                            //This is a fixup (destination) message
-                        }
+                    if(Prefs.isSet(getApplicationContext(), Prefs.PREFS_SERVICE_ENABLED, false)) {
+                        setAlarm(getApplicationContext(), Prefs.getIntSetting(getApplicationContext(), Prefs.PREFS_INTERVAL, 120));
                     }
-
-                    public void onPartialResult(TrainEvent result) {
-                        trainevents.add(result);
-                    }
-
-                    public void onRestart() {
-                        trainevents.clear();
-                    }
-
-                    public void onStatus(String status) {}
-                    public void onFail(){}
-                }, wl);
-            }
+                }
+            });
             
-            if(Prefs.isSet(getApplicationContext(), Prefs.PREFS_SERVICE_ENABLED, false)) {
-                setAlarm(getApplicationContext(), Prefs.getIntSetting(getApplicationContext(), Prefs.PREFS_INTERVAL, 120));
-            }
+            
         } finally {
             stopSelf();
         }
+    }
+
+//    private void scheduleWidgetUpdate()
+//    {
+//        Intent update = new Intent();
+//        update.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+//        update.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, value)
+//    }
+
+    private void scrape(String favName, String favURL)
+    {
+        //This will spawn a new thread so that we can return quickly
+        Log.v(Tag, "Starting scrape from background service for " + favName);
+        ScraperHelper.scrapeStation(favURL, favName, new ScrapeListener<TrainEvent, Object[]>(){
+            private List<TrainEvent> trainevents = new ArrayList<TrainEvent>();
+            
+            public void onFinished(Object[] result) {
+                if (result == null) {
+                    // this actually means finished!
+                    Delayed.getDb(getApplicationContext()).addTrainEvents(trainevents);
+                } else {
+                    //This is a fixup (destination) message
+                }
+            }
+
+            public void onPartialResult(TrainEvent result) {
+                trainevents.add(result);
+            }
+
+            public void onRestart() {
+                trainevents.clear();
+            }
+
+            public void onStatus(String status) {}
+            public void onFail(){}
+        });
     }
 
     /**

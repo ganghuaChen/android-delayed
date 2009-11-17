@@ -1,12 +1,17 @@
 package se.sandos.android.delayed.widget;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import se.sandos.android.delayed.Delayed;
 import se.sandos.android.delayed.R;
 import se.sandos.android.delayed.StationActivity;
 import se.sandos.android.delayed.TrainEvent;
+import se.sandos.android.delayed.db.DBAdapter;
+import se.sandos.android.delayed.db.Station;
+import se.sandos.android.delayed.prefs.Favorite;
 import se.sandos.android.delayed.prefs.Prefs;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
@@ -21,8 +26,6 @@ public class DelayedAppWidgetProvider extends AppWidgetProvider
 {
     private static String Tag = "DelayedAppWidgetProvider";
 
-    private static long lastUpdate = -1;
-
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds)
     {
         updateWidget(context, appWidgetManager, appWidgetIds);
@@ -33,46 +36,43 @@ public class DelayedAppWidgetProvider extends AppWidgetProvider
 
         RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.widget);
 
-        String url = Prefs.getSetting(context, Prefs.PREFS_FAV_URL, null);
-        String name = Prefs.getSetting(context, Prefs.PREFS_FAV_NAME, null);
-
-        Log.v(Tag, "URl/name: " + name + "/" + url);
+        Log.v(Tag, "Updating due to outdatedness");
         
-        if(name == null || url == null) {
-            return;
+        List<Favorite> favorites = Prefs.getFavorites(context);
+        List<TrainEvent> events = new ArrayList<TrainEvent>(40);
+        DBAdapter db = Delayed.getDb(context);
+        String name = ""; 
+        for(Favorite f : favorites) {
+            for(TrainEvent te : db.getStationEvents(f.getName())) {
+                te.setStation(new Station(f.getName(), null));
+                events.add(te);
+            }
+            //Just use a random favorite for the click-links for now
+            name = f.getName();
+        }
+        Collections.sort(events);
+        
+        int index = 0;
+        for (TrainEvent te : events) {
+            Log.v(Tag, "Got te: " + te);
+            if (index <= 4) {
+                Log.v(Tag, "Setting text: " + index);
+                
+                String delay = te.getDelayed();
+                if(delay != null && !delay.equals("")) {
+                    Log.v(Tag, "Adding delay info");
+                    rv.setTextViewText(getWidgetId(index, "WidgetDelay"), delay);
+                } else {
+                    rv.setTextViewText(getWidgetId(index, "WidgetDelay"), "");
+                }
+                rv.setTextViewText(getWidgetId(index, "WidgetTime"), te.toString() + " " + te.getStation().getName() + "->" + te.getDestination());
+            }
+            index++;
         }
         
-        long lastUp = Prefs.getLongSetting(context, "lastUpdateForStation" + name, -1);
-        // Update from DB, if it is updated recently enough
-        if (lastUpdate == -1 || lastUp > lastUpdate) {
-            lastUpdate = lastUp;
-
-            Log.v(Tag, "Updating due to outdatedness");
-            
-            List<TrainEvent> events = Delayed.getDb(context).getStationEvents(name);
-            int index = 0;
-            for (TrainEvent te : events) {
-                Log.v(Tag, "Got te: " + te);
-                if (index <= 4) {
-                    Log.v(Tag, "Setting text: " + index);
-                    
-                    String delay = te.getDelayed();
-                    if(delay != null && !delay.equals("")) {
-                        Log.v(Tag, "Adding delay info");
-                        rv.setTextViewText(getWidgetId(index, "WidgetDelay"), delay);
-                    } else {
-                        rv.setTextViewText(getWidgetId(index, "WidgetDelay"), "");
-                    }
-                    rv.setTextViewText(getWidgetId(index, "WidgetTime"), te.toString());
-                }
-                index++;
-            }
-            
-            for(;index<=5;index++) {
-                rv.setTextViewText(getWidgetId(index, "WidgetDelay"), "");
-                rv.setTextViewText(getWidgetId(index, "WidgetTime"), "");
-            }
-
+        for(;index<=5;index++) {
+            rv.setTextViewText(getWidgetId(index, "WidgetDelay"), "");
+            rv.setTextViewText(getWidgetId(index, "WidgetTime"), "");
         }
 
         Intent intent = new Intent("se.sandos.android.delayed.Station", null, context, StationActivity.class);

@@ -118,25 +118,6 @@ public class ScraperHelper {
 		});
 	}
 
-    public static void scrapeStationReleaseWakelock(String url, String name,
-            final ScrapeListener<TrainEvent, Object[]> listener, final PowerManager.WakeLock wl)
-    {
-        final Scraper<TrainEvent, Object[]> s = new StationScraper(url, name);
-
-        ScrapePool.addJob(new Job<Object>() {
-            @Override
-            public void run()
-            {
-                try {
-                    s.setScrapeListener(listener);
-                    s.scrape();
-                } finally {
-                    wl.release();
-                }
-            }
-        });
-    }
-	
 	public static void scrapeStations(final ScrapeListener<Station, ArrayList<Station>> notify)
 	{
 		final Scraper<Station, ArrayList<Station>> s = new StationListScraper();

@@ -20,8 +20,6 @@ public class LocaleBroadcastReceiver extends BroadcastReceiver
             
             boolean enabled = intent.getBooleanExtra(Prefs.PREFS_SERVICE_ENABLED, false);
             
-            
-            
             if(enabled) {
                 Prefs.setBooleanSetting(context, Prefs.PREFS_SERVICE_ENABLED, true);
                 ScrapeService.setAlarmWithDefaults(context);
@@ -30,8 +28,6 @@ public class LocaleBroadcastReceiver extends BroadcastReceiver
                 Prefs.setBooleanSetting(context, Prefs.PREFS_SERVICE_ENABLED, false);
                 ScrapeService.removeAlarm(context);
             }
-            
         }
     }
-
 }

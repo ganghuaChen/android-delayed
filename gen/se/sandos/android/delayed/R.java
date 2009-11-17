@@ -18,6 +18,7 @@ public final class R {
         public static final int Delayed=0x7f060005;
         public static final int Destination=0x7f060002;
         public static final int Extra=0x7f060001;
+        public static final int FavoriteList=0x7f06000e;
         public static final int FavoriteStation=0x7f06000b;
         public static final int FavoritesLabel=0x7f06000a;
         public static final int IntervalLabel=0x7f060006;
@@ -25,7 +26,6 @@ public final class R {
         public static final int LocaleEnabled=0x7f060007;
         public static final int ProgressBar01=0x7f060008;
         public static final int RelativeLayout01=0x7f060009;
-        public static final int SchedulerList=0x7f06000e;
         public static final int SchedulerName=0x7f06000f;
         public static final int StationName=0x7f060010;
         public static final int TNumber=0x7f060004;

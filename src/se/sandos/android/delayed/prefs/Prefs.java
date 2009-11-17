@@ -1,5 +1,8 @@
 package se.sandos.android.delayed.prefs;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -10,10 +13,12 @@ public class Prefs {
     
     public static final String PREFS_FAV_NAME = "favoriteName";
     public static final String PREFS_FAV_URL = "favoriteUrl";
+    public static final String PREFS_FAV_PREFIX = "favorite";
     public static final String PREFS_KEY = "delayedfilter";
     
     public static final String PREFS_INTERVAL = "defaultscheduleinterval";
 
+    
     public static final String PREFS_SERVICE_ENABLED = "se.sandos.android.delayed.serviceEnabled";
 
     
@@ -85,6 +90,61 @@ public class Prefs {
         String r = sp.getString(setting, def);
         Log.v(Tag, "Returning setting: " + setting + " " + r);
         return r;
+    }
+
+    public static boolean contains(Context ctx, String setting)
+    {
+        SharedPreferences sp = ctx.getSharedPreferences(PREFS_KEY, Context.MODE_PRIVATE);
+        return sp.contains(setting);
+    }
+    
+    public static List<Favorite> getFavorites(Context ctx)
+    {
+        List<Favorite> res = new ArrayList<Favorite>(20);
+        
+        int index = 0;
+        while(true) {
+            final String fav = PREFS_FAV_PREFIX + index++;
+            if(contains(ctx, fav)) {
+                Favorite f = new Favorite();
+                f.setIndex(index);
+                f.setName(getSetting(ctx, fav + ".name"));
+                res.add(f);
+            } else {
+                break;
+            }
+        }
+        
+        return res;
+    }
+    
+    private static boolean hasFavorite(Context ctx, String name)
+    {
+        for(Favorite f : getFavorites(ctx)) {
+            if(f.getName().equals(name)) {
+                return true;
+            }
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Add new favorite station.
+     * @param stationName
+     */
+    public static void addFavorite(Context ctx, String stationName)
+    {
+        //Do not allow re-adding
+        if(hasFavorite(ctx, stationName)) {
+            return;
+        }
+        
+        int index = getFavorites(ctx).size();
+        final String fav = PREFS_FAV_PREFIX + index;
+        
+        setBooleanSetting(ctx, fav, true);
+        setSetting(ctx, fav + ".name", stationName);
     }
 
 }

@@ -4,6 +4,6 @@
 	android:minWidth="72dp" android:minHeight="72dp"
 	android:updatePeriodMillis="120000"
 	android:initialLayout="@layout/widget"
-	android:label="TestWidget"
+	android:label="Delayed 1x1"
 >
 </appwidget-provider>

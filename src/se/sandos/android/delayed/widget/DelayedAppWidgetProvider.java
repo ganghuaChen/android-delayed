@@ -13,6 +13,7 @@ import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
 import android.content.Intent;
+import android.net.Uri;
 import android.util.Log;
 import android.widget.RemoteViews;
 
@@ -24,6 +25,10 @@ public class DelayedAppWidgetProvider extends AppWidgetProvider
 
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds)
     {
+        updateWidget(context, appWidgetManager, appWidgetIds);
+    }
+
+    public static void updateWidget(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         Log.v(Tag, "onUpdate " + context + " " + appWidgetManager);
 
         RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.widget);
@@ -71,8 +76,10 @@ public class DelayedAppWidgetProvider extends AppWidgetProvider
         }
 
         Intent intent = new Intent("se.sandos.android.delayed.Station", null, context, StationActivity.class);
-        intent.putExtra("name", name);
-        intent.putExtra("url", url);
+        //intent.setData(Uri.parse("delayed://trainstations/" + name));
+        intent.setData(Uri.fromParts("delayed", "trainstation", name));
+        intent.putExtra("name", (String)null);
+        intent.putExtra("url", (String)null);
         
         Log.v(Tag, "Setting pending intent to name" + name);
         
@@ -89,7 +96,7 @@ public class DelayedAppWidgetProvider extends AppWidgetProvider
         }
     }
 
-    private int getWidgetId(int index, String prefix)
+    private static int getWidgetId(int index, String prefix)
     {
         int id = 0;
         try {

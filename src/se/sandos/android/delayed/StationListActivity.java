@@ -15,6 +15,7 @@ import se.sandos.android.delayed.scrape.ScrapeService;
 import se.sandos.android.delayed.scrape.ScraperHelper;
 import android.app.ListActivity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
@@ -287,9 +288,7 @@ public class StationListActivity extends ListActivity {
 
 	private void gotoStation(String stationName, String url) {
 		Intent i = new Intent("se.sandos.android.delayed.Station", null, getApplicationContext(), StationActivity.class);
-		i.putExtra("name", stationName);
-		i.putExtra("url", url);
-		Log.i(Tag, "Url: " + url + " Name: " + stationName);
+		i.setData(Uri.fromParts("delayed", "trainstation", stationName));
 		startActivity(i);
 	}
 }

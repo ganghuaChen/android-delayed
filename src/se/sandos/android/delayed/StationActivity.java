@@ -15,6 +15,7 @@ import se.sandos.android.delayed.scrape.StationScraper;
 import se.sandos.android.delayed.scrape.ScraperHelper.Nameurl;
 import android.app.ListActivity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Debug;
 import android.os.Handler;
@@ -97,8 +98,21 @@ public class StationActivity extends ListActivity {
         setContentView(R.layout.liststations);
 
         Intent i = getIntent();
-        this.url = i.getStringExtra("url");
-        this.name = i.getStringExtra("name");
+        Uri uri = i.getData();
+        if(uri == null) {
+            Log.w(Tag, "No data URI!");
+            finish();
+            return;
+        }
+        Log.v(Tag, "data: " + uri);
+        name = uri.getFragment();
+        url = Delayed.getDb(getApplicationContext()).getUrl(this.name);
+        
+        if(url == null) {
+            Log.w(Tag, "Could not find station named " + name);
+            finish();
+            return;
+        }
 
         setTitle("Delayed: " + name);
 

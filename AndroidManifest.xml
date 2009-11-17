@@ -24,6 +24,9 @@
 				<action android:name="se.sandos.android.delayed.Prefs"></action>
 			</intent-filter>
 		</activity>
+        <activity android:name="se.sandos.android.delayed.prefs.FavoriteActivity">
+        </activity>
+		
 		
 		<!-- Widget -->
 		<receiver android:name=".widget.DelayedAppWidgetProvider" android:label="Delayed 1x1">
@@ -44,8 +47,6 @@
             </intent-filter>
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/appwidget41" />
         </receiver>
-
-
 
 		<!-- Auto-start of service at boot-time -->
 		<receiver android:name=".scrape.OnBoot" android:label="@string/app_name">

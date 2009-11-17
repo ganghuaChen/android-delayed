@@ -5,17 +5,22 @@ import java.util.HashMap;
 import java.util.List;
 
 import se.sandos.android.delayed.R;
+import se.sandos.android.delayed.scrape.IntentTest;
 import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.CheckBox;
 import android.widget.CheckedTextView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.AdapterView.OnItemClickListener;
 
 /**
  * Set preferences, filters etc
@@ -112,19 +117,23 @@ public class PreferencesActivity extends Activity {
         //sa.setViewBinder(vb);
         sa.notifyDataSetInvalidated();
 		lv.setAdapter(sa);
-//		lv.setOnItemClickListener(new OnItemClickListener(){
-//
-//            @SuppressWarnings("unchecked")
-//            public void onItemClick(AdapterView<?> l, View view, int pos, long id) {
-//                HashMap<String, String> m = (HashMap) sa.getItem(pos);
-//
+		lv.setOnItemClickListener(new OnItemClickListener(){
+
+            @SuppressWarnings("unchecked")
+            public void onItemClick(AdapterView<?> l, View view, int pos, long id) {
+                HashMap<String, String> m = (HashMap) sa.getItem(pos);
+
+                //Start activity for configuring the favorite
+                Intent intent = new Intent(getApplicationContext(), FavoriteActivity.class);
+                intent.setData(Uri.fromParts("delayed", "favorite", m.get("name")));
+                startActivity(intent);
 //                CheckedTextView child = (CheckedTextView) view.findViewById(R.id.SchedulerName);
 //                Log.v(Tag, "Child: " + child + " " + pos + " " + lv.getCheckedItemPosition() + " " + lv.getChoiceMode() + " " + view + " " + id);
 //                child.toggle();
 //                //sa.notifyDataSetChanged();
 //                //lv.invalidate();
 //                IntentTest.startSchedulerActivity(getApplicationContext(), mHandler, m.get("pkg"), m.get("class"));
-//            }
-//		});
+            }
+		});
     }
 }

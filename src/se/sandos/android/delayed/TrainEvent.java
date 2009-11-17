@@ -12,7 +12,7 @@ import android.util.Log;
  * @author johba
  *
  */
-public class TrainEvent {
+public class TrainEvent implements Comparable<TrainEvent> {
 	private final static String Tag = "TrainEvent";
 	
 	private String altDest;
@@ -185,4 +185,18 @@ public class TrainEvent {
 		}
 	}
 
+    public int compareTo(TrainEvent another) {
+        long ours = departure.getTime();
+        long theirs = another.getDepartureDate().getTime();
+        
+        if(ours < theirs) {
+            return -1;
+        }
+        
+        if(ours > theirs) {
+            return 1;
+        }
+        
+        return 0;
+    }
 }

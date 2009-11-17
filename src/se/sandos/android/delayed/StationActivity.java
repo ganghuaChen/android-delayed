@@ -9,6 +9,7 @@ import java.util.Map;
 
 import se.sandos.android.delayed.db.DBAdapter;
 import se.sandos.android.delayed.prefs.PreferencesActivity;
+import se.sandos.android.delayed.prefs.Prefs;
 import se.sandos.android.delayed.scrape.ScrapeListener;
 import se.sandos.android.delayed.scrape.ScraperHelper;
 import se.sandos.android.delayed.scrape.StationScraper;
@@ -289,7 +290,8 @@ public class StationActivity extends ListActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         menu.add(0, 1, 0, "Ladda om");
         menu.add(0, 2, 0, "Välj station");
-        menu.add(0, 3, 0, "Inställningar");
+        menu.add(0, 3, 0, "Gör till favorit");
+        menu.add(0, 4, 0, "Inställningar");
         
         return true;
     }
@@ -327,6 +329,11 @@ public class StationActivity extends ListActivity {
         }
 
         if (mi.getItemId() == 3) {
+            Prefs.addFavorite(getApplicationContext(), name);
+            return true;
+        }
+        
+        if (mi.getItemId() == 4) {
             Intent i = new Intent("se.sandos.android.delayed.Prefs", null, getApplicationContext(), PreferencesActivity.class);
             startActivity(i);
             return true;

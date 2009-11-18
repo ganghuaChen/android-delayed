@@ -65,7 +65,7 @@ public class DelayedAppWidgetProvider extends AppWidgetProvider
                 } else {
                     rv.setTextViewText(getWidgetId(index, "WidgetDelay"), "");
                 }
-                rv.setTextViewText(getWidgetId(index, "WidgetTime"), te.toString() + " " + te.getStation().getName() + "->" + te.getDestination());
+                rv.setTextViewText(getWidgetId(index, "WidgetTime"), te.toString() + "|" + te.getTrack() + " "+ te.getStation().getName() + "->" + te.getDestination());
             }
             index++;
         }

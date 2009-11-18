@@ -54,9 +54,11 @@ public class ScrapeService extends Service {
             
             List<Favorite> favorites = Prefs.getFavorites(getApplicationContext());
             for(Favorite f : favorites) {
-                String url = db.getUrl(f.getName());
-                scrape(f.getName(), url);
-                //scheduleWidgetUpdate();
+                if(f.isActive()) {
+                    String url = db.getUrl(f.getName());
+                    scrape(f.getName(), url);
+                    //scheduleWidgetUpdate();
+                }
             }
             
             // Schedule wakelock-release and alarm setting, this will run after any scrapes are done

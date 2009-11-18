@@ -6,6 +6,7 @@ import java.util.List;
 
 import se.sandos.android.delayed.R;
 import se.sandos.android.delayed.scrape.IntentTest;
+import se.sandos.android.delayed.scrape.ScrapeService;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
@@ -62,6 +63,16 @@ public class PreferencesActivity extends Activity {
         super.onPause();
         
         CheckBox automatic = (CheckBox) findViewById(R.id.AutomaticUpdate);
+        
+        boolean isCheckedNow = automatic.isChecked();
+        
+        if(Prefs.isSet(getApplicationContext(), Prefs.PREFS_SERVICE_ENABLED, false) != isCheckedNow) {
+            if(isCheckedNow) {
+                //Need to start service
+                ScrapeService.setAlarmWithDefaults(getApplicationContext());
+                ScrapeService.runOnceNow(getApplicationContext());
+            }
+        }
         
         Prefs.setBooleanSetting(getApplicationContext(), Prefs.PREFS_SERVICE_ENABLED, automatic.isChecked());
     }

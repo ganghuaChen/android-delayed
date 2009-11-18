@@ -86,18 +86,22 @@ public class DBAdapter {
     			for(TrainEvent te : trainevents) {
     				numbers[index++] = te.getNumber();
     			}
-    			TrainEvent[] events = getTrainEvent(station, numbers);
+    			TrainEvent[] events = getTrainEvents(station, numbers);
     			
-    			Set<Integer> e = new HashSet<Integer>();
+    			Set<Integer> existing_events = new HashSet<Integer>();
     			for(int i=0; i<events.length; i++) {
-    				e.add(Integer.valueOf(events[i].getNumber()));
+    				existing_events.add(Integer.valueOf(events[i].getNumber()));
     			}
     
     			int count=0;
     			for(TrainEvent te : trainevents) {
-    				if(!e.contains(Integer.valueOf(te.getNumber()))) {
+    				if(!existing_events.contains(Integer.valueOf(te.getNumber()))) {
     				    count++;
-    					addTrainEventImpl(te.getStation().getName(), te.getDepartureDate(), te.getTrack(), te.getNumber(), te.getDelayedDate(), te.getExtra(), te.getDestination());
+    					addTrainEventImpl(te.getStation().getName(), te.getDepartureDate(), te.getTrack(), te.getNumber(), te.getDelayedDate(), te.getExtra(), te.getDestination(), true);
+    				} else {
+    				    //Might still need updating, extra or delay!
+                        count++;
+                        addTrainEventImpl(te.getStation().getName(), te.getDepartureDate(), te.getTrack(), te.getNumber(), te.getDelayedDate(), te.getExtra(), te.getDestination(), false);
     				}
     			}
     			if(TRACE) {
@@ -129,7 +133,7 @@ public class DBAdapter {
         Calendar cal = Calendar.getInstance();
         //String cald = SIMPLE_DATEFORMATTER.format(cal);
         //-6 minute fuzz, arbitrary value for now
-        cal.add(Calendar.MINUTE, -6);
+        cal.add(Calendar.MINUTE, -4);
         
         Log.v(Tag, "Number of events in db: " + c.getCount());
         if (!c.isAfterLast() && !c.isBeforeFirst()) {
@@ -144,6 +148,7 @@ public class DBAdapter {
                     StringBuffer sb = te.getStringBuffer();
                     sb.setLength(0);
                     sb.append(c.getString(1));
+                    Log.v(Tag, "Setting extra: " + sb.toString());
                 }
                 if(!c.isNull(5)) {
                 	te.setDestinationFromString(c.getString(5));
@@ -161,12 +166,20 @@ public class DBAdapter {
 //                    Log.v(Tag, "Before!");
 //                }
                 //Calendar.before is broken??? Does not work for me anyway...
-                if(now < item && (te.getDelayedDate() == null || now < te.getDelayedDate().getTime())){
-                    res.add(te);
+                if(te.getExtra().equals("")) {
+                    if(now < item && (te.getDelayedDate() == null || now < te.getDelayedDate().getTime())){
+                        res.add(te);
+                    } else {
+                        //Remove it
+                        //Log.v(Tag, "Removing " + (now-item) + " " + SIMPLE_DATEFORMATTER.format(te.getDepartureDate()) + " " + SIMPLE_DATEFORMATTER.format(new Date(now)));
+                        db.execSQL("delete from trainevents where _id = " + c.getInt(4), new Object[0]);
+                    }
                 } else {
-                    //Remove it
-                    //Log.v(Tag, "Removing " + (now-item) + " " + SIMPLE_DATEFORMATTER.format(te.getDepartureDate()) + " " + SIMPLE_DATEFORMATTER.format(new Date(now)));
-                    db.execSQL("delete from trainevents where _id = " + c.getInt(4), new Object[0]);
+                    if(now < item - (1000*60*40)){
+                        res.add(te);
+                    } else {
+                        db.execSQL("delete from trainevents where _id = " + c.getInt(4), new Object[0]);
+                    }
                 }
                 
                 c.move(1);
@@ -179,10 +192,35 @@ public class DBAdapter {
         c.close();
         return new ArrayList<TrainEvent>();
     }
-	
-    //Trainevents are identified by train and station? Time, track, delay, extra is mutable.
-    public long addTrainEventImpl(String station, Date time, String track, int number, Date delay, String extra, String destination)
+
+    /**
+     * 
+     * @param station
+     * @param time
+     * @param track
+     * @param number
+     * @param delay
+     * @param extra
+     * @param destination
+     * @param add Wether to add this event, or possibly update it
+     * @return
+     */
+    public long addTrainEventImpl(String station, Date time, String track, int number, Date delay, String extra, String destination, boolean add)
     {
+        if(!add) {
+            ContentValues cv = new ContentValues();
+            if(delay != null) {
+                cv.put(TRAINEVENT_KEY_DELAY, delay.getTime());
+            } else {
+                cv.putNull(TRAINEVENT_KEY_DELAY);
+            }
+            cv.put(TRAINEVENT_KEY_EXTRA, extra);
+            Log.v(Tag, "SEtting extra: " + extra);
+            long res = db.update(TRAINEVENT_TABLE_NAME, cv, "" + TRAINEVENT_KEY_STATION + " = ? and " + TRAINEVENT_KEY_NUMBER + " = " + number, new String[]{station});
+            Log.v(Tag, "Affected " + res);
+            return res;
+        }
+        
 		ContentValues cv = new ContentValues();
 		cv.put(TRAINEVENT_KEY_STATION, station);
 		cv.put(TRAINEVENT_KEY_TIME, time.getTime());
@@ -202,7 +240,7 @@ public class DBAdapter {
 		return status;
     }
     
-    public TrainEvent[] getTrainEvent(String station, int[] numbers)
+    public TrainEvent[] getTrainEvents(String station, int[] numbers)
     {
     	if(station == null) {
     		return  null;

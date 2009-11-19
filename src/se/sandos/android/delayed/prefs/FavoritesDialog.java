@@ -17,6 +17,7 @@ import android.widget.AdapterView.OnItemClickListener;
 public class FavoritesDialog extends Dialog {
     private OnClickListener listener;
     private String favoriteName;
+    private boolean enabled;
 
     public FavoritesDialog(Context context) {
         super(context);
@@ -31,6 +32,10 @@ public class FavoritesDialog extends Dialog {
         return favoriteName;
     }
 
+    public boolean getEnabled() {
+        return enabled;
+    }
+    
     public void setClickListener(OnClickListener listener) {
         this.listener = listener;
     }
@@ -43,6 +48,7 @@ public class FavoritesDialog extends Dialog {
         for (Favorite f : favs) {
             HashMap<String, Object> m = new HashMap<String, Object>();
             m.put("name", f.getName());
+            m.put("enabled", f.isActive());
             listContent.add(m);
         }
 
@@ -59,6 +65,7 @@ public class FavoritesDialog extends Dialog {
                 HashMap<String, Object> m = (HashMap<String, Object>) sa.getItem(pos);
 
                 favoriteName = (String) m.get("name");
+                enabled = (Boolean) m.get("enabled");
 
                 if (listener != null) {
                     listener.onClick(di, 1);

@@ -15,7 +15,7 @@ public class FavoriteActivity extends Activity {
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
-        
+    
         setContentView(R.layout.favorite);
     }
 
@@ -38,7 +38,9 @@ public class FavoriteActivity extends Activity {
         if(mi.getItemId() == 2) {
             CheckBox cb = (CheckBox) findViewById(R.id.FavoriteEnabled);
             favorite.setActive(cb.isChecked());
-            favorite.persist(getApplicationContext());
+            if(getIntent().getData().getHost().equals("favorite")) {
+                favorite.persist(getApplicationContext());
+            }
             return true;
         }
         

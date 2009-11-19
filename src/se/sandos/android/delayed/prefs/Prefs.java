@@ -16,9 +16,9 @@ public class Prefs {
     
     public static final String PREFS_INTERVAL = "defaultscheduleinterval";
 
+    public static final String PREFS_WIDGET_PREFIX = "widget";
     
     public static final String PREFS_SERVICE_ENABLED = "se.sandos.android.delayed.serviceEnabled";
-
     
     /**
      * Get a setting. Default value if not found is null

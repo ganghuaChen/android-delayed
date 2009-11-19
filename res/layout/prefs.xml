@@ -7,13 +7,9 @@
 
 <RelativeLayout android:id="@+id/RelativeLayout01"
 	android:layout_width="wrap_content" android:layout_height="wrap_content">
-	<TextView android:layout_width="wrap_content"
-		android:layout_height="wrap_content" android:text="Favorite stations"
-		android:id="@+id/FavoritesLabel" android:layout_marginRight="4px"></TextView>
-	<TextView android:layout_width="wrap_content"
-		android:layout_height="wrap_content" android:text="Västerås"
-		android:id="@+id/FavoriteStation" android:layout_toRightOf="@+id/FavoritesLabel"></TextView>
-	<CheckBox android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@+id/FavoriteStation" android:text="Automatisk uppdatering" android:id="@+id/AutomaticUpdate"></CheckBox><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/ListLabel" android:textSize="26sp" android:layout_below="@+id/AutomaticUpdate" android:text="Favoriter"></TextView>
+	
+	
+	<CheckBox android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@+id/FavoriteStation" android:text="Automatisk uppdatering" android:id="@+id/AutomaticUpdate" android:textSize="24sp"></CheckBox><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/ListLabel" android:textSize="26sp" android:layout_below="@+id/AutomaticUpdate" android:text="Favoriter"></TextView>
 	<ListView android:layout_width="wrap_content"
 		android:layout_height="wrap_content" android:layout_below="@+id/ListLabel"
 		android:choiceMode="multipleChoice" android:id="@+id/FavoriteList"></ListView>

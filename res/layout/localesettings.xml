@@ -3,5 +3,11 @@
   xmlns:android="http://schemas.android.com/apk/res/android"
   android:layout_width="wrap_content"
   android:layout_height="wrap_content">
-<CheckBox android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Automatic updates" android:id="@+id/LocaleEnabled"></CheckBox>
+
+<RelativeLayout android:id="@+id/RelativeLayout01" android:layout_width="wrap_content" android:layout_height="wrap_content">
+<CheckBox android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/LocaleEnabled" android:text="Uppdatera" android:textSize="32sp"></CheckBox>
+
+<Button android:layout_below="@+id/LocaleEnabled" android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/AddFavorite" android:text="Lägg till favorit" android:textSize="32sp"></Button>
+<ListView android:layout_below="@+id/AddFavorite" android:layout_height="wrap_content" android:layout_width="wrap_content" android:id="@+id/SelectedFavorites"></ListView>
+</RelativeLayout>
 </LinearLayout>

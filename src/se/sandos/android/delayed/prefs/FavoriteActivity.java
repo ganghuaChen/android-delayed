@@ -2,6 +2,7 @@ package se.sandos.android.delayed.prefs;
 
 import se.sandos.android.delayed.R;
 import android.app.Activity;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -38,9 +39,11 @@ public class FavoriteActivity extends Activity {
         if(mi.getItemId() == 2) {
             CheckBox cb = (CheckBox) findViewById(R.id.FavoriteEnabled);
             favorite.setActive(cb.isChecked());
-            if(getIntent().getData().getHost().equals("favorite")) {
+            Uri uri = getIntent().getData();
+            if(uri.getSchemeSpecificPart() != null && uri.getSchemeSpecificPart().equals("favorite")) {
                 favorite.persist(getApplicationContext());
             }
+            finish();
             return true;
         }
         

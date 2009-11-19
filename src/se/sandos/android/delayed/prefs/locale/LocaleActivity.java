@@ -14,6 +14,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -29,7 +30,7 @@ public class LocaleActivity extends Activity
 {
     private static final String Tag = "LocaleActivity";
     
-    List<HashMap<String, String>> content = new ArrayList<HashMap<String, String>>(10);
+    List<HashMap<String, Object>> content = new ArrayList<HashMap<String, Object>>(10);
     
     SimpleAdapter sa;
     
@@ -41,7 +42,18 @@ public class LocaleActivity extends Activity
         setContentView(R.layout.localesettings);
         
         CheckBox cb = (CheckBox) findViewById(R.id.LocaleEnabled);
-        cb.setChecked(getIntent().getBooleanExtra(Prefs.PREFS_SERVICE_ENABLED, false));
+        Intent intent = getIntent();
+        cb.setChecked(intent.getBooleanExtra(Prefs.PREFS_SERVICE_ENABLED, false));
+        
+        int index = 0;
+        while(true) {
+            String name = intent.getStringExtra("favorite" + index); 
+            if(name != null) {
+                addFavorite(name, intent.getBooleanExtra("favoriteEnabled" + index++, false));
+            } else {
+                break;
+            }
+        }
         
         Button b = (Button) findViewById(R.id.AddFavorite);
         b.setOnClickListener(new OnClickListener() {
@@ -49,6 +61,8 @@ public class LocaleActivity extends Activity
                 showDialog(1);
             }
         });
+        
+        setTitle("Locale > Edit situation > Delayed");
     } 
    
     @Override
@@ -61,8 +75,9 @@ public class LocaleActivity extends Activity
                 
                 public void onClick(DialogInterface dialog, int which) {
                     FavoritesDialog fd = (FavoritesDialog) dialog;
-                    addFavorite(fd.getSelected());
+                    addFavorite(fd.getSelected(), fd.getEnabled());
                     dismissDialog(1);
+                    editFavorite(fd.getEnabled(), fd.getSelected());
                 }
             });
             
@@ -72,13 +87,14 @@ public class LocaleActivity extends Activity
         return null;
     }
 
-    private void addFavorite(String selected) {
+    private void addFavorite(String selected, boolean enabled) {
         if(exists(selected)) {
             return;
         }
         
-        HashMap<String, String> m = new HashMap<String, String>();
+        HashMap<String, Object> m = new HashMap<String, Object>();
         m.put("name", selected);
+        m.put("enabled", enabled);
         content.add(m);
         
         if(sa == null) {
@@ -92,20 +108,42 @@ public class LocaleActivity extends Activity
             lv.setOnItemClickListener(new OnItemClickListener() {
                 @SuppressWarnings("unchecked")
                 public void onItemClick(AdapterView<?> adapter, View view, int pos, long id) {
-                    HashMap<String, String> m = (HashMap<String, String>) adapter.getAdapter().getItem(pos);
+                    HashMap<String, Object> m = (HashMap<String, Object>) adapter.getAdapter().getItem(pos);
                     
-                    Intent intent = new Intent(getApplicationContext(), FavoriteActivity.class);
-                    intent.setData(Uri.fromParts("delayed", "favoriteFuture", m.get("name")));
-                    startActivity(intent);
+                    boolean enabled = ((Boolean)m.get("enabled")).booleanValue();
+                    String name = (String) m.get("name"); 
+                    editFavorite(enabled, name);
                 }
             });
         }
         
         sa.notifyDataSetChanged();
     }
+
+    private void editFavorite(boolean enabled, String name)
+    {
+        Intent intent = new Intent(getApplicationContext(), FavoriteActivity.class);
+        intent.putExtra("enabled", enabled);
+        intent.setData(Uri.fromParts("delayed", "favoriteFuture", name));
+        startActivityForResult(intent, 1);
+    }
+    
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        if(requestCode == 1 && data != null) {
+            Log.v(Tag, "Saving result from FavoriteActivity");
+            String name = data.getStringExtra("name");
+            for(HashMap<String, Object> m : content) {
+                if(m.get("name").equals(name)) {
+                    m.put("enabled", data.getBooleanExtra("enabled", false));
+                    Log.v(Tag, "E: " + m.get("enabled"));
+                }
+            }
+        }
+    }
     
     private boolean exists(String selected) {
-        for(HashMap<String, String> m : content) {
+        for(HashMap<String, Object> m : content) {
             if(m.get("name").equals(selected)) {
                 return true;
             }
@@ -155,8 +193,21 @@ public class LocaleActivity extends Activity
         } else {
             blurb += "disabled";
         }
+        blurb += " ";
+        int index = 0;
+        for(HashMap<String, Object> m : content) {
+            String name = (String) m.get("name");
+            intent.putExtra("favorite" + index, name);
+            Boolean b = (Boolean) m.get("enabled");
+            intent.putExtra("favoriteEnabled" + index++, b);
+            if(b == null || b.booleanValue()) {
+                blurb += "+";
+            } else {
+                blurb += "-";
+            }
+            blurb += name;
+        }
         intent.putExtra("com.twofortyfouram.locale.intent.extra.BLURB", blurb);
-        
         setResult(Activity.RESULT_OK, intent);
         finish();
     }

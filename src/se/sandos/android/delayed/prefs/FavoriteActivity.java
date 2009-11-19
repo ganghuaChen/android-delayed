@@ -2,11 +2,12 @@ package se.sandos.android.delayed.prefs;
 
 import se.sandos.android.delayed.R;
 import android.app.Activity;
-import android.net.Uri;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.CheckBox;
+import android.widget.TextView;
 
 public class FavoriteActivity extends Activity {
     
@@ -39,15 +40,30 @@ public class FavoriteActivity extends Activity {
         if(mi.getItemId() == 2) {
             CheckBox cb = (CheckBox) findViewById(R.id.FavoriteEnabled);
             favorite.setActive(cb.isChecked());
-            Uri uri = getIntent().getData();
-            if(uri.getSchemeSpecificPart() != null && uri.getSchemeSpecificPart().equals("favorite")) {
+            if(isReal()) {
                 favorite.persist(getApplicationContext());
+            } else {
+                Intent intent = new Intent();
+                intent.putExtra("name", favorite.getName());
+                intent.putExtra("enabled", favorite.isActive());
+                setResult(Activity.RESULT_OK, intent);
             }
+          
             finish();
             return true;
         }
         
         return false;
+    }
+
+    private boolean isReal()
+    {
+        return getIntent().getData().getSchemeSpecificPart() != null && getIntent().getData().getSchemeSpecificPart().equals("favorite");
+    }
+    
+    public Favorite getFavorite()
+    {
+        return favorite;
     }
     
     @Override
@@ -62,9 +78,20 @@ public class FavoriteActivity extends Activity {
             return;
         }
 
-        setTitle("Favorit: " + favorite.getName());
+        if(isReal()) {
+            setTitle("Favorit: " + favorite.getName());
+        } else {
+            setTitle("Locale > Edit situation > Delayed > Favorit > " + favorite.getName());
+        }
+        
+        TextView tv = (TextView) findViewById(R.id.FavoriteName);
+        tv.setText(favorite.getName());
         
         CheckBox cb = (CheckBox) findViewById(R.id.FavoriteEnabled);
-        cb.setChecked(favorite.isActive());
+        if(isReal()) {
+            cb.setChecked(favorite.isActive());
+        } else {
+            cb.setChecked(getIntent().getBooleanExtra("enabled", false));
+        }
     }
 }

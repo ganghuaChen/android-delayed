@@ -43,12 +43,14 @@ public class DelayedAppWidgetProvider extends AppWidgetProvider
         DBAdapter db = Delayed.getDb(context);
         String name = ""; 
         for(Favorite f : favorites) {
-            for(TrainEvent te : db.getStationEvents(f.getName())) {
-                te.setStation(new Station(f.getName(), null));
-                events.add(te);
+            if(f.isActive()) {
+                for(TrainEvent te : db.getStationEvents(f.getName())) {
+                    te.setStation(new Station(f.getName(), null));
+                    events.add(te);
+                }
+                //Just use a random favorite for the click-links for now
+                name = f.getName();
             }
-            //Just use a random favorite for the click-links for now
-            name = f.getName();
         }
         Collections.sort(events);
         

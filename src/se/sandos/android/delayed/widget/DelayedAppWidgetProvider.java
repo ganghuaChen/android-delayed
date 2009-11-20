@@ -3,6 +3,7 @@ package se.sandos.android.delayed.widget;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import se.sandos.android.delayed.Delayed;
@@ -20,6 +21,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.RemoteViews;
 
 public class DelayedAppWidgetProvider extends AppWidgetProvider
@@ -72,9 +75,20 @@ public class DelayedAppWidgetProvider extends AppWidgetProvider
             index++;
         }
         
-        for(;index<=5;index++) {
-            rv.setTextViewText(getWidgetId(index, "WidgetDelay"), "");
-            rv.setTextViewText(getWidgetId(index, "WidgetTime"), "");
+        if(index == 0) {
+            for(;index<=5;index++) {
+                rv.setViewVisibility(getWidgetId(index, "WidgetDelay"), View.GONE);
+                rv.setViewVisibility(getWidgetId(index, "WidgetTime"), View.GONE);
+            }
+            //Empty widget, please set sth
+            rv.setViewVisibility(R.id.EmptyPlaceHolder, View.VISIBLE);
+            rv.setTextViewText(R.id.EmptyPlaceHolder, "Inga tågtider\n" + TrainEvent.df.format(new Date()));
+        } else {
+            rv.setViewVisibility(R.id.EmptyPlaceHolder, View.GONE);
+            for(;index<=5;index++) {
+                rv.setViewVisibility(getWidgetId(index, "WidgetDelay"), View.GONE);
+                rv.setViewVisibility(getWidgetId(index, "WidgetTime"), View.GONE);
+            }
         }
 
         Intent intent = new Intent("se.sandos.android.delayed.Station", null, context, StationActivity.class);

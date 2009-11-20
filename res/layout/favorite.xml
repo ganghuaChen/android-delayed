@@ -5,4 +5,7 @@
   android:layout_height="wrap_content">
 
 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="FavoriteName" android:id="@+id/FavoriteName" android:textSize="32sp"></TextView><CheckBox android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="Aktiv" android:textSize="35sp" android:id="@+id/FavoriteEnabled" android:layout_below="@+id/FavoriteName"></CheckBox>
+<TextView android:layout_width="wrap_content" android:layout_below="@+id/FavoriteEnabled" android:layout_height="wrap_content" android:text="Mål" android:textSize="32sp" android:id="@+id/TargetListLabel"></TextView><ListView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/TargetList" android:layout_below="@+id/TargetListLabel"></ListView><CheckBox android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@+id/TargetList" android:text="Andra favoriter" android:textSize="32sp" android:id="@+id/OtherFavoritesEnabled"></CheckBox>
+
+
 </RelativeLayout>

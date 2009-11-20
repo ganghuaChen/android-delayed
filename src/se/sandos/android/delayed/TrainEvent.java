@@ -24,7 +24,7 @@ public class TrainEvent implements Comparable<TrainEvent> {
 	private Date departure;
 	private Date delayed;
 	//private Date arrival;
-	private static DateFormat df = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT, java.util.Locale.GERMANY);
+	public static DateFormat df = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT, java.util.Locale.GERMANY);
 	private String url;
 	private StringBuffer sb;
 	

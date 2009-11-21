@@ -25,6 +25,7 @@ import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 
 public class LocaleActivity extends Activity 
 {
@@ -97,6 +98,11 @@ public class LocaleActivity extends Activity
         m.put("enabled", enabled);
         content.add(m);
         
+        updateList();
+    }
+
+    private void updateList()
+    {
         if(sa == null) {
             sa = new SimpleAdapter(getApplicationContext(), content, R.layout.schedulerrow, 
                     new String[]{"name"}, new int[]{R.id.SchedulerName});
@@ -113,6 +119,27 @@ public class LocaleActivity extends Activity
                     boolean enabled = ((Boolean)m.get("enabled")).booleanValue();
                     String name = (String) m.get("name"); 
                     editFavorite(enabled, name);
+                }
+            });
+            
+            lv.setOnItemLongClickListener(new OnItemLongClickListener() {
+                @SuppressWarnings("unchecked")
+                public boolean onItemLongClick(AdapterView<?> adapter, View view, int pos, long id)
+                {
+                    HashMap<String, Object> m = (HashMap<String, Object>) adapter.getAdapter().getItem(pos);
+
+                    Prefs.removeFavorite(getApplicationContext(), (String)m.get("name"));
+                    List<HashMap<String, Object>> toRemove = new ArrayList<HashMap<String, Object>>(10);
+                    for(HashMap<String, Object> orig : content) {
+                        if(orig.get("name").equals(m.get("name"))) {
+                            toRemove.add(orig);
+                        }
+                    }
+                    for(HashMap<String, Object> map : toRemove) {
+                        content.remove(map);
+                    }
+                    updateList();
+                    return true;
                 }
             });
         }

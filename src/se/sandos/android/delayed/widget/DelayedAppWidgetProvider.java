@@ -9,6 +9,7 @@ import java.util.List;
 import se.sandos.android.delayed.Delayed;
 import se.sandos.android.delayed.R;
 import se.sandos.android.delayed.StationActivity;
+import se.sandos.android.delayed.StationListActivity;
 import se.sandos.android.delayed.TrainEvent;
 import se.sandos.android.delayed.db.DBAdapter;
 import se.sandos.android.delayed.db.Station;
@@ -91,6 +92,10 @@ public class DelayedAppWidgetProvider extends AppWidgetProvider
             }
         }
 
+        Intent mainIntent = new Intent("android.intent.action.MAIN", null, context, StationListActivity.class);
+        PendingIntent mainPi = PendingIntent.getActivity(context, 1, mainIntent, 0);
+        rv.setOnClickPendingIntent(R.id.EmptyPlaceHolder, mainPi);
+        
         Intent intent = new Intent("se.sandos.android.delayed.Station", null, context, StationActivity.class);
         intent.setData(Uri.fromParts("delayed", "trainstation", name));
         intent.putExtra("name", (String)null);

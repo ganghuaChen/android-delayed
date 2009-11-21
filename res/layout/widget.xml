@@ -17,7 +17,7 @@
 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/WidgetDelay4" android:layout_alignParentRight="true" android:layout_below="@+id/WidgetDelay3" android:textStyle="bold" android:text="Nofav" android:textColor="#ffdd0000"></TextView>
 
 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/WidgetTime5" android:layout_alignParentLeft="true" android:layout_below="@+id/WidgetTime4" android:textStyle="bold" android:text="Nofav" android:textColor="#ff000000"></TextView>
-<TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/WidgetDelay5" android:layout_alignParentRight="true" android:layout_below="@+id/WidgetDelay4" android:textStyle="bold" android:text="Nofav" android:textColor="#ffdd0000"></TextView><TextView android:layout_width="wrap_content" android:layout_below="@+id/WidgetTime5" android:layout_height="wrap_content" android:id="@+id/EmptyPlaceHolder"></TextView>
+<TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/WidgetDelay5" android:layout_alignParentRight="true" android:layout_below="@+id/WidgetDelay4" android:textStyle="bold" android:text="Nofav" android:textColor="#ffdd0000"></TextView><TextView android:layout_width="wrap_content" android:layout_below="@+id/WidgetTime5" android:layout_height="wrap_content" android:id="@+id/EmptyPlaceHolder" android:textColor="#ff000000"></TextView>
 
 
 </RelativeLayout>

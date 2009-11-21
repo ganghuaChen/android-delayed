@@ -70,9 +70,12 @@ public class Prefs {
 
     public static void removeSetting(Context ctx, String setting)
     {
+        Log.v(Tag, "Removing setting " + setting);
+        
         SharedPreferences sp = ctx.getSharedPreferences(PREFS_KEY, Context.MODE_PRIVATE);
         Editor editor = sp.edit();
         editor.remove(setting);
+        editor.commit();
     }
     
     public static boolean isSet(Context ctx, String setting, boolean def)
@@ -115,7 +118,9 @@ public class Prefs {
                 f.setActive(isSet(ctx, fav, false));
                 f.setIndex(index-1);
                 f.setName(getSetting(ctx, fav + ".name"));
-                res.add(f);
+                if(f.getName() != null) {
+                    res.add(f);
+                }
             } else {
                 break;
             }
@@ -138,7 +143,7 @@ public class Prefs {
     private static boolean hasFavorite(Context ctx, String name)
     {
         for(Favorite f : getFavorites(ctx)) {
-            if(f.getName().equals(name)) {
+            if(f.getName() != null && f.getName().equals(name)) {
                 return true;
             }
         }
@@ -173,18 +178,31 @@ public class Prefs {
         List<Favorite> favorites = getFavorites(context);
         
         boolean hasDeleted = false;
+        int highestIndex = -1;
         for(Favorite f : favorites) {
-            if(!hasDeleted && f.getName().equals(name)) {
-                Log.v(Tag, "Removing favorite: " + f.getName() + " " + f.getIndex());
-                hasDeleted = true;
-                final String fav = PREFS_FAV_PREFIX + f.getIndex();
-                removeSetting(context, fav);
-                removeSetting(context, fav + ".name");
+            if(!hasDeleted) {
+                if(f.getName().equals(name)) {
+                    highestIndex = f.getIndex();
+                    Log.v(Tag, "Removing favorite: " + f.getName() + " " + f.getIndex());
+                    hasDeleted = true;
+                    final String fav = PREFS_FAV_PREFIX + f.getIndex();
+                    removeSetting(context, fav);
+                    removeSetting(context, fav + ".name");
+                }
             } else {
+                highestIndex = f.getIndex();
+                Log.v(Tag, "Subtracting: " + f.getName() + " " + f.getIndex());
                 //Subtract one from index
                 f.setIndex(f.getIndex()-1);
                 f.persist(context);
             }
+        }
+        
+        //Remove the last one
+        if(highestIndex != -1) {
+            final String fav = PREFS_FAV_PREFIX + highestIndex;
+            removeSetting(context, fav);
+            removeSetting(context, fav + ".name");
         }
         
     }

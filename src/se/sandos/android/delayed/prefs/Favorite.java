@@ -30,8 +30,6 @@ public class Favorite {
     public void persist(Context ctx) {
         final String fav = Prefs.PREFS_FAV_PREFIX + index;
         Prefs.setBooleanSetting(ctx, fav, active);
-        
-        //Immutable for now
-        //Prefs.setSetting(ctx, fav + ".name", name);
+        Prefs.setSetting(ctx, fav + ".name", name);
     }
 }

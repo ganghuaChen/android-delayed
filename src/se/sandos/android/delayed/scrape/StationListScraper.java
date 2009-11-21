@@ -18,6 +18,8 @@ import android.util.Log;
 public class StationListScraper extends Scraper<Station, ArrayList<Station>> {
 	private static final String Tag = "StationListScraper";
 	
+	public static String domain = "http://m.banverket.se";
+    public static String base = domain + "/trafik/(111111111111111111111111)/WapPages/";
 	
 	@Override
 	public void scrapeImpl() throws Exception {
@@ -25,7 +27,6 @@ public class StationListScraper extends Scraper<Station, ArrayList<Station>> {
 		// HttpGet("http://m.banverket.se/trafik");
 		// HttpGet("http://m.banverket.se/trafik/(111111111111111111111111)/WapPages/StationSearch.aspx?JG=-1");
 		// HttpGet("http://m.banverket.se/trafik/(111111111111111111111111)/WapPages/TrainSearch.aspx?JG=-1");
-		String base = "http://m.banverket.se/trafik/(111111111111111111111111)/WapPages/";
 		String stationSearch = base + "StationSearch.aspx?JG=-1&stationlink=";
 		HttpGet hg = new HttpGet(stationSearch + "66");
 

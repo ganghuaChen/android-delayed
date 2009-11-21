@@ -12,6 +12,7 @@ import se.sandos.android.delayed.prefs.PreferencesActivity;
 import se.sandos.android.delayed.prefs.Prefs;
 import se.sandos.android.delayed.scrape.ScrapeListener;
 import se.sandos.android.delayed.scrape.ScraperHelper;
+import se.sandos.android.delayed.scrape.StationListScraper;
 import se.sandos.android.delayed.scrape.StationScraper;
 import se.sandos.android.delayed.scrape.ScraperHelper.Nameurl;
 import android.app.ListActivity;
@@ -295,6 +296,7 @@ public class StationActivity extends ListActivity {
         menu.add(0, 2, 0, "Välj station");
         menu.add(0, 3, 0, "Gör till favorit");
         menu.add(0, 4, 0, "Inställningar");
+        menu.add(0, 5, 0, "Browser");
         
         return true;
     }
@@ -341,6 +343,13 @@ public class StationActivity extends ListActivity {
             startActivity(i);
             return true;
         }
+
+        if (mi.getItemId() == 5) {
+            Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(StationListScraper.domain + url));
+            startActivity(i);
+            return true;
+        }
+
         
         return true;
     }

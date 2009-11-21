@@ -27,8 +27,8 @@ public class LauncherShortcuts extends Activity
     {
         if(requestCode == 0) {
 
-            Intent i = new Intent("se.sandos.android.delayed.Station", null, getApplicationContext(), StationActivity.class);
-            i.setData(Uri.fromParts("delayed", "trainstation", data.getExtras().getString("name")));
+            Intent i = new Intent("se.sandos.android.delayed.Station", Uri.fromParts("delayed", "trainstation", data.getExtras().getString(
+                    "name")), getApplicationContext(), StationActivity.class);
 
             // Then, set up the container intent (the response to the caller)
             Intent intent = new Intent();

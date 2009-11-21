@@ -124,6 +124,9 @@ public class StationActivity extends ListActivity {
         }
 
         fetchList();
+        
+        //We have different-height rows
+        getListView().setSmoothScrollbarEnabled(false);
     }
 
     private void addEvents(List<TrainEvent> events) {

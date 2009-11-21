@@ -68,6 +68,13 @@ public class Prefs {
         Log.v(Tag, "Setting boolean setting: " + setting + " " + value);
     }
 
+    public static void removeSetting(Context ctx, String setting)
+    {
+        SharedPreferences sp = ctx.getSharedPreferences(PREFS_KEY, Context.MODE_PRIVATE);
+        Editor editor = sp.edit();
+        editor.remove(setting);
+    }
+    
     public static boolean isSet(Context ctx, String setting, boolean def)
     {
         SharedPreferences sp = ctx.getSharedPreferences(PREFS_KEY, Context.MODE_PRIVATE);
@@ -155,6 +162,31 @@ public class Prefs {
         
         setBooleanSetting(ctx, fav, true);
         setSetting(ctx, fav + ".name", stationName);
+    }
+
+    public static void removeFavorite(Context context, String name)
+    {
+        if(!hasFavorite(context, name)) {
+            return;
+        }
+        
+        List<Favorite> favorites = getFavorites(context);
+        
+        boolean hasDeleted = false;
+        for(Favorite f : favorites) {
+            if(!hasDeleted && f.getName().equals(name)) {
+                Log.v(Tag, "Removing favorite: " + f.getName() + " " + f.getIndex());
+                hasDeleted = true;
+                final String fav = PREFS_FAV_PREFIX + f.getIndex();
+                removeSetting(context, fav);
+                removeSetting(context, fav + ".name");
+            } else {
+                //Subtract one from index
+                f.setIndex(f.getIndex()-1);
+                f.persist(context);
+            }
+        }
+        
     }
 
 }

@@ -10,8 +10,6 @@ import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
@@ -19,6 +17,7 @@ import android.widget.CheckedTextView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AdapterView.OnItemLongClickListener;
 
 /**
  * Set preferences, filters etc
@@ -83,14 +82,14 @@ public class PreferencesActivity extends Activity {
             listContent.add(m);
         }
         
-        final List<HashMap<String, Object>> ll = listContent;
+        final List<HashMap<String, Object>> content = listContent;
         
         SimpleAdapter.ViewBinder vb = new SimpleAdapter.ViewBinder() {
             public boolean setViewValue(View view, Object data, String textRepresentation) {
                 CheckedTextView tv = (CheckedTextView) view;
                 if (tv.getId() == R.id.SchedulerName) {
                     String t = "x";
-                    for(HashMap<String, Object> m : ll) {
+                    for(HashMap<String, Object> m : content) {
                         if(m.get("enabled") == data) {
                             t = (String) m.get("name");
                         }
@@ -128,5 +127,26 @@ public class PreferencesActivity extends Activity {
                 startActivity(intent);
             }
 		});
+		
+		lv.setOnItemLongClickListener(new OnItemLongClickListener() {
+            @SuppressWarnings("unchecked")
+            public boolean onItemLongClick(AdapterView<?> adapter, View view, int pos, long id)
+            {
+                HashMap<String, Object> m = (HashMap<String, Object>) adapter.getAdapter().getItem(pos);
+
+                Prefs.removeFavorite(getApplicationContext(), (String)m.get("name"));
+                List<HashMap<String, Object>> toRemove = new ArrayList<HashMap<String, Object>>(10);
+                for(HashMap<String, Object> orig : content) {
+                    if(orig.get("name").equals(m.get("name"))) {
+                        toRemove.add(orig);
+                    }
+                }
+                for(HashMap<String, Object> map : toRemove) {
+                    content.remove(map);
+                }
+                sa.notifyDataSetChanged();
+                return true;
+            }
+        });
     }
 }

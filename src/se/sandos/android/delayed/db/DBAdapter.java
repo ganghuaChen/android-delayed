@@ -63,54 +63,56 @@ public class DBAdapter {
         "timestamp, type, text)";
     
 
-	public void addTrainEvents(final List<TrainEvent> l) {
-	    //(Shallow) Copy the list to avoid ConcurrentModificationException
-	    final List<TrainEvent> trainevents = new ArrayList<TrainEvent>(l);
-	    
-    	if(trainevents == null || trainevents.size() == 0) {
-    	    return;
-    	}
-	    
-	    ScrapePool.addJob(new Runnable(){
-    		public void run()
-    		{
-    			if(TRACE) {
-    				Debug.startMethodTracing("dbstore");
-    			}
-    			Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-    			long s = System.currentTimeMillis();
+    public void addTrainEvents(final List<TrainEvent> l)
+    {
+        // (Shallow) Copy the list to avoid ConcurrentModificationException
+        final List<TrainEvent> trainevents = new ArrayList<TrainEvent>(l);
 
-    			String station = trainevents.get(0).getStation().getName();
-    			int[] numbers = new int[trainevents.size()];
-    			int index = 0;
-    			for(TrainEvent te : trainevents) {
-    				numbers[index++] = te.getNumber();
-    			}
-    			TrainEvent[] events = getTrainEvents(station, numbers);
-    			
-    			Set<Integer> existing_events = new HashSet<Integer>();
-    			for(int i=0; i<events.length; i++) {
-    				existing_events.add(Integer.valueOf(events[i].getNumber()));
-    			}
+        if (trainevents == null || trainevents.size() == 0) {
+            return;
+        }
+
+        ScrapePool.addJob(new Runnable() {
+            public void run()
+            {
+                if (TRACE) {
+                    Debug.startMethodTracing("dbstore");
+                }
+                Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+                long s = System.currentTimeMillis();
+
+                String station = trainevents.get(0).getStation().getName();
+                int[] numbers = new int[trainevents.size()];
+                int index = 0;
+                for (TrainEvent te : trainevents) {
+                    numbers[index++] = te.getNumber();
+                }
+                TrainEvent[] events = getTrainEvents(station, numbers);
+
+                Set<Integer> existing_events = new HashSet<Integer>();
+                for (int i = 0; i < events.length; i++) {
+                    existing_events.add(Integer.valueOf(events[i].getNumber()));
+                }
     
-    			int count=0;
-    			for(TrainEvent te : trainevents) {
-    				if(!existing_events.contains(Integer.valueOf(te.getNumber()))) {
-    				    count++;
-    					addTrainEventImpl(te.getStation().getName(), te.getDepartureDate(), te.getTrack(), te.getNumber(), te.getDelayedDate(), te.getExtra(), te.getDestination(), true);
-    				} else {
-    				    //Might still need updating, extra or delay!
-                        count++;
-                        addTrainEventImpl(te.getStation().getName(), te.getDepartureDate(), te.getTrack(), te.getNumber(), te.getDelayedDate(), te.getExtra(), te.getDestination(), false);
-    				}
-    			}
-    			if(TRACE) {
-    				Debug.stopMethodTracing();
-    			}
-    			Log.v(Tag, "Took " + (System.currentTimeMillis()-s) + " for " + count);
-    		}
-    	});
-	}
+                int count = 0;
+                for (TrainEvent te : trainevents) {
+                    if (!existing_events.contains(Integer.valueOf(te.getNumber()))) {
+                        addTrainEventImpl(te.getStation().getName(), te.getDepartureDate(), te.getTrack(), te.getNumber(), te
+                                .getDelayedDate(), te.getExtra(), te.getDestination(), true);
+                    } else {
+                        // Might still need updating, extra or delay!
+                        addTrainEventImpl(te.getStation().getName(), te.getDepartureDate(), te.getTrack(), te.getNumber(), te
+                                .getDelayedDate(), te.getExtra(), te.getDestination(), false);
+                    }
+                    count++;
+                }
+                if (TRACE) {
+                    Debug.stopMethodTracing();
+                }
+                Log.v(Tag, "Took " + (System.currentTimeMillis() - s) + " for " + count);
+            }
+        });
+    }
     
     /**
      * Return all trainevents for this station. Culling?

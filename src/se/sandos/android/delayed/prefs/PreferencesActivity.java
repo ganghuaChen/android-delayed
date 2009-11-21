@@ -126,12 +126,6 @@ public class PreferencesActivity extends Activity {
                 Intent intent = new Intent(getApplicationContext(), FavoriteActivity.class);
                 intent.setData(Uri.fromParts("delayed", "favorite", m.get("name")));
                 startActivity(intent);
-//                CheckedTextView child = (CheckedTextView) view.findViewById(R.id.SchedulerName);
-//                Log.v(Tag, "Child: " + child + " " + pos + " " + lv.getCheckedItemPosition() + " " + lv.getChoiceMode() + " " + view + " " + id);
-//                child.toggle();
-//                //sa.notifyDataSetChanged();
-//                //lv.invalidate();
-//                IntentTest.startSchedulerActivity(getApplicationContext(), mHandler, m.get("pkg"), m.get("class"));
             }
 		});
     }

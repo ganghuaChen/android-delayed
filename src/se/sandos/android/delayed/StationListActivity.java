@@ -13,7 +13,9 @@ import se.sandos.android.delayed.prefs.Prefs;
 import se.sandos.android.delayed.scrape.ScrapeListener;
 import se.sandos.android.delayed.scrape.ScrapeService;
 import se.sandos.android.delayed.scrape.ScraperHelper;
+import se.sandos.android.delayed.scrape.StationListScraper;
 import android.app.ListActivity;
+import android.content.ComponentName;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -251,10 +253,26 @@ public class StationListActivity extends ListActivity {
 			gotoStation(stationName, url);
 			return true;
 		}
+		
+		if(mi.getTitle().equals("Öppna URL i webläsare")) {
+            AdapterContextMenuInfo cmi = (AdapterContextMenuInfo) mi.getMenuInfo();
+            Map<String, String> m = (Map) getListView().getAdapter().getItem(cmi.position);
+            String stationName = m.get("name");
+
+            String url = null;
+            
+            if(Delayed.db != null) {
+                url = Delayed.db.getUrl(stationName);
+            }
+
+		    Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse((StationListScraper.domain + url)));
+            startActivity(i);
+        }
+		
 		return false;
 	}
-	
-	@SuppressWarnings("unchecked")
+
+    @SuppressWarnings("unchecked")
 	protected void onListItemClick(ListView l, View v, int position, long id)
 	{
 		Object o = l.getAdapter().getItem(position);

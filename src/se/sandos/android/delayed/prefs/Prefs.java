@@ -204,7 +204,5 @@ public class Prefs {
             removeSetting(context, fav);
             removeSetting(context, fav + ".name");
         }
-        
     }
-
 }

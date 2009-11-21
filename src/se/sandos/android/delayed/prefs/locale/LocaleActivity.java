@@ -128,7 +128,6 @@ public class LocaleActivity extends Activity
                 {
                     HashMap<String, Object> m = (HashMap<String, Object>) adapter.getAdapter().getItem(pos);
 
-                    Prefs.removeFavorite(getApplicationContext(), (String)m.get("name"));
                     List<HashMap<String, Object>> toRemove = new ArrayList<HashMap<String, Object>>(10);
                     for(HashMap<String, Object> orig : content) {
                         if(orig.get("name").equals(m.get("name"))) {

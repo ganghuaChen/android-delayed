@@ -139,11 +139,14 @@ public class StationActivity extends ListActivity {
 
         boolean needInvalidate = false;
         for (TrainEvent te : events) {
-            if (existsAndUpdate(te)) {
-                needInvalidate = true;
+            if (existsAndUpdate(te) == 2) {
                 continue;
+            } else if(existsAndUpdate(te) == 1) {
+                return;
             }
 
+            needInvalidate = true;
+            
             trainevents.add(te);
             Map<String, String> m = new HashMap<String, String>();
             m.put("name", te.toString());
@@ -212,29 +215,38 @@ public class StationActivity extends ListActivity {
      * @param te
      * @return true if the trainevent existed already and was updated, false if it was not found
      */
-    private boolean existsAndUpdate(TrainEvent te) {
+    private int existsAndUpdate(TrainEvent te) {
         if (listContent == null || listContent.size() == 0) {
-            return false;
+            return 0;
         }
 
+        boolean changed = false;
+        
         for (Map<String, String> m : listContent) {
             if (m.get("number").equals("Train #: " + Integer.toString(te.getNumber()))) {
                 // Update
                 String delayed = m.get("delayed");
                 if (!delayed.equals(te.getDelayed())) {
+                    changed = true;
                     m.put("delayed", te.getDelayed());
                 }
 
                 String extra = m.get("extra");
                 if (!extra.equals(te.getExtra())) {
+                    changed = true;
                     m.put("extra", te.getExtra());
                 }
 
-                return true;
+                if(changed) {
+                    return 2;
+                } else {
+                    return 1;
+                }
             }
         }
 
-        return false;
+        
+        return 0;
     }
 
     @Override

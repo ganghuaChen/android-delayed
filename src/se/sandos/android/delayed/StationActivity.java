@@ -22,6 +22,7 @@ import android.os.Bundle;
 import android.os.Debug;
 import android.os.Handler;
 import android.os.Message;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -164,9 +165,12 @@ public class StationActivity extends ListActivity {
                     TextView tv = (TextView) view;
 
                     if (tv.getId() == R.id.Extra) {
+//                        data = "majs http://swedroid.org";
                         if (((String) data).length() == 0) {
                             tv.setVisibility(View.GONE);
                         } else {
+//                            tv.setAutoLinkMask(Linkify.WEB_URLS);
+//                            tv.setLinkTextColor(0xffddddff);
                             tv.setText((String) data);
                             tv.setVisibility(View.VISIBLE);
                         }

@@ -173,13 +173,14 @@ public class DBAdapter {
                         res.add(te);
                     } else {
                         //Remove it
-                        //Log.v(Tag, "Removing " + (now-item) + " " + SIMPLE_DATEFORMATTER.format(te.getDepartureDate()) + " " + SIMPLE_DATEFORMATTER.format(new Date(now)));
+                        Log.v(Tag, "Removing (empty extra) " + (now-item) + " " + SIMPLE_DATEFORMATTER.format(te.getDepartureDate()) + " " + SIMPLE_DATEFORMATTER.format(new Date(now)));
                         db.execSQL("delete from trainevents where _id = " + c.getInt(4), new Object[0]);
                     }
                 } else {
                     if(now < item - (1000*60*40)){
                         res.add(te);
                     } else {
+                        Log.v(Tag, "Removing due to non-empty extra, but too old: " + te.toString());
                         db.execSQL("delete from trainevents where _id = " + c.getInt(4), new Object[0]);
                     }
                 }

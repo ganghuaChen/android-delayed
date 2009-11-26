@@ -121,6 +121,12 @@ public class Prefs {
                 if(f.getName() != null) {
                     res.add(f);
                 }
+                f.setOtherFavorites(isSet(ctx, fav + ".otherfavs", false));
+                int targetIndex = 0;
+                
+                while(contains(ctx, fav + ".targets." + targetIndex)) {
+                    f.getTargets().add(getSetting(ctx, fav + ".targets" + targetIndex++));
+                }
             } else {
                 break;
             }

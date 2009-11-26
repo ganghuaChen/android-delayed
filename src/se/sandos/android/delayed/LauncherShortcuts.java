@@ -25,7 +25,7 @@ public class LauncherShortcuts extends Activity
     
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
-        if(requestCode == 0) {
+        if(requestCode == 0 && data != null) {
 
             Intent i = new Intent("se.sandos.android.delayed.Station", Uri.fromParts("delayed", "trainstation", data.getExtras().getString(
                     "name")), getApplicationContext(), StationActivity.class);

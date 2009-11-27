@@ -175,7 +175,7 @@ public class DBAdapter {
                         //Remove it
                         Log.v(Tag, "Removing (empty extra) " + (now-item) + " " + SIMPLE_DATEFORMATTER.format(te.getDepartureDate()) + " " + SIMPLE_DATEFORMATTER.format(new Date(now)) + " #: " + te.getNumber() + " d: " + te.getDestination() + " tes departure: " + te.toString());
                         if(te.getDelayedDate() != null) {
-                            Log.v(Tag, " Delayed until: " + SIMPLE_DATEFORMATTER.format(te.getDelayedDate()));
+                            Log.v(Tag, " Delayed until: " + SIMPLE_DATEFORMATTER.format(te.getDelayedDate()) + " " + now + " < " + te.getDelayedDate().getTime());
                         }
                         db.execSQL("delete from trainevents where _id = " + c.getInt(4), new Object[0]);
                     }

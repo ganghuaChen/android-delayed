@@ -49,7 +49,7 @@ public class DelayedAppWidgetProvider extends AppWidgetProvider
         for(Favorite f : favorites) {
             if(f.isActive()) {
                 for(TrainEvent te : db.getStationEvents(f.getName())) {
-                    if(isFavoriteTarget(favorites, te)) {
+                    if(Favorite.isFavoriteTarget(favorites, te)) {
                         te.setStation(new Station(f.getName(), null));
                         events.add(te);
                     }
@@ -118,27 +118,6 @@ public class DelayedAppWidgetProvider extends AppWidgetProvider
             
             appWidgetManager.updateAppWidget(appWidgetIds[i], rv);
         }
-    }
-
-    private static boolean isFavoriteTarget(List<Favorite> favorites, TrainEvent te) {
-        for(Favorite f : favorites) {
-            if(f.isActive() && f.filter(te.getDestination())) {
-                return true;
-            }
-            
-            if(f.targetOtherFavorites()) {
-                //Just assume we got all favorites
-                for(Favorite fav : favorites) {
-                    if(te.getDestination().equals(fav.getName())) {
-                        return true;
-                    }
-                }
-            }
-            
-            Log.v(Tag, "" + f.getName() + " did not like");
-        }
-        
-        return false;
     }
 
     private static int getWidgetId(int index, String prefix)

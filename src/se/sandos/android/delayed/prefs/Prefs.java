@@ -125,7 +125,10 @@ public class Prefs {
                 int targetIndex = 0;
                 
                 while(contains(ctx, fav + ".targets." + targetIndex)) {
-                    f.getTargets().add(getSetting(ctx, fav + ".targets" + targetIndex++));
+                    String targetName = getSetting(ctx, fav + ".targets." + targetIndex++); 
+                    if(targetName != null && !targetName.equals("")) {
+                        f.getTargets().add(targetName);
+                    }
                 }
             } else {
                 break;

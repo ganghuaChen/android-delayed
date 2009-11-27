@@ -6,6 +6,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import se.sandos.android.delayed.TrainEvent;
+
 import android.content.Context;
 import android.util.Log;
 
@@ -90,5 +92,26 @@ public class Favorite {
             Log.v(Tag, "Contains also " + i.next());
         }
         return targetSet.contains(name);
+    }
+    
+    public static boolean isFavoriteTarget(List<Favorite> favorites, TrainEvent te) {
+        for(Favorite f : favorites) {
+            if(f.isActive() && f.filter(te.getDestination())) {
+                return true;
+            }
+            
+            if(f.targetOtherFavorites()) {
+                //Just assume we got all favorites
+                for(Favorite fav : favorites) {
+                    if(te.getDestination().equals(fav.getName())) {
+                        return true;
+                    }
+                }
+            }
+            
+            Log.v(Tag, "" + f.getName() + " did not like");
+        }
+        
+        return false;
     }
 }

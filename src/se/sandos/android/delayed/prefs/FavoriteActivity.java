@@ -14,11 +14,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.AdapterView.OnItemLongClickListener;
 
 public class FavoriteActivity extends Activity {
     private static final String Tag = "FavoriteActivity";
@@ -78,11 +80,33 @@ public class FavoriteActivity extends Activity {
         
         content.add(m);
         
+        ListView lv = (ListView) findViewById(R.id.TargetList);
+
         if(sa == null) {
             sa = new SimpleAdapter(getApplicationContext(), content, R.layout.schedulerrow, new String[]{"name"}, new int[]{R.id.SchedulerName});
-            ListView lv = (ListView) findViewById(R.id.TargetList);
             lv.setAdapter(sa);
         }
+        
+        lv.setOnItemLongClickListener(new OnItemLongClickListener() {
+
+            @SuppressWarnings("unchecked")
+            public boolean onItemLongClick(AdapterView<?> adapter, View view, int pos, long id) {
+                HashMap<String, String> m = (HashMap<String, String>) adapter.getAdapter().getItem(pos);
+
+                List<HashMap<String, String>> toRemove = new ArrayList<HashMap<String, String>>(10);
+                for(HashMap<String, String> orig : content) {
+                    if(orig.get("name").equals(m.get("name"))) {
+                        toRemove.add(orig);
+                    }
+                }
+                for(HashMap<String, String> map : toRemove) {
+                    content.remove(map);
+                }
+                sa.notifyDataSetChanged();
+
+                return true;
+            }
+        });
         
         sa.notifyDataSetChanged();
     }

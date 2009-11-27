@@ -122,7 +122,7 @@ public class DelayedAppWidgetProvider extends AppWidgetProvider
 
     private static boolean isFavoriteTarget(List<Favorite> favorites, TrainEvent te) {
         for(Favorite f : favorites) {
-            if(f.filter(te.getDestination())) {
+            if(f.isActive() && f.filter(te.getDestination())) {
                 return true;
             }
             Log.v(Tag, "" + f.getName() + " did not like");

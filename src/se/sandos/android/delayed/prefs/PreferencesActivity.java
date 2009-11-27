@@ -13,7 +13,6 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.CheckBox;
-import android.widget.CheckedTextView;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.AdapterView.OnItemClickListener;
@@ -83,31 +82,6 @@ public class PreferencesActivity extends Activity {
         }
         
         final List<HashMap<String, Object>> content = listContent;
-        
-        SimpleAdapter.ViewBinder vb = new SimpleAdapter.ViewBinder() {
-            public boolean setViewValue(View view, Object data, String textRepresentation) {
-                CheckedTextView tv = (CheckedTextView) view;
-                if (tv.getId() == R.id.SchedulerName) {
-                    String t = "x";
-                    for(HashMap<String, Object> m : content) {
-                        if(m.get("enabled") == data) {
-                            t = (String) m.get("name");
-                        }
-                    }
-                    tv.setText(t);
-                    if (tv.isChecked()) {
-                        tv.setBackgroundColor(0xff333333);
-                        tv.setTextColor(0xff334455);
-                    } else {
-                        tv.setBackgroundColor(0xff000000);
-                        tv.setTextColor(0xffffffff);
-                    }
-                } else {
-                    tv.setText((String) data);
-                }
-                return true;
-            }
-        };
         
         final SimpleAdapter sa = new SimpleAdapter(getApplicationContext(), listContent, R.layout.schedulerrow,
                 new String[] { "name"}, new int[] { R.id.SchedulerName});

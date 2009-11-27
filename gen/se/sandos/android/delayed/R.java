@@ -16,7 +16,7 @@ public final class R {
     }
     public static final class id {
         public static final int AddFavorite=0x7f060010;
-        public static final int AddTarget=0x7f060009;
+        public static final int AddTarget=0x7f06000a;
         public static final int AutomaticUpdate=0x7f060014;
         public static final int Delayed=0x7f060005;
         public static final int Destination=0x7f060002;
@@ -30,14 +30,14 @@ public final class R {
         public static final int IntervalLabel=0x7f06000d;
         public static final int ListLabel=0x7f060015;
         public static final int LocaleEnabled=0x7f06000f;
-        public static final int OtherFavoritesEnabled=0x7f06000b;
+        public static final int OtherFavoritesEnabled=0x7f060009;
         public static final int ProgressBar01=0x7f060012;
         public static final int RelativeLayout01=0x7f06000e;
         public static final int SchedulerName=0x7f060017;
         public static final int SelectedFavorites=0x7f060011;
         public static final int StationName=0x7f060018;
         public static final int TNumber=0x7f060004;
-        public static final int TargetList=0x7f06000a;
+        public static final int TargetList=0x7f06000b;
         public static final int TargetListLabel=0x7f060008;
         public static final int Time=0x7f060000;
         public static final int Track=0x7f060003;

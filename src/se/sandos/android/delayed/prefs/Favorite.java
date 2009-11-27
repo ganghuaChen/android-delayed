@@ -40,7 +40,7 @@ public class Favorite {
         }
         Log.v(Tag, "New target set has " + targetSet.size());
     }
-    public boolean isOtherFavorites() {
+    public boolean targetOtherFavorites() {
         return otherFavorites;
     }
     public void setOtherFavorites(boolean otherFavorites) {

@@ -198,7 +198,7 @@ public class FavoriteActivity extends Activity {
         
         cb = (CheckBox) findViewById(R.id.OtherFavoritesEnabled);
         if(isReal()) {
-            cb.setChecked(favorite.isOtherFavorites());
+            cb.setChecked(favorite.targetOtherFavorites());
         } else {
             cb.setVisibility(View.GONE);
         }

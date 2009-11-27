@@ -125,6 +125,16 @@ public class DelayedAppWidgetProvider extends AppWidgetProvider
             if(f.isActive() && f.filter(te.getDestination())) {
                 return true;
             }
+            
+            if(f.targetOtherFavorites()) {
+                //Just assume we got all favorites
+                for(Favorite fav : favorites) {
+                    if(te.getDestination().equals(fav.getName())) {
+                        return true;
+                    }
+                }
+            }
+            
             Log.v(Tag, "" + f.getName() + " did not like");
         }
         

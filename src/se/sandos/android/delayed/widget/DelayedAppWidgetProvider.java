@@ -49,8 +49,10 @@ public class DelayedAppWidgetProvider extends AppWidgetProvider
         for(Favorite f : favorites) {
             if(f.isActive()) {
                 for(TrainEvent te : db.getStationEvents(f.getName())) {
-                    te.setStation(new Station(f.getName(), null));
-                    events.add(te);
+                    if(isFavoriteTarget(favorites, te)) {
+                        te.setStation(new Station(f.getName(), null));
+                        events.add(te);
+                    }
                 }
                 //Just use a random favorite for the click-links for now
                 name = f.getName();
@@ -116,6 +118,17 @@ public class DelayedAppWidgetProvider extends AppWidgetProvider
             
             appWidgetManager.updateAppWidget(appWidgetIds[i], rv);
         }
+    }
+
+    private static boolean isFavoriteTarget(List<Favorite> favorites, TrainEvent te) {
+        for(Favorite f : favorites) {
+            if(f.filter(te.getDestination())) {
+                return true;
+            }
+            Log.v(Tag, "" + f.getName() + " did not like");
+        }
+        
+        return false;
     }
 
     private static int getWidgetId(int index, String prefix)

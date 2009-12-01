@@ -86,11 +86,14 @@ public class DBAdapter {
                 int index = 0;
                 for (TrainEvent te : trainevents) {
                     numbers[index++] = te.getNumber();
+                    Log.v(Tag, "Exists 1: " + numbers[index-1]);
                 }
                 TrainEvent[] events = getTrainEvents(station, numbers);
 
                 Set<Integer> existing_events = new HashSet<Integer>();
+                Log.v(Tag, "Number of found pre-existing trains: " + events.length);
                 for (int i = 0; i < events.length; i++) {
+                    Log.v(Tag, "Exists 2: " + events[i]);
                     existing_events.add(Integer.valueOf(events[i].getNumber()));
                 }
     
@@ -214,19 +217,22 @@ public class DBAdapter {
     public long addTrainEventImpl(String station, Date time, String track, int number, Date delay, String extra, String destination, boolean add)
     {
         if(!add) {
+            Log.v(Tag, "Updating " + number);
             ContentValues cv = new ContentValues();
             if(delay != null) {
+                Log.v(Tag, "Setting delayed: " + delay.getTime());
                 cv.put(TRAINEVENT_KEY_DELAY, delay.getTime());
             } else {
+                Log.v(Tag, "Setting null delayed");
                 cv.putNull(TRAINEVENT_KEY_DELAY);
             }
             cv.put(TRAINEVENT_KEY_EXTRA, extra);
-            Log.v(Tag, "SEtting extra: " + extra);
+            Log.v(Tag, "Setting extra: " + extra);
             long res = db.update(TRAINEVENT_TABLE_NAME, cv, "" + TRAINEVENT_KEY_STATION + " = ? and " + TRAINEVENT_KEY_NUMBER + " = " + number, new String[]{station});
             Log.v(Tag, "Affected " + res);
             return res;
         }
-        
+        Log.v(Tag, "Adding " + number);
 		ContentValues cv = new ContentValues();
 		cv.put(TRAINEVENT_KEY_STATION, station);
 		cv.put(TRAINEVENT_KEY_TIME, time.getTime());
@@ -260,7 +266,7 @@ public class DBAdapter {
 							TRAINEVENT_KEY_DELAY, 
 							TRAINEVENT_KEY_NUMBER, 
 							TRAINEVENT_KEY_DESTINATION}, 
-			TRAINEVENT_KEY_NUMBER + " IN(" + expand(numbers) + ") AND " + TRAINEVENT_KEY_STATION + "= ?", 
+			TRAINEVENT_KEY_NUMBER + " IN(" + expand(numbers) + ") AND " + TRAINEVENT_KEY_STATION + " = ?", 
 			new String[]{station} , null, null, null);
 		c.move(1);
     	TrainEvent[] events = new TrainEvent[c.getCount()];

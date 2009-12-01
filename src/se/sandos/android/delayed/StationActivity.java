@@ -139,25 +139,29 @@ public class StationActivity extends ListActivity {
 
         boolean needInvalidate = false;
         for (TrainEvent te : events) {
+            boolean updated = false;
             if (existsAndUpdate(te) == 2) {
-                continue;
+                updated = true;
             } else if(existsAndUpdate(te) == 1) {
                 return;
             }
 
-            needInvalidate = true;
             
             trainevents.add(te);
-            Map<String, String> m = new HashMap<String, String>();
-            m.put("name", te.toString());
-            m.put("track", "Track: " + te.getTrack());
-            m.put("number", "Train #: " + Integer.toString(te.getNumber()));
-            m.put("destination", te.getDestination());
-            m.put("url", te.getUrl());
-            m.put("delayed", te.getDelayed());
-            m.put("extra", te.getExtra());
-            m.put("time", Long.toString(te.getDepartureDate().getTime()));
-            listContent.add(m);
+            if(!updated) {
+                needInvalidate = true;
+
+                Map<String, String> m = new HashMap<String, String>();
+                m.put("name", te.toString());
+                m.put("track", "Track: " + te.getTrack());
+                m.put("number", "Train #: " + Integer.toString(te.getNumber()));
+                m.put("destination", te.getDestination());
+                m.put("url", te.getUrl());
+                m.put("delayed", te.getDelayed());
+                m.put("extra", te.getExtra());
+                m.put("time", Long.toString(te.getDepartureDate().getTime()));
+                listContent.add(m);
+            }
         }
 
         if (sa == null) {

@@ -132,29 +132,26 @@ public class StationListActivity extends ListActivity {
 		}
 	}
 
-	private void setList(final StationList sl)
-	{
-		runOnUiThread(new Runnable(){
-			public void run() {
-				if(content == null) {
-					content = new ArrayList<Map<String, String>>();
-				}
-				
-				for(Station station : sl.getList()) {
-					Map<String, String> m = new HashMap<String, String>();
-					m.put("name", station.getName());
-					content.add(m);
-				}
-				
-				if(sa == null) {
-					sa = new SimpleAdapter(getApplicationContext(), content, R.layout.stationrow, new String[]{"name"}, new int[]{R.id.StationName});
-					setListAdapter(sa);
-				}
-				
-				sa.notifyDataSetChanged();
-			}
-		});
-	}
+    private void setList(final StationList sl)
+    {
+        if (content == null) {
+            content = new ArrayList<Map<String, String>>();
+        }
+
+        for (Station station : sl.getList()) {
+            Map<String, String> m = new HashMap<String, String>();
+            m.put("name", station.getName());
+            content.add(m);
+        }
+
+        if (sa == null) {
+            sa = new SimpleAdapter(getApplicationContext(), content, R.layout.stationrow, new String[] { "name" },
+                    new int[] { R.id.StationName });
+            setListAdapter(sa);
+        }
+
+        sa.notifyDataSetChanged();
+    }
 	
 	private void clearList()
 	{

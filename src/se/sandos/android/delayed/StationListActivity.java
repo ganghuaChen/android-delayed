@@ -88,7 +88,9 @@ public class StationListActivity extends ListActivity {
 		
 		Log.v(Tag, "Created StationList ");
 
-        ScrapeService.setAlarm(getApplicationContext(), Prefs.getIntSetting(getApplicationContext(), Prefs.PREFS_INTERVAL, 120));
+		if(Prefs.isSet(getApplicationContext(), Prefs.PREFS_SERVICE_ENABLED, false)) {
+		    ScrapeService.setAlarm(getApplicationContext(), Prefs.getIntSetting(getApplicationContext(), Prefs.PREFS_INTERVAL, 120));
+		}
         
 		//Register context menu
 		if(!chooser) {

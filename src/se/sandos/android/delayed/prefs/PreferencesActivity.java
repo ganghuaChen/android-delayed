@@ -61,6 +61,11 @@ public class PreferencesActivity extends Activity {
                 //Need to start service
                 ScrapeService.setAlarmWithDefaults(getApplicationContext());
             }
+        } else {
+            if(!isCheckedNow) {
+                //Terminate alarm
+                ScrapeService.removeAlarm(getApplicationContext());
+            }
         }
 
         

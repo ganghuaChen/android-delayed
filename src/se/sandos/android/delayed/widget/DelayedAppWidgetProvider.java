@@ -23,7 +23,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.util.Log;
 import android.view.View;
-import android.widget.ImageView;
 import android.widget.RemoteViews;
 
 public class DelayedAppWidgetProvider extends AppWidgetProvider
@@ -32,10 +31,6 @@ public class DelayedAppWidgetProvider extends AppWidgetProvider
 
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds)
     {
-        updateWidget(context, appWidgetManager, appWidgetIds);
-    }
-
-    public static void updateWidget(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
         Log.v(Tag, "onUpdate " + context + " " + appWidgetManager);
 
         RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.widget);
@@ -114,9 +109,11 @@ public class DelayedAppWidgetProvider extends AppWidgetProvider
         }
         
         for (int i = 0; i < appWidgetIds.length; i++) {
-            Log.v(Tag, "Updating id " + appWidgetIds[i]);
+            int id = appWidgetIds[i];
+            Log.v(Tag, "Updating id " + id);
+            Prefs.addWidget(context, id);
             
-            appWidgetManager.updateAppWidget(appWidgetIds[i], rv);
+            appWidgetManager.updateAppWidget(id, rv);
         }
     }
 
@@ -131,5 +128,19 @@ public class DelayedAppWidgetProvider extends AppWidgetProvider
             Log.w(Tag, "Something went wrong: " + e);
         }
         return id;
+    }
+    
+    public void onReceive(Context context, Intent intent)
+    {
+        super.onReceive(context, intent);
+
+        //Handle deletions ourselfs due to bug in 1.5/1.6
+        if(intent.getAction().equals(AppWidgetManager.ACTION_APPWIDGET_DELETED)) {
+            int id = intent.getIntExtra("appWidgetId", -1);
+            
+            Log.v(Tag, "Id: " + id);
+            
+            Prefs.removeWidget(context, id);
+        }
     }
 }

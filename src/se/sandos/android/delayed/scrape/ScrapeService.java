@@ -8,12 +8,15 @@ import se.sandos.android.delayed.TrainEvent;
 import se.sandos.android.delayed.db.DBAdapter;
 import se.sandos.android.delayed.prefs.Favorite;
 import se.sandos.android.delayed.prefs.Prefs;
+import se.sandos.android.delayed.prefs.Widget;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ResolveInfo;
+import android.net.Uri;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.util.Log;
@@ -57,7 +60,6 @@ public class ScrapeService extends Service {
                 if(f.isActive()) {
                     String url = db.getUrl(f.getName());
                     scrape(f.getName(), url);
-                    //scheduleWidgetUpdate();
                 }
             }
             
@@ -80,14 +82,22 @@ public class ScrapeService extends Service {
         }
     }
 
-//    private void scheduleWidgetUpdate()
-//    {
-//        Intent update = new Intent();
-//        update.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
-//        update.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, value)
-//    }
+    private void scheduleAllWidgetUpdate(String favorite)
+    {
+        Log.v(Tag, "scheduleAllWidgetUpdate for " + favorite + " " + getApplicationContext());
+        
+        for(Widget w : Prefs.getWidgets(getApplicationContext())) {
+            Log.v(Tag, "Updating widget with id " + w.getId());
+            Intent update = new Intent();
+            update.setAction("se.sandos.android.delayed.widgetUpdate");
+            //update.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
+            update.setData(Uri.fromParts("delayed", "widgetupdate", String.valueOf(w.getId())));
+            update.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, new int[] {w.getId()});
+            getApplicationContext().sendBroadcast(update);
+        }
+    }
 
-    private void scrape(String favName, String favURL)
+    private void scrape(final String favName, final String favURL)
     {
         //This will spawn a new thread so that we can return quickly
         Log.v(Tag, "Starting scrape from background service for " + favName);
@@ -98,6 +108,7 @@ public class ScrapeService extends Service {
                 if (result == null) {
                     // this actually means finished!
                     Delayed.getDb(getApplicationContext()).addTrainEvents(trainevents);
+                    scheduleAllWidgetUpdate(favName);
                 } else {
                     //This is a fixup (destination) message
                 }
@@ -116,6 +127,15 @@ public class ScrapeService extends Service {
         });
     }
 
+
+    public static void startIfNeeded(Context ctx)
+    {
+        if(Prefs.isSet(ctx, Prefs.PREFS_SERVICE_ENABLED, false)) {
+            runOnceNow(ctx);
+            ScrapeService.setAlarm(ctx, Prefs.getIntSetting(ctx, Prefs.PREFS_INTERVAL, 120));
+        }
+    }
+    
     /**
      * 
      * @param ctx

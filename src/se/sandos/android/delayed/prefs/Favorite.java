@@ -96,20 +96,28 @@ public class Favorite {
     
     public static boolean isFavoriteTarget(List<Favorite> favorites, TrainEvent te) {
         for(Favorite f : favorites) {
-            if(f.isActive() && f.filter(te.getDestination())) {
-                return true;
-            }
-            
-            if(f.targetOtherFavorites()) {
-                //Just assume we got all favorites
-                for(Favorite fav : favorites) {
-                    if(te.getDestination().equals(fav.getName())) {
+            if(te.getStation().getName().equals(f.getName())) {
+                if(f.isActive() && f.filter(te.getDestination())) {
+                    return true;
+                }
+                
+                if(f.targetOtherFavorites()) {
+                    //Just assume we got all favorites
+                    for(Favorite fav : favorites) {
+                        if(te.getDestination().equals(fav.getName())) {
+                            return true;
+                        }
+                    }
+                } else {
+                    //If nothing set at all, accept anything
+                    if(f.getTargets().size() == 0) {
+                        Log.v(Tag, "Returning true since nothing is set for " + f.getName());
                         return true;
                     }
                 }
+                
+                Log.v(Tag, "" + f.getName() + " did not like");
             }
-            
-            Log.v(Tag, "" + f.getName() + " did not like");
         }
         
         return false;

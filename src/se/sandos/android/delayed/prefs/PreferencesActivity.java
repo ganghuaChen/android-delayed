@@ -57,11 +57,12 @@ public class PreferencesActivity extends Activity {
         
         if(Prefs.isSet(getApplicationContext(), Prefs.PREFS_SERVICE_ENABLED, false) != isCheckedNow) {
             if(isCheckedNow) {
+                ScrapeService.runOnceNow(getApplicationContext());
                 //Need to start service
                 ScrapeService.setAlarmWithDefaults(getApplicationContext());
-                ScrapeService.runOnceNow(getApplicationContext());
             }
         }
+
         
         Prefs.setBooleanSetting(getApplicationContext(), Prefs.PREFS_SERVICE_ENABLED, automatic.isChecked());
     }

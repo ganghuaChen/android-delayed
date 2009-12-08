@@ -19,6 +19,7 @@ public class Prefs {
     public static final String PREFS_WIDGET_PREFIX = "widget";
     
     public static final String PREFS_SERVICE_ENABLED = "se.sandos.android.delayed.serviceEnabled";
+
     
     /**
      * Get a setting. Default value if not found is null
@@ -68,6 +69,18 @@ public class Prefs {
         Log.v(Tag, "Setting boolean setting: " + setting + " " + value);
     }
 
+    public static void setIntSetting(Context ctx, String setting, int value)
+    {
+        SharedPreferences sp = ctx.getSharedPreferences(PREFS_KEY, Context.MODE_PRIVATE);
+        Editor editor = sp.edit();
+        editor.putInt(setting, value);
+        if(!editor.commit()) {
+            Log.w(Tag, "Failed to commit!");
+        }
+        Log.v(Tag, "Setting boolean setting: " + setting + " " + value);
+    }
+
+    
     public static void removeSetting(Context ctx, String setting)
     {
         Log.v(Tag, "Removing setting " + setting);
@@ -106,9 +119,90 @@ public class Prefs {
         return sp.contains(setting);
     }
     
+    public static boolean hasWidget(Context ctx, int id)
+    {
+        for(Widget w : getWidgets(ctx)) {
+            if(w.getId() == id) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static List<Widget> getWidgets(Context ctx)
+    {
+        List<Widget> res = new ArrayList<Widget>(4);
+        
+        int index = 0;
+        while(true) {
+            final String wdgt = PREFS_WIDGET_PREFIX + index;
+            if(contains(ctx, wdgt)) {
+                Widget w = new Widget(getIntSetting(ctx, wdgt, -1));
+                w.setIndex(index++);
+                
+                res.add(w);
+            } else {
+                break;
+            }
+        }
+        
+        return res;
+    }
+    
+    
+    public static void addWidget(Context ctx, int id)
+    {
+        if(hasWidget(ctx, id)) {
+            return;
+        }
+        
+        int index = getWidgets(ctx).size();
+        final String wdgt = PREFS_WIDGET_PREFIX + index;
+            
+        Log.v(Tag, "Added new widget: " + index);
+        
+        setIntSetting(ctx, wdgt, id);
+    }
+    
+    public static void removeWidget(Context ctx, int id)
+    {
+        if(!hasWidget(ctx, id)) {
+            return;
+        }
+        
+        List<Widget> widgets = getWidgets(ctx);
+        
+        boolean hasDeleted = false;
+        int highestIndex = -1;
+        for(Widget f : widgets) {
+            if(!hasDeleted) {
+                if(f.getId() == id) {
+                    highestIndex = f.getIndex();
+                    Log.v(Tag, "Removing widget: " + f.getId() + " " + f.getIndex());
+                    hasDeleted = true;
+                    final String wdgt = PREFS_WIDGET_PREFIX + f.getIndex();
+                    removeSetting(ctx, wdgt);
+                }
+            } else {
+                highestIndex = f.getIndex();
+                Log.v(Tag, "Subtracting: " + f.getId() + " " + f.getIndex());
+                //Subtract one from index
+                f.setIndex(f.getIndex()-1);
+                final String wdgt = PREFS_WIDGET_PREFIX + f.getIndex();
+                setIntSetting(ctx, wdgt, f.getIndex());
+            }
+        }
+        
+        //Remove the last one
+        if(highestIndex != -1) {
+            final String wdgt = PREFS_WIDGET_PREFIX + highestIndex;
+            removeSetting(ctx, wdgt);
+        }
+    }
+    
     public static List<Favorite> getFavorites(Context ctx)
     {
-        List<Favorite> res = new ArrayList<Favorite>(20);
+        List<Favorite> res = new ArrayList<Favorite>(6);
         
         int index = 0;
         while(true) {

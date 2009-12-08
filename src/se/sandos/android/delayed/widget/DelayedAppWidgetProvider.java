@@ -31,12 +31,8 @@ public class DelayedAppWidgetProvider extends AppWidgetProvider
 
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds)
     {
-        Log.v(Tag, "onUpdate " + context + " " + appWidgetManager);
-
         RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.widget);
 
-        Log.v(Tag, "Updating due to outdatedness");
-        
         List<Favorite> favorites = Prefs.getFavorites(context);
         List<TrainEvent> events = new ArrayList<TrainEvent>(40);
         DBAdapter db = Delayed.getDb(context);
@@ -44,12 +40,12 @@ public class DelayedAppWidgetProvider extends AppWidgetProvider
         for(Favorite f : favorites) {
             if(f.isActive()) {
                 for(TrainEvent te : db.getStationEvents(f.getName())) {
+                    te.setStation(new Station(f.getName(), null));
                     if(Favorite.isFavoriteTarget(favorites, te)) {
-                        te.setStation(new Station(f.getName(), null));
                         events.add(te);
                     }
                 }
-                //Just use a random favorite for the click-links for now
+                //XXX: Just use a random favorite for the click-links for now
                 name = f.getName();
             }
         }
@@ -134,6 +130,12 @@ public class DelayedAppWidgetProvider extends AppWidgetProvider
     {
         super.onReceive(context, intent);
 
+        Log.v(Tag, "" + intent.getAction() + " " + intent.getDataString());
+        
+        if(intent.getAction().equals("se.sandos.android.delayed.widgetUpdate")) {
+            onUpdate(context, AppWidgetManager.getInstance(context), intent.getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS)); 
+        }
+        
         //Handle deletions ourselfs due to bug in 1.5/1.6
         if(intent.getAction().equals(AppWidgetManager.ACTION_APPWIDGET_DELETED)) {
             int id = intent.getIntExtra("appWidgetId", -1);

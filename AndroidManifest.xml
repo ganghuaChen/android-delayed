@@ -15,8 +15,8 @@
 
 		<activity android:name="StationActivity">
 			<intent-filter>
-				<action android:name="se.sandos.android.delayed.Station"></action>
-				<data android:scheme="delayed" android:host="trainstations"/>
+				<action android:name="se.sandos.android.delayed.Station"/>
+				<data android:scheme="delayed" android:host="trainstation"/>
 			</intent-filter>
 		</activity>
 		<activity android:name="se.sandos.android.delayed.prefs.PreferencesActivity">
@@ -24,8 +24,8 @@
 				<action android:name="se.sandos.android.delayed.Prefs"></action>
 			</intent-filter>
 		</activity>
-        <activity android:name="se.sandos.android.delayed.prefs.FavoriteActivity">
-        </activity>
+
+        <activity android:name="se.sandos.android.delayed.prefs.FavoriteActivity"/>
 		
 		
 		<!-- Widget -->
@@ -33,17 +33,29 @@
 			<intent-filter>
 				<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
 			</intent-filter>
+			<intent-filter>
+                <action android:name="se.sandos.android.delayed.widgetUpdate" />
+                <data android:scheme="delayed"/>
+			</intent-filter>
 			<meta-data android:name="android.appwidget.provider" android:resource="@xml/appwidget11" />
 		</receiver>
         <receiver android:name=".widget.DelayedAppWidgetProvider21" android:label="Delayed 2x1">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="se.sandos.android.delayed.widgetUpdate" />
+                <data android:scheme="delayed"/>
+            </intent-filter>
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/appwidget21" />
         </receiver>
         <receiver android:name=".widget.DelayedAppWidgetProvider41" android:label="Delayed 4x1">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="se.sandos.android.delayed.widgetUpdate" />
+                <data android:scheme="delayed"/>
             </intent-filter>
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/appwidget41" />
         </receiver>

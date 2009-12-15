@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<RelativeLayout android:id="@+id/RelativeLayout01" android:layout_width="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android" android:layout_height="wrap_content" android:background="@drawable/widget_bg_png_black">
+<RelativeLayout android:layout_width="fill_parent" xmlns:android="http://schemas.android.com/apk/res/android" android:layout_height="wrap_content" android:background="@drawable/widget_bg_png_black" android:id="@+id/WidgetLayout">
 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/WidgetTime0" android:layout_alignParentLeft="true" android:textStyle="bold" android:text="Nofav" android:textColor="#ffffffff" android:paddingTop="5dip" android:paddingLeft="5dip"></TextView>
 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/WidgetDelay0" android:layout_alignParentRight="true" android:textStyle="bold" android:text="Nofav" android:textColor="#ffdd0000" android:paddingTop="5dip" android:paddingRight="5dip"></TextView>
 

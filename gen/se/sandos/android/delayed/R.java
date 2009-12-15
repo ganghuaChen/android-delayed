@@ -20,7 +20,7 @@ public final class R {
         public static final int AutomaticUpdate=0x7f060014;
         public static final int Delayed=0x7f060005;
         public static final int Destination=0x7f060002;
-        public static final int EmptyPlaceHolder=0x7f060025;
+        public static final int EmptyPlaceHolder=0x7f060026;
         public static final int Extra=0x7f060001;
         public static final int FavoriteEnabled=0x7f060007;
         public static final int FavoriteList=0x7f060016;
@@ -41,18 +41,19 @@ public final class R {
         public static final int TargetListLabel=0x7f060008;
         public static final int Time=0x7f060000;
         public static final int Track=0x7f060003;
-        public static final int WidgetDelay0=0x7f06001a;
-        public static final int WidgetDelay1=0x7f06001c;
-        public static final int WidgetDelay2=0x7f06001e;
-        public static final int WidgetDelay3=0x7f060020;
-        public static final int WidgetDelay4=0x7f060022;
-        public static final int WidgetDelay5=0x7f060024;
-        public static final int WidgetTime0=0x7f060019;
-        public static final int WidgetTime1=0x7f06001b;
-        public static final int WidgetTime2=0x7f06001d;
-        public static final int WidgetTime3=0x7f06001f;
-        public static final int WidgetTime4=0x7f060021;
-        public static final int WidgetTime5=0x7f060023;
+        public static final int WidgetDelay0=0x7f06001b;
+        public static final int WidgetDelay1=0x7f06001d;
+        public static final int WidgetDelay2=0x7f06001f;
+        public static final int WidgetDelay3=0x7f060021;
+        public static final int WidgetDelay4=0x7f060023;
+        public static final int WidgetDelay5=0x7f060025;
+        public static final int WidgetLayout=0x7f060019;
+        public static final int WidgetTime0=0x7f06001a;
+        public static final int WidgetTime1=0x7f06001c;
+        public static final int WidgetTime2=0x7f06001e;
+        public static final int WidgetTime3=0x7f060020;
+        public static final int WidgetTime4=0x7f060022;
+        public static final int WidgetTime5=0x7f060024;
     }
     public static final class layout {
         public static final int eventrow=0x7f030000;

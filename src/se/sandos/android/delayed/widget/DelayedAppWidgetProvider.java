@@ -53,13 +53,13 @@ public class DelayedAppWidgetProvider extends AppWidgetProvider
         
         int index = 0;
         for (TrainEvent te : events) {
-            Log.v(Tag, "Got te: " + te);
+            //Log.v(Tag, "Got te: " + te);
             if (index <= 4) {
-                Log.v(Tag, "Setting text: " + index);
+                //Log.v(Tag, "Setting text: " + index);
                 
                 String delay = te.getDelayed();
                 if(delay != null && !delay.equals("")) {
-                    Log.v(Tag, "Adding delay info");
+                    //Log.v(Tag, "Adding delay info");
                     rv.setTextViewText(getWidgetId(index, "WidgetDelay"), delay);
                 } else {
                     rv.setTextViewText(getWidgetId(index, "WidgetDelay"), "");

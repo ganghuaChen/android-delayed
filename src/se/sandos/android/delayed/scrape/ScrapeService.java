@@ -108,7 +108,15 @@ public class ScrapeService extends Service {
                 if (result == null) {
                     // this actually means finished!
                     Delayed.getDb(getApplicationContext()).addTrainEvents(trainevents);
-                    scheduleAllWidgetUpdate(favName);
+                    
+                    // We need to add this to the thread-pool unfortunately, since the DB update is
+                    // done using the same threadpool.
+                    // This job should be "just behind" the db-update job
+                    ScrapePool.addJob(new Runnable() {
+                        public void run() {
+                            scheduleAllWidgetUpdate(favName);
+                        }
+                    });
                 } else {
                     //This is a fixup (destination) message
                 }

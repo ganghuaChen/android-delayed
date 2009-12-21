@@ -138,7 +138,7 @@ public class DBAdapter {
         Calendar cal = Calendar.getInstance();
         //String cald = SIMPLE_DATEFORMATTER.format(cal);
         //-6 minute fuzz, arbitrary value for now
-        cal.add(Calendar.MINUTE, -4);
+        //cal.add(Calendar.MINUTE, -4);
         
         Log.v(Tag, "Number of events in db: " + c.getCount());
         if (!c.isAfterLast() && !c.isBeforeFirst()) {
@@ -153,7 +153,6 @@ public class DBAdapter {
                     StringBuffer sb = te.getStringBuffer();
                     sb.setLength(0);
                     sb.append(c.getString(1));
-                    Log.v(Tag, "Setting extra: " + sb.toString());
                 }
                 if(!c.isNull(5)) {
                 	te.setDestinationFromString(c.getString(5));
@@ -172,20 +171,30 @@ public class DBAdapter {
 //                }
                 //Calendar.before is broken??? Does not work for me anyway...
                 if(te.getExtra().equals("")) {
-                    if(now < item && (te.getDelayedDate() == null || now < te.getDelayedDate().getTime())){
+                    if(now < (item + (1000*60*6)) || (te.getDelayedDate() == null || now < te.getDelayedDate().getTime())){
                         res.add(te);
                     } else {
                         //Remove it
                         Log.v(Tag, "Removing (empty extra) " + (now-item) + " " + SIMPLE_DATEFORMATTER.format(te.getDepartureDate()) + " " + SIMPLE_DATEFORMATTER.format(new Date(now)) + " #: " + te.getNumber() + " d: " + te.getDestination() + " tes departure: " + te.toString());
                         if(te.getDelayedDate() != null) {
-                            Log.v(Tag, " Delayed until: " + SIMPLE_DATEFORMATTER.format(te.getDelayedDate()) + " " + now + " < " + te.getDelayedDate().getTime());
+                            Log.v(Tag, " Delayed until: " + SIMPLE_DATEFORMATTER.format(te.getDelayedDate()) + " " + now + " < " + te.getDelayedDate().getTime() + " " + SIMPLE_DATEFORMATTER.format(new Date(now)));
                         }
                         db.execSQL("delete from trainevents where _id = " + c.getInt(4), new Object[0]);
                     }
                 } else {
-                    if(now < item - (1000*60*40)){
+                    Log.v(Tag, "Extra is set: " + te.getExtra());
+                    if(now < (item + (1000*60*75))){
+                        Log.v(Tag, "Adding: " + te.getNumber() + ":" + te.getStation());
+                        Log.v(Tag, "Removing (non-empty extra) " + (now-item) + " " + SIMPLE_DATEFORMATTER.format(te.getDepartureDate()) + " " + SIMPLE_DATEFORMATTER.format(new Date(now)) + " #: " + te.getNumber() + " d: " + te.getDestination() + " tes departure: " + te.toString());
+                        if(te.getDelayedDate() != null) {
+                            Log.v(Tag, " Delayed until: " + SIMPLE_DATEFORMATTER.format(te.getDelayedDate()) + " " + now + " < " + te.getDelayedDate().getTime() + " " + SIMPLE_DATEFORMATTER.format(new Date(now)));
+                        }
                         res.add(te);
                     } else {
+                        Log.v(Tag, "Removing (non-empty extra) " + (now-item) + " " + SIMPLE_DATEFORMATTER.format(te.getDepartureDate()) + " " + SIMPLE_DATEFORMATTER.format(new Date(now)) + " #: " + te.getNumber() + " d: " + te.getDestination() + " tes departure: " + te.toString());
+                        if(te.getDelayedDate() != null) {
+                            Log.v(Tag, " Delayed until: " + SIMPLE_DATEFORMATTER.format(te.getDelayedDate()) + " " + now + " < " + te.getDelayedDate().getTime() + " " + SIMPLE_DATEFORMATTER.format(new Date(now)));
+                        }
                         Log.v(Tag, "Removing due to non-empty extra, but too old: " + te.toString());
                         db.execSQL("delete from trainevents where _id = " + c.getInt(4), new Object[0]);
                     }

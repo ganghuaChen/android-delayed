@@ -74,7 +74,7 @@ public class StationScraper extends Scraper<TrainEvent, Object[]> {
 				events.add(te);
 				
 				if(mListener != null) {
-	 				Log.v(Tag, "Sending trainevent: " + te + " " + te.getStation().getName());
+//	 				Log.v(Tag, "Sending trainevent: " + te + " " + te.getStation().getName());
 					mListener.onPartialResult(te);
 				} else {
 					Log.w(Tag, "Parsing, but nobody listening?");
@@ -103,7 +103,7 @@ public class StationScraper extends Scraper<TrainEvent, Object[]> {
 			//also parse destination
 			String dest = html.substring(html.indexOf(" till ") + 6);
 			dest = dest.substring(0, dest.indexOf("<br>"));
-			Log.v(Tag, "Dest: " + dest);
+//			Log.v(Tag, "Dest: " + dest);
 			
 			//Try to find it in db
 			te.setDestinationFromString(dest);
@@ -123,7 +123,7 @@ public class StationScraper extends Scraper<TrainEvent, Object[]> {
 		}
 		
 		if(!delimiterSeen) {
-			Log.v(Tag, "Has not seen delimiter yet, ignoring: " + html);
+//			Log.v(Tag, "Has not seen delimiter yet, ignoring: " + html);
 			return false;
 		}
 		
@@ -162,7 +162,7 @@ public class StationScraper extends Scraper<TrainEvent, Object[]> {
 					});
 				}
 			} else {
-				Log.v(Tag, "Destination was set");
+//				Log.v(Tag, "Destination was set");
 			}
 			return false;
 		}
@@ -180,9 +180,9 @@ public class StationScraper extends Scraper<TrainEvent, Object[]> {
 			return false;
 		}
 		
-		if(!hasHandled) {
-			Log.v(Tag, "not handled: " + html);
-		}
+//		if(!hasHandled) {
+//			Log.v(Tag, "not handled: " + html);
+//		}
 		
 		if(!te.hasTrack() && delimiterSeen) {
 			te.getStringBuffer().append(html);

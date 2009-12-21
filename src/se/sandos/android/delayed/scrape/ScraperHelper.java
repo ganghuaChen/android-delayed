@@ -26,7 +26,7 @@ import android.util.Log;
 public class ScraperHelper {
 	public final static String BASE_URL = "http://m.banverket.se/trafik/(111111111111111111111111)/WapPages/";
 	
-	public final static String Tag = "Scraper";
+	public final static String Tag = "ScraperHelper";
 	
 	public static class Nameurl {
 		public String name;
@@ -82,13 +82,13 @@ public class ScraperHelper {
 				}
 				if(s.indexOf("showallstations") != -1) {
 					String uri = s.substring(9, s.lastIndexOf("\">"));
-					Log.i(Tag, "Url: " + uri);
+//					Log.i(Tag, "Url: " + uri);
 					
 					String stationName = s.substring(s.lastIndexOf("\">") + 2, s.length() - 8);
 					stationName = StringEscapeUtils.unescapeHtml(stationName);
 					names.add(new Nameurl(stationName, uri));
 				} else {
-					Log.i(Tag, s);
+//					Log.i(Tag, s);
 				}
 			}
 			Log.i(Tag, "Got names of all stations for " + cut);

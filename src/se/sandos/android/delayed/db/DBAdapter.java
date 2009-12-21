@@ -171,7 +171,7 @@ public class DBAdapter {
 //                }
                 //Calendar.before is broken??? Does not work for me anyway...
                 if(te.getExtra().equals("")) {
-                    if(now < (item + (1000*60*6)) || (te.getDelayedDate() == null || now < te.getDelayedDate().getTime())){
+                    if(now < (item + (1000*60*6)) || (te.getDelayedDate() != null && now < (te.getDelayedDate().getTime() + (1000*60*6) ))){
                         res.add(te);
                     } else {
                         //Remove it

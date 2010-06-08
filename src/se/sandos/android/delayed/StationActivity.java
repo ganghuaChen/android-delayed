@@ -22,11 +22,13 @@ import android.os.Bundle;
 import android.os.Debug;
 import android.os.Handler;
 import android.os.Message;
-import android.text.util.Linkify;
 import android.util.Log;
+import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
@@ -214,6 +216,18 @@ public class StationActivity extends ListActivity {
         }
     }
 
+    @SuppressWarnings("unchecked")
+	protected void onListItemClick(ListView l, View v, int position, long id)
+	{
+		Object o = l.getAdapter().getItem(position);
+		Map<String, String> m = (Map) o;
+
+		String url = m.get("url");
+		
+	    Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse((StationListScraper.domain + url)));
+        startActivity(i);
+	}
+    
     /**
      * Update our listContent model of the list
      * @param te

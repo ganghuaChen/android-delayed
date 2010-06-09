@@ -1,8 +1,11 @@
 package se.sandos.android.delayed;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,11 +26,9 @@ import android.os.Debug;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.view.ContextMenu;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ContextMenu.ContextMenuInfo;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
@@ -224,7 +225,20 @@ public class StationActivity extends ListActivity {
 
 		String url = m.get("url");
 		
-	    Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse((StationListScraper.domain + url)));
+		if(url == null) {
+			//Compute URL
+			url = StationListScraper.base;
+			Calendar c = new GregorianCalendar();
+			DecimalFormat dff = new DecimalFormat("00");
+			
+			url += "TrainShow.aspx?JF=-1&train=" + c.get(Calendar.YEAR)
+					+ dff.format((c.get(Calendar.MONTH) + 1)) + dff.format(c.get(Calendar.DATE)) + ","
+					+ m.get("number").substring(9);
+		} else {
+			url = StationListScraper.domain + url;
+		}
+		
+	    Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
         startActivity(i);
 	}
     

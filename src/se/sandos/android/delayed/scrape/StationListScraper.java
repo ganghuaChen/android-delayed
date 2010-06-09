@@ -18,8 +18,8 @@ import android.util.Log;
 public class StationListScraper extends Scraper<Station, ArrayList<Station>> {
 	private static final String Tag = "StationListScraper";
 	
-	public static String domain = "http://m.banverket.se";
-    public static String base = domain + "/trafik/(111111111111111111111111)/WapPages/";
+	public final static String domain = "http://m.banverket.se";
+    public final static String base = domain + "/trafik/(111111111111111111111111)/WapPages/";
 	
 	@Override
 	public void scrapeImpl() throws Exception {

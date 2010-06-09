@@ -15,7 +15,7 @@ import android.app.Service;
 import android.appwidget.AppWidgetManager;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ResolveInfo;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.IBinder;
 import android.os.PowerManager;
@@ -41,6 +41,8 @@ public class ScrapeService extends Service {
     @Override
     public void onStart(Intent intent, int startid)
     {
+    	ConnectivityManager cm = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+    	//We need a way to distinguish between background and foreground activity here!
         if(!Prefs.isSet(getApplicationContext(), Prefs.PREFS_SERVICE_ENABLED, false)) {
             stopSelf();
             return;

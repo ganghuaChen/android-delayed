@@ -15,7 +15,6 @@ import se.sandos.android.delayed.scrape.ScrapeService;
 import se.sandos.android.delayed.scrape.ScraperHelper;
 import se.sandos.android.delayed.scrape.StationListScraper;
 import android.app.ListActivity;
-import android.content.ComponentName;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;

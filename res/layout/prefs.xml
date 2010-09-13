@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:layout_width="wrap_content"
+  android:layout_height="wrap_content">
+
+<RelativeLayout android:id="@+id/RelativeLayout01"
+	android:layout_width="wrap_content" android:layout_height="wrap_content">
+	
+	
+	<CheckBox android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_below="@+id/FavoriteStation" android:text="Automatisk uppdatering" android:id="@+id/AutomaticUpdate" android:textSize="24sp"></CheckBox><TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/ListLabel" android:textSize="26sp" android:layout_below="@+id/AutomaticUpdate" android:text="Favoriter"></TextView>
+	<ListView android:layout_width="wrap_content"
+		android:layout_height="wrap_content" android:layout_below="@+id/ListLabel"
+		android:choiceMode="multipleChoice" android:id="@+id/FavoriteList"></ListView>
+
+
+</RelativeLayout>
+</LinearLayout>

@@ -154,14 +154,16 @@ public class StationListActivity extends ListActivity {
 	{
 		runOnUiThread(new Runnable(){
 			public void run() {
-				content.clear();
+			    if(content != null) {
+			        content.clear();
 				
-				if(sa == null) {
-					sa = new SimpleAdapter(getApplicationContext(), content, R.layout.stationrow, new String[]{"name"}, new int[]{R.id.StationName});
-					setListAdapter(sa);
-				}
-				
-				sa.notifyDataSetInvalidated();
+    				if(sa == null) {
+    					sa = new SimpleAdapter(getApplicationContext(), content, R.layout.stationrow, new String[]{"name"}, new int[]{R.id.StationName});
+    					setListAdapter(sa);
+    				}
+    				
+    				sa.notifyDataSetInvalidated();
+			    }
 			}
 		});
 	}

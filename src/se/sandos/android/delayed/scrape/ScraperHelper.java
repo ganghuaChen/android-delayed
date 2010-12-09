@@ -24,7 +24,7 @@ import android.util.Log;
  *
  */
 public class ScraperHelper {
-	public final static String BASE_URL = "http://m.banverket.se/trafik/(111111111111111111111111)/WapPages/";
+	public final static String BASE_URL = "http://m.trafikverket.se/tagtrafik/(111111111111111111111111)/WapPages/";
 	
 	public final static String Tag = "ScraperHelper";
 	

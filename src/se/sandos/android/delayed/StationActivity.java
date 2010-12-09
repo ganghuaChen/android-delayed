@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
@@ -148,7 +149,6 @@ public class StationActivity extends ListActivity {
             } else if(existsAndUpdate(te) == 1) {
                 return;
             }
-
             
             trainevents.add(te);
             if(!updated) {
@@ -162,7 +162,15 @@ public class StationActivity extends ListActivity {
                 m.put("url", te.getUrl());
                 m.put("delayed", te.getDelayed());
                 m.put("extra", te.getExtra());
-                m.put("time", Long.toString(te.getDepartureDate().getTime()));
+                Date departureDate = te.getDepartureDate();
+                if(departureDate != null)
+                {
+                    m.put("time", Long.toString(departureDate.getTime()));
+                }
+                else
+                {
+                    m.put("time", "-");
+                }
                 listContent.add(m);
             }
         }
@@ -202,11 +210,17 @@ public class StationActivity extends ListActivity {
         
         Collections.sort(listContent, new Comparator<Map<String, String>>(){
             public int compare(Map<String, String> object1, Map<String, String> object2) {
-                long time1 = Long.valueOf(object1.get("time")).longValue();
-                long time2 = Long.valueOf(object2.get("time")).longValue();
+                try {
+                    long time1 = Long.valueOf(object1.get("time")).longValue();
+                    long time2 = Long.valueOf(object2.get("time")).longValue();
+
+                    if(time1 < time2) { return -1; }
+                    if(time1 > time2) { return 1; }
+                }
+                catch(Exception e)
+                {
+                }
                 
-                if(time1 < time2) { return -1; }
-                if(time1 > time2) { return 1; }
                 return 0;
             }
         });

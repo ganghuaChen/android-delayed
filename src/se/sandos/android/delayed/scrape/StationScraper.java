@@ -26,18 +26,21 @@ import se.sandos.android.delayed.scrape.ScraperHelper.Nameurl;
 import android.util.Log;
 
 public class StationScraper extends Scraper<TrainEvent, Object[]> {
-	private static final String Tag = "StationScraper";
-	
-	private String mName;
-	private String mUrl;
-	
-    private static final DateFormat df = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT, java.util.Locale.GERMANY);
+    private static final String Tag = "StationScraper";
+
+    private static final int DELIMITER_IGNORE = 3;
+
+    private String mName;
+    private String mUrl;
+
+    private static final DateFormat df = SimpleDateFormat.getTimeInstance(SimpleDateFormat.SHORT,
+            java.util.Locale.GERMANY);
 
     private static final Map<String, String> nameMap = new HashMap<String, String>();
-    
-	private boolean delimiterSeen = false;
 
-	public final static int MSG_DEST = 1;
+    private int delimiterSeen = 0;
+
+    public final static int MSG_DEST = 1;
 
 	public StationScraper(String url, String name)
 	{
@@ -65,7 +68,7 @@ public class StationScraper extends Scraper<TrainEvent, Object[]> {
 		List<TrainEvent> events = new ArrayList<TrainEvent>(20);
 		//XXX: Move this out to scraper
 		TrainEvent te = new TrainEvent(new Station(mName, mUrl));
-		delimiterSeen = false;
+		delimiterSeen = 0;
 		int line = 0;
 		while ((s = br.readLine()) != null) {
 			mListener.onStatus("pl: " + line++);
@@ -88,12 +91,12 @@ public class StationScraper extends Scraper<TrainEvent, Object[]> {
 		}
 	}
 	
-	public boolean parse(TrainEvent te, final String html)
+	private boolean parse(TrainEvent te, final String html)
 	{
 		boolean hasHandled = false;
 		if(html.indexOf(" till ") != -1) {
 			hasHandled = true;
-			delimiterSeen = true;
+			delimiterSeen = DELIMITER_IGNORE;
 			String arrival = html.substring(0, html.indexOf(" "));
 			Date dd = null;
 			dd = parseTime(arrival);
@@ -111,19 +114,20 @@ public class StationScraper extends Scraper<TrainEvent, Object[]> {
 		}
 		
 		if(html.endsWith("-<br>")) {
-			if(delimiterSeen) {
+			if(delimiterSeen >= DELIMITER_IGNORE) {
 				StringBuffer sb = te.getStringBuffer();
 				if(sb != null && sb.length() != 0) {
-					Log.v(Tag, "EXTRA DATA: " + te.getStringBuffer().toString());
+//					Log.v(Tag, "EXTRA DATA: " + te.getStringBuffer().toString());
 				}
 				return true;
 			}
-			delimiterSeen = true;
+			delimiterSeen++;
 			return false;
 		}
 		
-		if(!delimiterSeen) {
+		if(delimiterSeen < DELIMITER_IGNORE) {
 //			Log.v(Tag, "Has not seen delimiter yet, ignoring: " + html);
+		    //delimiterSeen++;
 			return false;
 		}
 		
@@ -184,7 +188,7 @@ public class StationScraper extends Scraper<TrainEvent, Object[]> {
 //			Log.v(Tag, "not handled: " + html);
 //		}
 		
-		if(!te.hasTrack() && delimiterSeen) {
+		if(!te.hasTrack() && delimiterSeen >= DELIMITER_IGNORE) {
 			te.getStringBuffer().append(html);
 		}
 		

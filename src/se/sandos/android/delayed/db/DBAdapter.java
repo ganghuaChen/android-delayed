@@ -225,6 +225,12 @@ public class DBAdapter {
      */
     public long addTrainEventImpl(String station, Date time, String track, int number, Date delay, String extra, String destination, boolean add)
     {
+        if(time == null)
+        {
+            Log.v(Tag, "Null time, not so sure about this");
+            return -1;
+        }
+        
         if(!add) {
             Log.v(Tag, "Updating " + number);
             ContentValues cv = new ContentValues();
@@ -241,10 +247,10 @@ public class DBAdapter {
             Log.v(Tag, "Affected " + res);
             return res;
         }
-        Log.v(Tag, "Adding " + number);
+//        Log.v(Tag, "Adding " + number);
 		ContentValues cv = new ContentValues();
 		cv.put(TRAINEVENT_KEY_STATION, station);
-		cv.put(TRAINEVENT_KEY_TIME, time.getTime());
+	    cv.put(TRAINEVENT_KEY_TIME, time.getTime());
 		cv.put(TRAINEVENT_KEY_TRACK, track);
 		cv.put(TRAINEVENT_KEY_NUMBER, number);
 		if(delay != null) {

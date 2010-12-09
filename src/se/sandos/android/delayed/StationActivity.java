@@ -157,7 +157,7 @@ public class StationActivity extends ListActivity {
                 Map<String, String> m = new HashMap<String, String>();
                 m.put("name", te.toString());
                 m.put("track", "Track: " + te.getTrack());
-                m.put("number", "Train #: " + Integer.toString(te.getNumber()));
+                m.put("number", "Train #: " + te.getNumber());
                 m.put("destination", te.getDestination());
                 m.put("url", te.getUrl());
                 m.put("delayed", te.getDelayed());
@@ -269,7 +269,7 @@ public class StationActivity extends ListActivity {
         boolean changed = false;
         
         for (Map<String, String> m : listContent) {
-            if (m.get("number").equals("Train #: " + Integer.toString(te.getNumber()))) {
+            if (m.get("number").equals("Train #: " + te.getNumber())) {
                 // Update
                 String delayed = m.get("delayed");
                 if (!delayed.equals(te.getDelayed())) {

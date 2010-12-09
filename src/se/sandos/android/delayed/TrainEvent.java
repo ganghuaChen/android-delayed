@@ -19,7 +19,7 @@ public class TrainEvent implements Comparable<TrainEvent> {
 	private Station destination;
 	private Station station;
 
-	private int number = -1;
+	private String number = "";
 	private String track;
 	private Date departure;
 	private Date delayed;
@@ -41,7 +41,7 @@ public class TrainEvent implements Comparable<TrainEvent> {
 	    station = s;
 	}
 	
-	public int getNumber()
+	public String getNumber()
 	{
 		return number;
 	}
@@ -146,7 +146,7 @@ public class TrainEvent implements Comparable<TrainEvent> {
 		destination = dest;
 	}
 	
-	public void setNumber(int id)
+	public void setNumber(String id)
 	{
 		this.number = id;
 	}

@@ -42,9 +42,9 @@ public class ScrapeService extends Service {
     public void onStart(Intent intent, int startid)
     {
     	ConnectivityManager cm = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-    	//We need a way to distinguish between background and foreground activity here!
-        if(!Prefs.isSet(getApplicationContext(), Prefs.PREFS_SERVICE_ENABLED, false)) {
+        if(!cm.getBackgroundDataSetting() || !Prefs.isSet(getApplicationContext(), Prefs.PREFS_SERVICE_ENABLED, false)) {
             stopSelf();
+            removeAlarm(getApplicationContext());
             return;
         }
         

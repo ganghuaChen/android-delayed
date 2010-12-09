@@ -136,7 +136,7 @@ public class StationScraper extends Scraper<TrainEvent, Object[]> {
 			String d = html.substring(startNr);
 			int endNr = d.indexOf("</a>");
 			d = d.substring(0, endNr);
-			te.setNumber(Integer.valueOf(d));
+			te.setNumber(d);
 			
 			String url = html.substring(html.indexOf("href=\"") + 6);
 			final String finalUrl = url.substring(0, url.indexOf("\""));
@@ -205,7 +205,10 @@ public class StationScraper extends Scraper<TrainEvent, Object[]> {
         Calendar correctitem = Calendar.getInstance();
 		Date dd = null;
 		try {
-			dd = df.parse(arrival);
+		    synchronized (df)
+            {
+		        dd = df.parse(arrival);
+            }
 		} catch (ParseException e) {
 			Log.i(Tag, "Exception parsing date: " + e.getMessage());
 		}
@@ -220,15 +223,12 @@ public class StationScraper extends Scraper<TrainEvent, Object[]> {
 		
         //Compare
         long diff = correctitem.getTimeInMillis() - now.getTimeInMillis(); 
-        
+        Log.v(Tag, "Diff is " + diff / 3600000.0f );
         //Log.v(Tag, "Now: " + DBAdapter.SIMPLE_DATEFORMATTER.format(now.getTime()));
-        if(diff > 3600000 * 2) {
-            //Need to add one day
-            now.add(Calendar.DAY_OF_YEAR, 1);
-            //Log.v(Tag, "Fixed day of time, too big diff: " + DBAdapter.SIMPLE_DATEFORMATTER.format(correctitem.getTime()));
-        } else if(diff < -(3600000 * 2)) {
-            now.add(Calendar.DAY_OF_YEAR, -1);
-            //Log.v(Tag, "Fixed day of time, too small diff: " + DBAdapter.SIMPLE_DATEFORMATTER.format(correctitem.getTime()));
+        if(diff > 3600000 * 6) {
+            correctitem.add(Calendar.DAY_OF_YEAR, -1);
+        } else if(diff < -(3600000 * 6)) {
+            correctitem.add(Calendar.DAY_OF_YEAR, 1);
         }
 		
         Date ret = correctitem.getTime();

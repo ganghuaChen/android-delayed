@@ -82,7 +82,7 @@ public class DBAdapter {
                 long s = System.currentTimeMillis();
 
                 String station = trainevents.get(0).getStation().getName();
-                int[] numbers = new int[trainevents.size()];
+                String[] numbers = new String[trainevents.size()];
                 int index = 0;
                 for (TrainEvent te : trainevents) {
                     numbers[index++] = te.getNumber();
@@ -145,7 +145,7 @@ public class DBAdapter {
             while (!c.isAfterLast()) {
                 TrainEvent te = new TrainEvent(null);
                 te.setDeparture(c.getLong(0));
-                te.setNumber(c.getInt(3));
+                te.setNumber(c.getString(3));
                 if(!c.isNull(2)) {
                     te.setDelayed(c.getLong(2));
                 }
@@ -223,7 +223,7 @@ public class DBAdapter {
      * @param add Wether to add this event, or possibly update it
      * @return
      */
-    public long addTrainEventImpl(String station, Date time, String track, int number, Date delay, String extra, String destination, boolean add)
+    public long addTrainEventImpl(String station, Date time, String track, String number, Date delay, String extra, String destination, boolean add)
     {
         if(time == null)
         {
@@ -267,7 +267,7 @@ public class DBAdapter {
 		return status;
     }
     
-    public TrainEvent[] getTrainEvents(String station, int[] numbers)
+    public TrainEvent[] getTrainEvents(String station, String[] numbers)
     {
     	if(station == null) {
     		return  null;
@@ -291,7 +291,7 @@ public class DBAdapter {
 			while(!c.isAfterLast()) {
 				TrainEvent te = new TrainEvent(null);
 				te.setDeparture(c.getLong(0));
-				te.setNumber(c.getInt(3));
+				te.setNumber(c.getString(3));
 				te.setDestinationFromString(c.getString(4));
 				events[index++] = te;
 				c.move(1);
@@ -306,7 +306,7 @@ public class DBAdapter {
 		return new TrainEvent[0];
     }
     
-	private String expand(int[] numbers) {
+	private String expand(String[] numbers) {
 		StringBuffer sb = new StringBuffer();
 		
 		for(int i=0; i<numbers.length; i++) {

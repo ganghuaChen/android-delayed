@@ -38,8 +38,10 @@ public class DelayedAppWidgetProvider extends AppWidgetProvider
         DBAdapter db = Delayed.getDb(context);
         String name = ""; 
         for(Favorite f : favorites) {
+//            Log.v(Tag, "Favorite: " + f.getName());
             if(f.isActive()) {
                 for(TrainEvent te : db.getStationEvents(f.getName())) {
+//                    Log.v(Tag, "TE: " + te);
                     te.setStation(new Station(f.getName(), null));
                     if(Favorite.isFavoriteTarget(favorites, te)) {
                         events.add(te);

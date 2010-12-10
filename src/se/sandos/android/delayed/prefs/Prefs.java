@@ -34,7 +34,7 @@ public class Prefs {
     public static void setSetting(Context ctx, String setting, String value) 
     {
         SharedPreferences sp = ctx.getSharedPreferences(PREFS_KEY, Context.MODE_PRIVATE);
-        Log.v(Tag, "Setting setting: " + setting + " to " + value);
+//        Log.v(Tag, "Setting setting: " + setting + " to " + value);
         Editor editor = sp.edit();
         editor.putString(setting, value);
         if(!editor.commit()) {
@@ -46,7 +46,7 @@ public class Prefs {
     {
         SharedPreferences sp = ctx.getSharedPreferences(PREFS_KEY, Context.MODE_PRIVATE);
         long r = sp.getLong(setting, def);
-        Log.v(Tag, "Returning long setting: " + setting + " " + r);
+//        Log.v(Tag, "Returning long setting: " + setting + " " + r);
         return r;
     }
 
@@ -54,7 +54,7 @@ public class Prefs {
     {
         SharedPreferences sp = ctx.getSharedPreferences(PREFS_KEY, Context.MODE_PRIVATE);
         int r = sp.getInt(setting, def);
-        Log.v(Tag, "Returning int setting: " + setting + " " + r);
+//        Log.v(Tag, "Returning int setting: " + setting + " " + r);
         return r;
     }
     
@@ -66,7 +66,7 @@ public class Prefs {
         if(!editor.commit()) {
             Log.w(Tag, "Failed to commit!");
         }
-        Log.v(Tag, "Setting boolean setting: " + setting + " " + value);
+//        Log.v(Tag, "Setting boolean setting: " + setting + " " + value);
     }
 
     public static void setIntSetting(Context ctx, String setting, int value)
@@ -77,13 +77,13 @@ public class Prefs {
         if(!editor.commit()) {
             Log.w(Tag, "Failed to commit!");
         }
-        Log.v(Tag, "Setting boolean setting: " + setting + " " + value);
+//        Log.v(Tag, "Setting int setting: " + setting + " " + value);
     }
 
     
     public static void removeSetting(Context ctx, String setting)
     {
-        Log.v(Tag, "Removing setting " + setting);
+//        Log.v(Tag, "Removing setting " + setting);
         
         SharedPreferences sp = ctx.getSharedPreferences(PREFS_KEY, Context.MODE_PRIVATE);
         Editor editor = sp.edit();
@@ -95,7 +95,7 @@ public class Prefs {
     {
         SharedPreferences sp = ctx.getSharedPreferences(PREFS_KEY, Context.MODE_PRIVATE);
         boolean r = sp.getBoolean(setting, def);
-        Log.v(Tag, "Returning boolean setting: " + setting + " " + r);
+//        Log.v(Tag, "Returning boolean setting: " + setting + " " + r);
         return r;
     }
     
@@ -109,7 +109,7 @@ public class Prefs {
     {
         SharedPreferences sp = ctx.getSharedPreferences(PREFS_KEY, Context.MODE_PRIVATE);
         String r = sp.getString(setting, def);
-        Log.v(Tag, "Returning setting: " + setting + " " + r);
+//        Log.v(Tag, "Returning setting: " + setting + " " + r);
         return r;
     }
 

@@ -82,15 +82,15 @@ public class Favorite {
     
     public boolean filter(String name)
     {
-        if(!targetSet.contains(name)) {
-            Log.v(Tag ,"Did not contain " + name + "<");
-        }
-        for(String s : targets) {
-            Log.v(Tag, "Contains " + s + "<");
-        }
-        for(Iterator<String> i = targetSet.iterator(); i.hasNext();) {
-            Log.v(Tag, "Contains also " + i.next());
-        }
+//        if(!targetSet.contains(name)) {
+//            Log.v(Tag ,"Did not contain " + name + "<");
+//        }
+//        for(String s : targets) {
+//            Log.v(Tag, "Contains " + s + "<");
+//        }
+//        for(Iterator<String> i = targetSet.iterator(); i.hasNext();) {
+//            Log.v(Tag, "Contains also " + i.next());
+//        }
         return targetSet.contains(name);
     }
     
@@ -116,7 +116,7 @@ public class Favorite {
                     }
                 }
                 
-                Log.v(Tag, "" + f.getName() + " did not like");
+//                Log.v(Tag, "" + f.getName() + " did not like");
             }
         }
         

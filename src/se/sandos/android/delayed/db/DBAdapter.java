@@ -23,7 +23,7 @@ import android.os.Debug;
 import android.util.Log;
 
 public class DBAdapter {
-	private final static String Tag = "DBAdapter";
+	private final static String Tag = "dldAdapter";
 	
 	private final static boolean TRACE = false;
 	
@@ -86,20 +86,20 @@ public class DBAdapter {
                 int index = 0;
                 for (TrainEvent te : trainevents) {
                     numbers[index++] = te.getNumber();
-                    Log.v(Tag, "Exists 1: " + numbers[index-1]);
+//                    Log.v(Tag, "Exists 1: " + numbers[index-1]);
                 }
                 TrainEvent[] events = getTrainEvents(station, numbers);
 
-                Set<Integer> existing_events = new HashSet<Integer>();
+                Set<String> existing_events = new HashSet<String>();
                 Log.v(Tag, "Number of found pre-existing trains: " + events.length);
                 for (int i = 0; i < events.length; i++) {
-                    Log.v(Tag, "Exists 2: " + events[i]);
-                    existing_events.add(Integer.valueOf(events[i].getNumber()));
+//                    Log.v(Tag, "Exists 2: " + events[i]);
+                    existing_events.add(events[i].getNumber());
                 }
     
                 int count = 0;
                 for (TrainEvent te : trainevents) {
-                    if (!existing_events.contains(Integer.valueOf(te.getNumber()))) {
+                    if (!existing_events.contains(te.getNumber())) {
                         addTrainEventImpl(te.getStation().getName(), te.getDepartureDate(), te.getTrack(), te.getNumber(), te
                                 .getDelayedDate(), te.getExtra(), te.getDestination(), true);
                     } else {
@@ -175,27 +175,27 @@ public class DBAdapter {
                         res.add(te);
                     } else {
                         //Remove it
-                        Log.v(Tag, "Removing (empty extra) " + (now-item) + " " + SIMPLE_DATEFORMATTER.format(te.getDepartureDate()) + " " + SIMPLE_DATEFORMATTER.format(new Date(now)) + " #: " + te.getNumber() + " d: " + te.getDestination() + " tes departure: " + te.toString());
-                        if(te.getDelayedDate() != null) {
-                            Log.v(Tag, " Delayed until: " + SIMPLE_DATEFORMATTER.format(te.getDelayedDate()) + " " + now + " < " + te.getDelayedDate().getTime() + " " + SIMPLE_DATEFORMATTER.format(new Date(now)));
-                        }
+//                        Log.v(Tag, "Removing (empty extra) " + (now-item) + " " + SIMPLE_DATEFORMATTER.format(te.getDepartureDate()) + " " + SIMPLE_DATEFORMATTER.format(new Date(now)) + " #: " + te.getNumber() + " d: " + te.getDestination() + " tes departure: " + te.toString());
+//                        if(te.getDelayedDate() != null) {
+//                            Log.v(Tag, " Delayed until: " + SIMPLE_DATEFORMATTER.format(te.getDelayedDate()) + " " + now + " < " + te.getDelayedDate().getTime() + " " + SIMPLE_DATEFORMATTER.format(new Date(now)));
+//                        }
                         db.execSQL("delete from trainevents where _id = " + c.getInt(4), new Object[0]);
                     }
                 } else {
-                    Log.v(Tag, "Extra is set: " + te.getExtra());
+//                    Log.v(Tag, "Extra is set: " + te.getExtra());
                     if(now < (item + (1000*60*75))){
-                        Log.v(Tag, "Adding: " + te.getNumber() + ":" + te.getStation());
-                        Log.v(Tag, "Removing (non-empty extra) " + (now-item) + " " + SIMPLE_DATEFORMATTER.format(te.getDepartureDate()) + " " + SIMPLE_DATEFORMATTER.format(new Date(now)) + " #: " + te.getNumber() + " d: " + te.getDestination() + " tes departure: " + te.toString());
-                        if(te.getDelayedDate() != null) {
-                            Log.v(Tag, " Delayed until: " + SIMPLE_DATEFORMATTER.format(te.getDelayedDate()) + " " + now + " < " + te.getDelayedDate().getTime() + " " + SIMPLE_DATEFORMATTER.format(new Date(now)));
-                        }
+//                        Log.v(Tag, "Adding: " + te.getNumber() + ":" + te.getStation());
+//                        Log.v(Tag, "Removing (non-empty extra) " + (now-item) + " " + SIMPLE_DATEFORMATTER.format(te.getDepartureDate()) + " " + SIMPLE_DATEFORMATTER.format(new Date(now)) + " #: " + te.getNumber() + " d: " + te.getDestination() + " tes departure: " + te.toString());
+//                        if(te.getDelayedDate() != null) {
+//                            Log.v(Tag, " Delayed until: " + SIMPLE_DATEFORMATTER.format(te.getDelayedDate()) + " " + now + " < " + te.getDelayedDate().getTime() + " " + SIMPLE_DATEFORMATTER.format(new Date(now)));
+//                        }
                         res.add(te);
                     } else {
-                        Log.v(Tag, "Removing (non-empty extra) " + (now-item) + " " + SIMPLE_DATEFORMATTER.format(te.getDepartureDate()) + " " + SIMPLE_DATEFORMATTER.format(new Date(now)) + " #: " + te.getNumber() + " d: " + te.getDestination() + " tes departure: " + te.toString());
-                        if(te.getDelayedDate() != null) {
-                            Log.v(Tag, " Delayed until: " + SIMPLE_DATEFORMATTER.format(te.getDelayedDate()) + " " + now + " < " + te.getDelayedDate().getTime() + " " + SIMPLE_DATEFORMATTER.format(new Date(now)));
-                        }
-                        Log.v(Tag, "Removing due to non-empty extra, but too old: " + te.toString());
+//                        Log.v(Tag, "Removing (non-empty extra) " + (now-item) + " " + SIMPLE_DATEFORMATTER.format(te.getDepartureDate()) + " " + SIMPLE_DATEFORMATTER.format(new Date(now)) + " #: " + te.getNumber() + " d: " + te.getDestination() + " tes departure: " + te.toString());
+//                        if(te.getDelayedDate() != null) {
+//                            Log.v(Tag, " Delayed until: " + SIMPLE_DATEFORMATTER.format(te.getDelayedDate()) + " " + now + " < " + te.getDelayedDate().getTime() + " " + SIMPLE_DATEFORMATTER.format(new Date(now)));
+//                        }
+//                        Log.v(Tag, "Removing due to non-empty extra, but too old: " + te.toString());
                         db.execSQL("delete from trainevents where _id = " + c.getInt(4), new Object[0]);
                     }
                 }
@@ -232,19 +232,19 @@ public class DBAdapter {
         }
         
         if(!add) {
-            Log.v(Tag, "Updating " + number);
+//            Log.v(Tag, "Updating " + number);
             ContentValues cv = new ContentValues();
             if(delay != null) {
-                Log.v(Tag, "Setting delayed: " + delay.getTime());
+//                Log.v(Tag, "Setting delayed: " + delay.getTime());
                 cv.put(TRAINEVENT_KEY_DELAY, delay.getTime());
             } else {
-                Log.v(Tag, "Setting null delayed");
+//                Log.v(Tag, "Setting null delayed");
                 cv.putNull(TRAINEVENT_KEY_DELAY);
             }
             cv.put(TRAINEVENT_KEY_EXTRA, extra);
-            Log.v(Tag, "Setting extra: " + extra);
+//            Log.v(Tag, "Setting extra: " + extra);
             long res = db.update(TRAINEVENT_TABLE_NAME, cv, "" + TRAINEVENT_KEY_STATION + " = ? and " + TRAINEVENT_KEY_NUMBER + " = " + number, new String[]{station});
-            Log.v(Tag, "Affected " + res);
+//            Log.v(Tag, "Affected " + res);
             return res;
         }
 //        Log.v(Tag, "Adding " + number);
@@ -310,12 +310,12 @@ public class DBAdapter {
 		StringBuffer sb = new StringBuffer();
 		
 		for(int i=0; i<numbers.length; i++) {
-			sb.append(numbers[i]);
+			sb.append("\"").append(numbers[i]).append("\"");
 			if(i < (numbers.length - 1)) {
 				sb.append(", ");
 			}
 		}
-		
+//		Log.v(Tag, "Returning " + sb.toString());
 		return sb.toString();
 	}
 

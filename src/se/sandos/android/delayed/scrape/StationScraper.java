@@ -223,11 +223,11 @@ public class StationScraper extends Scraper<TrainEvent, Object[]> {
 		
         //Compare
         long diff = correctitem.getTimeInMillis() - now.getTimeInMillis(); 
-        Log.v(Tag, "Diff is " + diff / 3600000.0f );
+//        Log.v(Tag, "Diff is " + diff / 3600000.0f );
         //Log.v(Tag, "Now: " + DBAdapter.SIMPLE_DATEFORMATTER.format(now.getTime()));
-        if(diff > 3600000 * 6) {
+        if(diff > 3600000 * 11) {
             correctitem.add(Calendar.DAY_OF_YEAR, -1);
-        } else if(diff < -(3600000 * 6)) {
+        } else if(diff < -(3600000 * 11)) {
             correctitem.add(Calendar.DAY_OF_YEAR, 1);
         }
 		

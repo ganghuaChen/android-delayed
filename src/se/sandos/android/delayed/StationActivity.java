@@ -283,7 +283,12 @@ public class StationActivity extends ListActivity
     protected void onListItemClick(ListView l, View v, int position, long id)
     {
         Object o = l.getAdapter().getItem(position);
-        Map<String, String> m = (Map) o;
+        if(o instanceof Map<?, ?>)
+        {
+            return;
+        }
+        
+        Map<String, String> m = (Map<String, String>) o;
 
         String url = m.get("url");
 

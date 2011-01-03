@@ -52,36 +52,34 @@ public class ScrapeService extends Service {
         final PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Delayed service");
         wl.acquire();
         
-        try {
-            Log.v(Tag, "onStart, missed: " + intent.getIntExtra(Intent.EXTRA_ALARM_COUNT, 0));
-            
-            DBAdapter db = Delayed.getDb(getApplicationContext());
-            
-            List<Favorite> favorites = Prefs.getFavorites(getApplicationContext());
-            for(Favorite f : favorites) {
-                if(f.isActive()) {
-                    String url = db.getUrl(f.getName());
-                    scrape(f.getName(), url);
-                }
+        Log.v(Tag, "onStart, missed: " + intent.getIntExtra(Intent.EXTRA_ALARM_COUNT, 0));
+        
+        DBAdapter db = Delayed.getDb(getApplicationContext());
+        
+        List<Favorite> favorites = Prefs.getFavorites(getApplicationContext());
+        for(Favorite f : favorites) {
+            if(f.isActive()) {
+                String url = db.getUrl(f.getName());
+                scrape(f.getName(), url);
             }
-            
-            // Schedule wakelock-release and alarm setting, this will run after any scrapes are done
-            // We want to set the alarm after the scrapes are done, to avoid over-runs from previous
-            // triggers
-            ScrapePool.addJob(new Runnable(){
-                public void run(){
-                    wl.release();
-                    
-                    if(Prefs.isSet(getApplicationContext(), Prefs.PREFS_SERVICE_ENABLED, false)) {
-                        setAlarm(getApplicationContext(), Prefs.getIntSetting(getApplicationContext(), Prefs.PREFS_INTERVAL, 120));
-                    }
-                }
-            });
-            
-            
-        } finally {
-            stopSelf();
         }
+        
+        // Schedule wakelock-release and alarm setting, this will run after any scrapes are done
+        // We want to set the alarm after the scrapes are done, to avoid over-runs from previous
+        // triggers
+        ScrapePool.addJob(new Runnable(){
+            public void run(){
+                wl.release();
+                
+                if(Prefs.isSet(getApplicationContext(), Prefs.PREFS_SERVICE_ENABLED, false)) {
+                    setAlarm(getApplicationContext(), Prefs.getIntSetting(getApplicationContext(), Prefs.PREFS_INTERVAL, 120));
+                }
+                
+                stopSelf();
+            }
+        });
+            
+            
     }
 
     private void scheduleAllWidgetUpdate(String favorite)

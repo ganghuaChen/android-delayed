@@ -214,6 +214,32 @@ public class DBAdapter {
     /**
      * 
      * @param station
+     * @param train
+     * @return true if this train passes this station
+     */
+    public boolean checkIfPasses(String station, String train)
+    {
+		Cursor c = db.query(TRAINEVENT_TABLE_NAME,
+			new String[] { 	TRAINEVENT_KEY_TIME, 
+							TRAINEVENT_KEY_EXTRA,
+							TRAINEVENT_KEY_DELAY, 
+							TRAINEVENT_KEY_NUMBER, 
+							TRAINEVENT_KEY_DESTINATION}, 
+			TRAINEVENT_KEY_NUMBER + " = " + train + " AND " + TRAINEVENT_KEY_STATION + " = ?", 
+			new String[]{station} , null, null, null);
+		
+		
+		if(c.getCount() > 0)
+		{
+		   return true; 
+		}
+		
+		return false;
+    }
+    
+    /**
+     * 
+     * @param station
      * @param time
      * @param track
      * @param number

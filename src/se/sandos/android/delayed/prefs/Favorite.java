@@ -5,8 +5,10 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Delayed;
 
 import se.sandos.android.delayed.TrainEvent;
+import se.sandos.android.delayed.db.DBAdapter;
 
 import android.content.Context;
 import android.util.Log;
@@ -94,10 +96,15 @@ public class Favorite {
         return targetSet.contains(name);
     }
     
-    public static boolean isFavoriteTarget(List<Favorite> favorites, TrainEvent te) {
+    public static boolean isFavoriteTarget(List<Favorite> favorites, TrainEvent te, DBAdapter db) {
         for(Favorite f : favorites) {
+            if(!f.isActive())
+            {
+                continue;
+            }
+            
             if(te.getStation().getName().equals(f.getName())) {
-                if(f.isActive() && f.filter(te.getDestination())) {
+                if(f.filter(te.getDestination())) {
                     return true;
                 }
                 
@@ -117,6 +124,13 @@ public class Favorite {
                 }
                 
 //                Log.v(Tag, "" + f.getName() + " did not like");
+            }
+            
+            //Check if train passes this favorite!
+            if(db.checkIfPasses(f.getName(), te.getNumber()))
+            {
+                Log.v(Tag, "Adding train " + te.getNumber() + " since it passes " + f.getName());
+                return true;
             }
         }
         

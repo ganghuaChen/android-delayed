@@ -43,6 +43,8 @@ public class StationActivity extends ListActivity
     private static final DateFormat df = SimpleDateFormat.getTimeInstance(SimpleDateFormat.MEDIUM,
             java.util.Locale.GERMANY);
 
+    private static long lastRefresh = -1;
+    
     private static final boolean TRACE = false;
 
     private List<Map<String, String>> listContent = null;
@@ -157,7 +159,6 @@ public class StationActivity extends ListActivity
 
     private void addEvents(List<TrainEvent> events)
     {
-
         if (listContent == null)
         {
             listContent = new ArrayList<Map<String, String>>();
@@ -202,6 +203,11 @@ public class StationActivity extends ListActivity
             }
         }
 
+//        refreshList(needInvalidate);
+    }
+
+    private void refreshList(boolean needInvalidate)
+    {
         if (sa == null)
         {
             needInvalidate = true;
@@ -283,7 +289,8 @@ public class StationActivity extends ListActivity
     protected void onListItemClick(ListView l, View v, int position, long id)
     {
         Object o = l.getAdapter().getItem(position);
-        if(o instanceof Map<?, ?>)
+
+        if(!(o instanceof Map))
         {
             return;
         }
@@ -389,7 +396,7 @@ public class StationActivity extends ListActivity
         {
             public void onStatus(String status)
             {
-                // mHandler.dispatchMessage(Message.obtain(mHandler, ScrapeListener.MSG_STATUS, status));
+//                 mHandler.dispatchMessage(Message.obtain(mHandler, ScrapeListener.MSG_STATUS, status));
             }
 
             public void onFinished(Object[] result)
@@ -399,14 +406,24 @@ public class StationActivity extends ListActivity
                     // this actually means finished!
                     Delayed.getDb(getApplicationContext()).addTrainEvents(trainevents);
 
-                    // Send ourselves a status-message
-                    
-                    mHandler.dispatchMessage(Message.obtain(mHandler, ScrapeListener.MSG_STATUS, "updated " + printNow()));
-
-                    if (TRACE)
+                    runOnUiThread(new Runnable()
                     {
-                        Debug.stopMethodTracing();
-                    }
+                        public void run()
+                        {
+                            refreshList(false);
+                        
+                            lastRefresh = System.currentTimeMillis();
+                                
+                            // Send ourselves a status-message
+                            
+                            mHandler.dispatchMessage(Message.obtain(mHandler, ScrapeListener.MSG_STATUS, "updated " + printNow()));
+        
+                            if (TRACE)
+                            {
+                                Debug.stopMethodTracing();
+                            }
+                        }
+                    });
                 }
                 else
                 {
@@ -418,7 +435,7 @@ public class StationActivity extends ListActivity
 
             public void onPartialResult(TrainEvent result)
             {
-                // mHandler.dispatchMessage(Message.obtain(mHandler, 0, result));
+                 mHandler.dispatchMessage(Message.obtain(mHandler, 0, result));
             }
 
             public void onRestart()
@@ -469,11 +486,39 @@ public class StationActivity extends ListActivity
         }
     }
 
+    public void onWindowFocusChanged(boolean hasFocus)
+    {
+        if(hasFocus)
+        {
+            maybeRefresh();
+        }
+    }
+    
+    protected void onResume()
+    {
+        super.onResume();
+        
+        maybeRefresh();
+    }
+
+    private void maybeRefresh()
+    {
+        //Auto-refresh if latest refresh was more than a few minutes ago
+        long now = System.currentTimeMillis(); 
+        if (lastRefresh == -1 || (now - lastRefresh) > 1000*120)
+        {
+            listContent.clear();
+            fetchList();
+        }
+    }
+
+    
     public boolean onOptionsItemSelected(MenuItem mi)
     {
         if (mi.getItemId() == 1)
         {
-            clearList();
+//            clearList();
+            listContent.clear();
             fetchList();
             return true;
         }

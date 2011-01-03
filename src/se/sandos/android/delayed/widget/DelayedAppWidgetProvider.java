@@ -43,7 +43,7 @@ public class DelayedAppWidgetProvider extends AppWidgetProvider
                 for(TrainEvent te : db.getStationEvents(f.getName())) {
 //                    Log.v(Tag, "TE: " + te);
                     te.setStation(new Station(f.getName(), null));
-                    if(Favorite.isFavoriteTarget(favorites, te)) {
+                    if(Favorite.isFavoriteTarget(favorites, te, db)) {
                         events.add(te);
                     }
                 }

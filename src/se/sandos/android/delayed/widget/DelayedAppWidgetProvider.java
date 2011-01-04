@@ -59,6 +59,17 @@ public class DelayedAppWidgetProvider extends AppWidgetProvider
             if (index <= 4) {
                 //Log.v(Tag, "Setting text: " + index);
                 
+                String extra = te.getExtra();
+               
+                if(extra != null && !extra.equals(""))
+                {
+                    rv.setViewVisibility(getWidgetId(index, "WidgetStrike"), View.VISIBLE);
+                }
+                else
+                {
+                    rv.setViewVisibility(getWidgetId(index, "WidgetStrike"), View.GONE);
+                }
+                
                 String delay = te.getDelayed();
                 if(delay != null && !delay.equals("")) {
                     //Log.v(Tag, "Adding delay info");

@@ -1,7 +1,8 @@
 package se.sandos.android.delayed.scrape;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Class for handling stuff in threads.
@@ -9,7 +10,11 @@ import java.util.concurrent.Executors;
  *
  */
 public class ScrapePool {
-	private static ExecutorService e = Executors.newFixedThreadPool(1);
+//	private static ExecutorService e = Executors.newFixedThreadPool(1);
+	
+	final static ArrayBlockingQueue<Runnable> queue = new ArrayBlockingQueue<Runnable>(5);
+	
+	private static ThreadPoolExecutor e = new ThreadPoolExecutor(1,1, 1000, TimeUnit.MILLISECONDS, queue);
 	
 	public static void addJob(Runnable r)
 	{

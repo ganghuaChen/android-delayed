@@ -28,6 +28,11 @@ public class Favorite {
         return new ArrayList<String>(targets);
     }
     
+    public Set<String> getTargetSet()
+    {
+        return targetSet;
+    }
+    
     public void addTarget(String target)
     {
         targets.add(target);
@@ -111,9 +116,23 @@ public class Favorite {
                 if(f.targetOtherFavorites()) {
                     //Just assume we got all favorites
                     for(Favorite fav : favorites) {
+                        //exclude ourselves, equals will work here
+                        if(fav.equals(f))
+                        {
+                            continue;
+                        }
+                        
                         if(te.getDestination().equals(fav.getName())) {
                             return true;
                         }
+                        
+                        // Check if train passes this favorite!
+                        if (db.checkIfPasses(fav.getName(), te.getNumber()))
+                        {
+                            Log.v(Tag, "Adding train " + te.getNumber() + " since it passes " + fav.getName());
+                            return true;
+                        }
+
                     }
                 } else {
                     //If nothing set at all, accept anything
@@ -124,13 +143,6 @@ public class Favorite {
                 }
                 
 //                Log.v(Tag, "" + f.getName() + " did not like");
-            }
-            
-            //Check if train passes this favorite!
-            if(db.checkIfPasses(f.getName(), te.getNumber()))
-            {
-                Log.v(Tag, "Adding train " + te.getNumber() + " since it passes " + f.getName());
-                return true;
             }
         }
         

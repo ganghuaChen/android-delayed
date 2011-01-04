@@ -225,13 +225,20 @@ public class DBAdapter {
 							TRAINEVENT_KEY_DELAY, 
 							TRAINEVENT_KEY_NUMBER, 
 							TRAINEVENT_KEY_DESTINATION}, 
-			TRAINEVENT_KEY_NUMBER + " = " + train + " AND " + TRAINEVENT_KEY_STATION + " = ?", 
-			new String[]{station} , null, null, null);
-		
-		
-		if(c.getCount() > 0)
+			TRAINEVENT_KEY_NUMBER + " = ? AND " + TRAINEVENT_KEY_STATION + " = ?", 
+			new String[]{train, station} , null, null, null);
+
+		try {
+//    		Log.v(Tag, "Count for passing: " + c.getCount() + " " + station + " " + train);
+    		
+    		if(c.getCount() > 0)
+    		{
+    		   return true; 
+    		}
+		}
+		finally 
 		{
-		   return true; 
+		    c.close();
 		}
 		
 		return false;

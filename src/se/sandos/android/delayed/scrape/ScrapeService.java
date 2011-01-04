@@ -1,7 +1,10 @@
 package se.sandos.android.delayed.scrape;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import se.sandos.android.delayed.Delayed;
 import se.sandos.android.delayed.TrainEvent;
@@ -57,11 +60,44 @@ public class ScrapeService extends Service {
         DBAdapter db = Delayed.getDb(getApplicationContext());
         
         List<Favorite> favorites = Prefs.getFavorites(getApplicationContext());
-        for(Favorite f : favorites) {
+        Set<Favorite> toScrape = new HashSet<Favorite>();
+        for(Favorite f : favorites)
+        {
             if(f.isActive()) {
-                String url = db.getUrl(f.getName());
-                scrape(f.getName(), url);
+                toScrape.add(f);
+                
+                List<Favorite> toAdd = new LinkedList<Favorite>();
+                if(f.targetOtherFavorites())
+                {
+                    toAdd = favorites;
+                }
+                else
+                {
+                    for(Favorite innerFav : favorites)
+                    {
+                        if(f.getTargetSet().contains(innerFav.getName()))
+                        {
+                            toAdd.add(innerFav);
+                        }
+                    }
+                }
+                
+                for(Favorite innerFav : toAdd)
+                {
+                    // We do not check activeness here. We want to see trains toward inactive favorites. (This kinda
+                    // sucks)
+                    if(!innerFav.equals(f))
+                    {
+                        toScrape.add(innerFav);
+                    }
+                }
             }
+        }
+        
+        for(Favorite f : toScrape)
+        {
+            String url = db.getUrl(f.getName());
+            scrape(f.getName(), url);
         }
         
         // Schedule wakelock-release and alarm setting, this will run after any scrapes are done

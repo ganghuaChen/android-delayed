@@ -97,6 +97,7 @@ public class DelayedAppWidgetProvider extends AppWidgetProvider
             for(;index<=5;index++) {
                 rv.setViewVisibility(getWidgetId(index, "WidgetDelay"), View.GONE);
                 rv.setViewVisibility(getWidgetId(index, "WidgetTime"), View.GONE);
+                rv.setViewVisibility(getWidgetId(index, "WidgetStrike"), View.GONE);
             }
         }
 

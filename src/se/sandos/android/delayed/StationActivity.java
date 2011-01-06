@@ -17,7 +17,6 @@ import se.sandos.android.delayed.db.DBAdapter;
 import se.sandos.android.delayed.prefs.PreferencesActivity;
 import se.sandos.android.delayed.prefs.Prefs;
 import se.sandos.android.delayed.scrape.ScrapeListener;
-import se.sandos.android.delayed.scrape.ScrapePool;
 import se.sandos.android.delayed.scrape.ScraperHelper;
 import se.sandos.android.delayed.scrape.ScraperHelper.Nameurl;
 import se.sandos.android.delayed.scrape.StationListScraper;
@@ -29,6 +28,8 @@ import android.os.Bundle;
 import android.os.Debug;
 import android.os.Handler;
 import android.os.Message;
+import android.text.Html;
+import android.text.util.Linkify;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -51,7 +52,7 @@ public class StationActivity extends ListActivity
     private List<Map<String, String>> listContent = null;
     private SimpleAdapter sa = null;
 
-    // These are passed to use on creation
+    // These are passed to us on creation
     private String url;
     private String name;
 
@@ -228,9 +229,9 @@ public class StationActivity extends ListActivity
                         }
                         else
                         {
-                            // tv.setAutoLinkMask(Linkify.WEB_URLS);
-                            // tv.setLinkTextColor(0xffddddff);
-                            tv.setText((String) data);
+                            //tv.setAutoLinkMask(Linkify.WEB_URLS);
+                            //tv.setLinkTextColor(0xffddddff);
+                            tv.setText(Html.fromHtml((String)data));
                             tv.setVisibility(View.VISIBLE);
                         }
                     }

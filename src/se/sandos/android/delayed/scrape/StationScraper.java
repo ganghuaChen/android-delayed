@@ -154,7 +154,7 @@ public class StationScraper extends Scraper<TrainEvent, Object[]> {
 				} else {
 					Log.v(Tag, "Destination is not set, finding it");
 					nameMap.put(name, null);
-					ScraperHelper.queueForParse(finalUrl, new Job<List<Nameurl>>(){
+					ScraperHelper.queueForParse(finalUrl, new Job<List<Nameurl>>(DelayRunnable.Importance.NORMAL){
 						public void run() {
 							mListener.onFinished(new Object[] {name, value});
 							//handler.sendMessage(Message.obtain(handler, MSG_DEST, new Object[] {finalUrl, value}));

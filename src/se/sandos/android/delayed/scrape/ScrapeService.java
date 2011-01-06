@@ -103,7 +103,7 @@ public class ScrapeService extends Service {
         // Schedule wakelock-release and alarm setting, this will run after any scrapes are done
         // We want to set the alarm after the scrapes are done, to avoid over-runs from previous
         // triggers
-        ScrapePool.addJob(new Runnable(){
+        ScrapePool.addJob(new DelayRunnable(DelayRunnable.Importance.HIGH){
             public void run(){
                 wl.release();
                 
@@ -148,7 +148,7 @@ public class ScrapeService extends Service {
                     // We need to add this to the thread-pool unfortunately, since the DB update is
                     // done using the same threadpool.
                     // This job should be "just behind" the db-update job
-                    ScrapePool.addJob(new Runnable() {
+                    ScrapePool.addJob(new DelayRunnable(DelayRunnable.Importance.NORMAL) {
                         public void run() {
                             scheduleAllWidgetUpdate(favName);
                         }

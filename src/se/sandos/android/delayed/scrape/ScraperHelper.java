@@ -34,16 +34,21 @@ public class ScraperHelper {
 		public Nameurl(String n, String u) { name = n; url = u; }
 	}
 
-	public abstract static class Job<T> implements Runnable
+	public abstract static class Job<T> extends DelayRunnable
 	{
-		protected T value;
+		public Job(Importance imp)
+        {
+            super(imp);
+        }
+
+        protected T value;
 		
 		public abstract void run();
 	}
 	
 	public static void queueForParse(final String relativeUrl, final Job<List<Nameurl>> job)
 	{
-		ScrapePool.addJob(new Job<List<Nameurl>>(){
+		ScrapePool.addJob(new Job<List<Nameurl>>(DelayRunnable.Importance.NORMAL){
 			@Override
 			public void run() {
 				job.value = parseTrainPage(relativeUrl);
@@ -109,7 +114,7 @@ public class ScraperHelper {
 	{
 		final Scraper<TrainEvent, Object[]> s = new StationScraper(url, name);
 		
-		ScrapePool.addJob(new Job<Object>(){
+		ScrapePool.addJob(new Job<Object>(DelayRunnable.Importance.NORMAL){
 			@Override
 			public void run() {
 				s.setScrapeListener(listener);
@@ -122,7 +127,7 @@ public class ScraperHelper {
 	{
 		final Scraper<Station, ArrayList<Station>> s = new StationListScraper();
 		
-		ScrapePool.addJob(new Job<Object>(){
+		ScrapePool.addJob(new Job<Object>(DelayRunnable.Importance.NORMAL){
 			@Override
 			public void run() {
 				s.setScrapeListener(notify);

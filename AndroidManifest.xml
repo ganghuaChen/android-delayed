@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+	package="se.sandos.android.delayed" android:versionCode="13"
+	android:versionName="0.8.4">
+	<application android:icon="@drawable/icon" android:label="@string/app_name">
+		<activity android:name=".StationListActivity" android:label="@string/app_name">
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN" />
+				<category android:name="android.intent.category.LAUNCHER" />
+			</intent-filter>
+			<intent-filter>
+				<action android:name="se.sandos.android.delayed.StationList" />
+			</intent-filter>
+		</activity>
+
+		<activity android:name="StationActivity">
+			<intent-filter>
+				<action android:name="se.sandos.android.delayed.Station"/>
+				<data android:scheme="delayed" android:host="trainstation"/>
+			</intent-filter>
+		</activity>
+		<activity android:name="se.sandos.android.delayed.prefs.PreferencesActivity">
+			<intent-filter>
+				<action android:name="se.sandos.android.delayed.Prefs"></action>
+			</intent-filter>
+		</activity>
+
+        <activity android:name="se.sandos.android.delayed.prefs.FavoriteActivity"/>
+		
+		
+		<!-- Widget -->
+		<receiver android:name=".widget.DelayedAppWidgetProvider" android:label="Delayed 1x1">
+			<intent-filter>
+				<action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+			</intent-filter>
+			<intent-filter>
+                <action android:name="se.sandos.android.delayed.widgetUpdate" />
+                <data android:scheme="delayed"/>
+			</intent-filter>
+			<meta-data android:name="android.appwidget.provider" android:resource="@xml/appwidget11" />
+		</receiver>
+        <receiver android:name=".widget.DelayedAppWidgetProvider21" android:label="Delayed 2x1">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="se.sandos.android.delayed.widgetUpdate" />
+                <data android:scheme="delayed"/>
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/appwidget21" />
+        </receiver>
+        <receiver android:name=".widget.DelayedAppWidgetProvider41" android:label="Delayed 4x1">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="se.sandos.android.delayed.widgetUpdate" />
+                <data android:scheme="delayed"/>
+            </intent-filter>
+            <meta-data android:name="android.appwidget.provider" android:resource="@xml/appwidget41" />
+        </receiver>
+
+		<!-- Auto-start of service at boot-time -->
+		<receiver android:name=".scrape.OnBoot" android:label="@string/app_name">
+			<intent-filter>
+				<action android:name="android.intent.action.BOOT_COMPLETED" />
+				<category android:name="android.intent.category.LAUNCHER" />
+			</intent-filter>
+		</receiver>
+
+		<service android:name=".scrape.ScrapeService"/>
+
+        <!-- schedulers -->
+        <receiver android:name=".scrape.scheduler.Simple">
+            <intent-filter>
+                <action android:name="se.sandos.android.delayed.Scheduler" />
+            </intent-filter>
+            <meta-data android:name="label" android:value="Every 5 mins"/>
+        </receiver>
+
+        <receiver android:name=".scrape.scheduler.Interval">
+            <intent-filter>
+                <action android:name="se.sandos.android.delayed.Scheduler" />
+            </intent-filter>
+            <meta-data android:name="label" android:value="Interval scheduler"/>
+        </receiver>
+
+        <activity android:name=".scrape.scheduler.IntervalActivity">
+            <intent-filter>
+                <action android:name="se.sandos.android.delayed.SchedulerSettings"></action>
+            </intent-filter>
+        </activity>
+
+        <!--  Locale plugin -->
+		<activity android:name=".prefs.locale.LocaleActivity"
+			android:label="@string/localelabel" 
+			android:icon="@drawable/icon"
+			android:exported="true">
+			<intent-filter>
+				<action android:name="com.twofortyfouram.locale.intent.action.EDIT_SETTING"></action>
+			</intent-filter>
+		</activity>
+		
+         <!-- Listen for the "fire" action-->
+         <receiver android:name=".prefs.locale.LocaleBroadcastReceiver" >
+             <intent-filter>
+                 <action android:name="com.twofortyfouram.locale.intent.action.FIRE_SETTING" />
+             </intent-filter>
+         </receiver>
+
+		<!--  Launcher shortcuts -->
+		<activity android:name="LauncherShortcuts" android:label="@string/shortcuts">
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN" />
+				<category android:name="android.intent.category.SAMPLE_CODE" />
+			</intent-filter>
+
+		</activity>
+
+		<activity-alias android:name="CreateShortcuts"
+			android:targetActivity="LauncherShortcuts" android:label="@string/sample_shortcuts">
+
+			<intent-filter>
+				<action android:name="android.intent.action.CREATE_SHORTCUT" />
+				<category android:name="android.intent.category.DEFAULT" />
+			</intent-filter>
+
+		</activity-alias>
+
+	</application>
+	<uses-permission android:name="android.permission.INTERNET" />
+	<uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+	<uses-sdk android:minSdkVersion="3"/>
+	
+</manifest> 

@@ -33,6 +33,7 @@ public class LauncherShortcuts extends Activity
             // Then, set up the container intent (the response to the caller)
             Intent intent = new Intent();
             intent.putExtra(Intent.EXTRA_SHORTCUT_INTENT, i);
+            intent.putExtra(Intent.EXTRA_SHORTCUT_ICON_RESOURCE, Intent.ShortcutIconResource.fromContext(getApplicationContext(), R.drawable.icon));
             intent.putExtra(Intent.EXTRA_SHORTCUT_NAME, data.getExtras().getString("name"));
             // Now, return the result to the launcher
 

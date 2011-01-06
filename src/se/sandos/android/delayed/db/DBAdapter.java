@@ -11,14 +11,15 @@ import java.util.List;
 import java.util.Set;
 
 import se.sandos.android.delayed.TrainEvent;
+import se.sandos.android.delayed.scrape.DelayRunnable;
 import se.sandos.android.delayed.scrape.ScrapePool;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Debug;
 import android.util.Log;
 
@@ -72,7 +73,7 @@ public class DBAdapter {
             return;
         }
 
-        ScrapePool.addJob(new Runnable() {
+        ScrapePool.addJob(new DelayRunnable(DelayRunnable.Importance.HIGH) {
             public void run()
             {
                 if (TRACE) {

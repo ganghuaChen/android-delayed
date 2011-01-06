@@ -7,6 +7,8 @@ import java.util.List;
 import se.sandos.android.delayed.R;
 import se.sandos.android.delayed.StationListActivity;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -15,12 +17,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemLongClickListener;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
-import android.widget.AdapterView.OnItemLongClickListener;
 
 public class FavoriteActivity extends Activity {
     private static final String Tag = "FavoriteActivity";
@@ -29,6 +31,8 @@ public class FavoriteActivity extends Activity {
     
     private List<HashMap<String, String>> content = new ArrayList<HashMap<String, String>>(10);
     private SimpleAdapter sa = null;
+    
+    private boolean hasShownDialog = false;
     
     @Override
     public void onCreate(Bundle savedInstanceState)
@@ -55,7 +59,7 @@ public class FavoriteActivity extends Activity {
     {
         menu.add(0, 1, 0, "Spara ej");
         menu.add(0, 2, 0, "Spara");
-        menu.add(0, 3, 0, "Avancerat");
+        //menu.add(0, 3, 0, "Avancerat");
         
         return true;
     }
@@ -67,8 +71,40 @@ public class FavoriteActivity extends Activity {
             addToTargets(data.getStringExtra("name"));
         }
     }
-
     
+    public void onBackPressed()
+    {
+        if(hasShownDialog)
+        {
+//            finish();
+        }
+        
+        DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener()
+        {
+            public void onClick(DialogInterface dialog, int which)
+            {
+                switch (which)
+                {
+                    case DialogInterface.BUTTON_POSITIVE:
+                        saveMe();
+                        
+                        finish();
+                        break;
+
+                    case DialogInterface.BUTTON_NEGATIVE:
+                        finish();
+                        break;
+                }
+            }
+        };
+
+        hasShownDialog = true;
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Vill du spara ändringar?").setPositiveButton("Ja", dialogClickListener)
+                .setNegativeButton("Nej", dialogClickListener).show();
+    }
+
     private void addToTargets(String target) {
         Log.v(Tag, "Target: " + target);
         if(targetExists(target)) {
@@ -129,33 +165,38 @@ public class FavoriteActivity extends Activity {
         }
 
         if(mi.getItemId() == 2) {
-            CheckBox cb = (CheckBox) findViewById(R.id.FavoriteEnabled);
-            favorite.setActive(cb.isChecked());
-            cb = (CheckBox) findViewById(R.id.OtherFavoritesEnabled);
-            favorite.setOtherFavorites(cb.isChecked());
-            
-            ArrayList<String> targets = new ArrayList<String>(10);
-            for(HashMap<String, String> m : content) {
-                Log.v(Tag, "M " + m);
-                targets.add(m.get("name"));
-            }
-            
-            favorite.setTargets(targets);
-            
-            if(isReal()) {
-                favorite.persist(getApplicationContext());
-            } else {
-                Intent intent = new Intent();
-                intent.putExtra("name", favorite.getName());
-                intent.putExtra("enabled", favorite.isActive());
-                setResult(Activity.RESULT_OK, intent);
-            }
+            saveMe();
           
             finish();
             return true;
         }
         
         return false;
+    }
+
+    private void saveMe()
+    {
+        CheckBox cb = (CheckBox) findViewById(R.id.FavoriteEnabled);
+        favorite.setActive(cb.isChecked());
+        cb = (CheckBox) findViewById(R.id.OtherFavoritesEnabled);
+        favorite.setOtherFavorites(cb.isChecked());
+        
+        ArrayList<String> targets = new ArrayList<String>(10);
+        for(HashMap<String, String> m : content) {
+            Log.v(Tag, "M " + m);
+            targets.add(m.get("name"));
+        }
+        
+        favorite.setTargets(targets);
+        
+        if(isReal()) {
+            favorite.persist(getApplicationContext());
+        } else {
+            Intent intent = new Intent();
+            intent.putExtra("name", favorite.getName());
+            intent.putExtra("enabled", favorite.isActive());
+            setResult(Activity.RESULT_OK, intent);
+        }
     }
 
     private boolean isReal()
@@ -172,6 +213,8 @@ public class FavoriteActivity extends Activity {
     public void onResume()
     {
         super.onResume();
+        
+        hasShownDialog = true;
         
         favorite = Prefs.getFavorite(getApplicationContext(), getIntent().getData().getFragment());
         

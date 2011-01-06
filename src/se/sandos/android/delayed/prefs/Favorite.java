@@ -127,7 +127,7 @@ public class Favorite {
                         }
                         
                         // Check if train passes this favorite!
-                        if (db.checkIfPasses(fav.getName(), te.getNumber()))
+                        if (db.checkIfPasses(fav.getName(), te.getNumber(), te.getDepartureDate()))
                         {
                             Log.v(Tag, "Adding train " + te.getNumber() + " since it passes " + fav.getName());
                             return true;

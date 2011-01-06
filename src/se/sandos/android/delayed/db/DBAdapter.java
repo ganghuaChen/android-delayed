@@ -218,7 +218,7 @@ public class DBAdapter {
      * @param train
      * @return true if this train passes this station
      */
-    public boolean checkIfPasses(String station, String train)
+    public boolean checkIfPasses(String station, String train, Date departureDate)
     {
 		Cursor c = db.query(TRAINEVENT_TABLE_NAME,
 			new String[] { 	TRAINEVENT_KEY_TIME, 
@@ -234,6 +234,14 @@ public class DBAdapter {
     		
     		if(c.getCount() > 0)
     		{
+    		   c.moveToNext();
+    		   long passes = c.getLong(0);
+    		   
+    		   //Don't look back in time, we want stations to come
+    		   if(passes < departureDate.getTime())
+    		   {
+    		       return false;
+    		   }
     		   return true; 
     		}
 		}

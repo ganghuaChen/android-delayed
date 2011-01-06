@@ -13,6 +13,9 @@
 			</intent-filter>
 		</activity>
 
+		<activity android:name="se.sandos.android.delayed.scrape.ServiceNotification">
+		</activity>
+		
 		<activity android:name="StationActivity">
 			<intent-filter>
 				<action android:name="se.sandos.android.delayed.Station"/>

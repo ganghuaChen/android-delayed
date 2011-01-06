@@ -7,12 +7,16 @@ import java.util.List;
 import java.util.Set;
 
 import se.sandos.android.delayed.Delayed;
+import se.sandos.android.delayed.StationActivity;
 import se.sandos.android.delayed.TrainEvent;
 import se.sandos.android.delayed.db.DBAdapter;
 import se.sandos.android.delayed.prefs.Favorite;
 import se.sandos.android.delayed.prefs.Prefs;
 import se.sandos.android.delayed.prefs.Widget;
+import android.R;
 import android.app.AlarmManager;
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.appwidget.AppWidgetManager;
@@ -26,6 +30,7 @@ import android.util.Log;
 
 public class ScrapeService extends Service {
     private static final String Tag = "ScrapeService";
+    private static final int SERVICE_NOTIFICATION_ID = 1;
     
     @Override
     public IBinder onBind(Intent arg0)
@@ -50,6 +55,8 @@ public class ScrapeService extends Service {
             removeAlarm(getApplicationContext());
             return;
         }
+        
+        showNotification();
         
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         final PowerManager.WakeLock wl = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "Delayed service");
@@ -103,6 +110,9 @@ public class ScrapeService extends Service {
         // Schedule wakelock-release and alarm setting, this will run after any scrapes are done
         // We want to set the alarm after the scrapes are done, to avoid over-runs from previous
         // triggers
+        
+        final ScrapeService t = this;
+        
         ScrapePool.addJob(new DelayRunnable(DelayRunnable.Importance.HIGH){
             public void run(){
                 wl.release();
@@ -112,10 +122,45 @@ public class ScrapeService extends Service {
                 }
                 
                 stopSelf();
+                
+                t.cancelNotification();
             }
         });
             
             
+    }
+
+    private void cancelNotification()
+    {
+        String ns = Context.NOTIFICATION_SERVICE;
+        NotificationManager notificationMgr = (NotificationManager) getSystemService(ns);
+        
+        notificationMgr.cancel(SERVICE_NOTIFICATION_ID);
+    }
+    
+    private void showNotification()
+    {
+        String ns = Context.NOTIFICATION_SERVICE;
+        NotificationManager notificationMgr = (NotificationManager) getSystemService(ns);
+        
+        int icon = R.drawable.ic_dialog_alert;
+        CharSequence tickerText = "Delayed";
+        long when = System.currentTimeMillis();
+
+        Notification notification = new Notification(icon, tickerText, when);
+        
+        Context context = getApplicationContext();
+        CharSequence contentTitle = "Delayed uppdatering";
+        CharSequence contentText = "Uppdatering görs i bakgrunden";
+        Intent notificationIntent = new Intent(this, StationActivity.class);
+        
+        PendingIntent contentIntent = PendingIntent.getActivity(this, 0, notificationIntent, 0);
+        
+        notification.setLatestEventInfo(context, contentTitle, contentText, contentIntent);
+        
+        notification.flags = Notification.FLAG_AUTO_CANCEL;
+        
+        notificationMgr.notify(SERVICE_NOTIFICATION_ID, notification);
     }
 
     private void scheduleAllWidgetUpdate(String favorite)

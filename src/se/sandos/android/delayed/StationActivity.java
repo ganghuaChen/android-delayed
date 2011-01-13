@@ -55,6 +55,8 @@ public class StationActivity extends ListActivity
     // These are passed to us on creation
     private String url;
     private String name;
+    
+    private boolean needsInvalidate = false;
 
     private List<TrainEvent> trainevents = new ArrayList<TrainEvent>();
 
@@ -114,7 +116,7 @@ public class StationActivity extends ListActivity
 
             List<TrainEvent> evs = new ArrayList<TrainEvent>();
             evs.add(te);
-            addEvents(evs);
+            addEvents(evs, false);
         }
 
     };
@@ -159,14 +161,13 @@ public class StationActivity extends ListActivity
         getListView().setSmoothScrollbarEnabled(false);
     }
 
-    private void addEvents(List<TrainEvent> events)
+    private void addEvents(List<TrainEvent> events, boolean updateUI)
     {
         if (listContent == null)
         {
             listContent = new ArrayList<Map<String, String>>();
         }
 
-        boolean needInvalidate = false;
         for (TrainEvent te : events)
         {
             boolean updated = false;
@@ -182,7 +183,7 @@ public class StationActivity extends ListActivity
             trainevents.add(te);
             if (!updated)
             {
-                needInvalidate = true;
+                needsInvalidate = true;
 
                 Map<String, String> m = new HashMap<String, String>();
                 m.put("name", te.toString());
@@ -205,14 +206,17 @@ public class StationActivity extends ListActivity
             }
         }
 
-//        refreshList(needInvalidate);
+        if(updateUI)
+        {
+            refreshList();
+        }
     }
 
-    private void refreshList(boolean needInvalidate)
+    private void refreshList()
     {
         if (sa == null)
         {
-            needInvalidate = true;
+            needsInvalidate = true;
             SimpleAdapter.ViewBinder vb = new SimpleAdapter.ViewBinder()
             {
 
@@ -277,7 +281,7 @@ public class StationActivity extends ListActivity
                 return 0;
             }
         });
-        if (!needInvalidate)
+        if (!needsInvalidate)
         {
             sa.notifyDataSetChanged();
         }
@@ -285,6 +289,7 @@ public class StationActivity extends ListActivity
         {
             sa.notifyDataSetInvalidated();
         }
+        needsInvalidate = false;
     }
 
     @SuppressWarnings("unchecked")
@@ -390,7 +395,7 @@ public class StationActivity extends ListActivity
             // Fetch from db
             List<TrainEvent> events = db.getStationEvents(name);
 
-            addEvents(events);
+            addEvents(events, true);
             trainevents.clear();
         }
 
@@ -412,7 +417,7 @@ public class StationActivity extends ListActivity
                     {
                         public void run()
                         {
-                            refreshList(false);
+                            refreshList();
                         
                             lastRefresh = System.currentTimeMillis();
                                 

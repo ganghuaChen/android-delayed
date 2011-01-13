@@ -30,7 +30,6 @@
 
         <activity android:name="se.sandos.android.delayed.prefs.FavoriteActivity"/>
 		
-		
 		<!-- Widget -->
 		<receiver android:name=".widget.DelayedAppWidgetProvider" android:label="Delayed 1x1">
 			<intent-filter>

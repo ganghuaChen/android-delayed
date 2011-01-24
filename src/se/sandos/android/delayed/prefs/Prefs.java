@@ -159,7 +159,7 @@ public class Prefs {
         int index = getWidgets(ctx).size();
         final String wdgt = PREFS_WIDGET_PREFIX + index;
             
-        Log.v(Tag, "Added new widget: " + index);
+        Log.v(Tag, "Added new widget: " + index + " " + id);
         
         setIntSetting(ctx, wdgt, id);
     }
@@ -167,6 +167,7 @@ public class Prefs {
     public static void removeWidget(Context ctx, int id)
     {
         if(!hasWidget(ctx, id)) {
+            Log.v(Tag, "Did not find widget to delete: " + id);
             return;
         }
         
@@ -189,7 +190,7 @@ public class Prefs {
                 //Subtract one from index
                 f.setIndex(f.getIndex()-1);
                 final String wdgt = PREFS_WIDGET_PREFIX + f.getIndex();
-                setIntSetting(ctx, wdgt, f.getIndex());
+                setIntSetting(ctx, wdgt, f.getId());
             }
         }
         

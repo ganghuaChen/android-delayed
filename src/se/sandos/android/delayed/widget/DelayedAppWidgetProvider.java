@@ -25,13 +25,15 @@ import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
 
-public class DelayedAppWidgetProvider extends AppWidgetProvider
+abstract public class DelayedAppWidgetProvider extends AppWidgetProvider
 {
     private static String Tag = "DelayedAppWidgetProvider";
 
+    abstract protected int ourLayout();
+    
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds)
     {
-        RemoteViews rv = new RemoteViews(context.getPackageName(), R.layout.widget);
+        RemoteViews rv = new RemoteViews(context.getPackageName(), ourLayout());
 
         List<Favorite> favorites = Prefs.getFavorites(context);
         List<TrainEvent> events = new ArrayList<TrainEvent>(40);
@@ -128,7 +130,7 @@ public class DelayedAppWidgetProvider extends AppWidgetProvider
         }
     }
 
-    private static int getWidgetId(int index, String prefix)
+    protected static int getWidgetId(int index, String prefix)
     {
         int id = 0;
         try {

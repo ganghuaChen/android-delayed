@@ -265,7 +265,7 @@ public class DBAdapter {
      * @param add Wether to add this event, or possibly update it
      * @return
      */
-    public long addTrainEventImpl(String station, Date time, String track, String number, Date delay, String extra, String destination, boolean add)
+    protected long addTrainEventImpl(String station, Date time, String track, String number, Date delay, String extra, String destination, boolean add)
     {
         if(time == null)
         {

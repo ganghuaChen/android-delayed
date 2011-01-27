@@ -153,7 +153,7 @@ abstract public class DelayedAppWidgetProvider extends AppWidgetProvider
         Log.v(Tag, "" + intent.getAction() + " " + intent.getDataString());
         
         if(intent.getAction().equals("se.sandos.android.delayed.widgetUpdate")) {
-            Log.v(Tag, "Our own widget update");
+            Log.v(Tag, "Our own widget update " + this.getClass());
             onUpdate(context, AppWidgetManager.getInstance(context), intent.getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS)); 
         }
         

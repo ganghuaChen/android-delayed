@@ -213,6 +213,10 @@ public class DBAdapter {
             Log.v(Tag, "Purged eventlist from RAM cache");
             stationCache.remove(station);
         }
+        else
+        {
+            Log.v(Tag, "" + station + " was not in cache");
+        }
         
         ArrayList<TrainEvent> res = new ArrayList<TrainEvent>(100);
 
@@ -295,13 +299,16 @@ public class DBAdapter {
             c.close();
             StationCache sc = new StationCache(res, station);
             stationCache.put(station, sc);
-            Log.v(Tag, "Put eventlist to RAM cache");
+            Log.v(Tag, "Put eventlist to RAM cache: " + station + " " + res.size());
             return res;
         }
 
         c.close();
         
-        return new ArrayList<TrainEvent>();
+        ArrayList<TrainEvent> emptyRes = new ArrayList<TrainEvent>();
+        stationCache.put(station, new StationCache(emptyRes, station));
+        Log.v(Tag, "Put empty eventlist to RAM cache: " + station);
+        return emptyRes;
     }
 
     /**
@@ -365,6 +372,7 @@ public class DBAdapter {
             return -1;
         }
         
+        stationCache.remove(station);
         if(!add) {
 //            Log.v(Tag, "Updating " + number);
             ContentValues cv = new ContentValues();

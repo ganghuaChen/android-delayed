@@ -169,7 +169,7 @@ public class StationActivity extends ListActivity
         getListView().setSmoothScrollbarEnabled(false);
     }
 
-    private void addEvents(List<TrainEvent> events, boolean updateUI)
+    private synchronized void addEvents(List<TrainEvent> events, boolean updateUI)
     {
         if (listContent == null)
         {
@@ -345,7 +345,7 @@ public class StationActivity extends ListActivity
      * @param te
      * @return true if the trainevent existed already and was updated, false if it was not found
      */
-    private int existsAndUpdate(TrainEvent te)
+    private synchronized int existsAndUpdate(TrainEvent te)
     {
         if (listContent == null || listContent.size() == 0)
         {
@@ -543,7 +543,14 @@ public class StationActivity extends ListActivity
             {
                 listContent.clear();
             }
-            fetchList();
+            Runnable r = new Runnable()
+            {
+                public void run()
+                {
+                    fetchList();
+                }
+            };
+            new Thread(r).start();
             return true;
         }
 

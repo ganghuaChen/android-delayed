@@ -155,7 +155,15 @@ public class StationActivity extends ListActivity
             Debug.startMethodTracing("list");
         }
 
-        fetchList();
+        //Run this lengthy operation in the background, so we can access the menu immediately
+        Runnable r = new Runnable()
+        {
+            public void run()
+            {
+                fetchList();
+            }
+        };
+        new Thread(r).start();
 
         // We have different-height rows
         getListView().setSmoothScrollbarEnabled(false);
@@ -208,7 +216,13 @@ public class StationActivity extends ListActivity
 
         if(updateUI)
         {
-            refreshList();
+            runOnUiThread(new Runnable()
+            {
+                public void run()
+                {
+                    refreshList();
+                }
+            });
         }
     }
 
@@ -512,7 +526,7 @@ public class StationActivity extends ListActivity
     {
         //Auto-refresh if latest refresh was more than a few minutes ago
         long now = System.currentTimeMillis(); 
-        if (lastRefresh == -1 || (now - lastRefresh) > 1000*120)
+        if (listContent != null && (lastRefresh == -1 || (now - lastRefresh) > 1000*120))
         {
             listContent.clear();
             fetchList();

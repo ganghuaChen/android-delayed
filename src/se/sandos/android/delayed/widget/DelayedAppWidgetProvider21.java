@@ -7,8 +7,15 @@ import se.sandos.android.delayed.R;
  */
 public class DelayedAppWidgetProvider21 extends DelayedAppWidgetProvider
 {
+    @Override
     protected int ourLayout()
     {
         return R.layout.widget;
+    }
+
+    @Override
+    public String getControlsPrefix()
+    {
+        return "";
     }    
 }

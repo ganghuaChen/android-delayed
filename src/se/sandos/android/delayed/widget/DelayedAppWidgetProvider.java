@@ -38,10 +38,11 @@ abstract public class DelayedAppWidgetProvider extends AppWidgetProvider
         List<Favorite> favorites = Prefs.getFavorites(context);
         List<TrainEvent> events = new ArrayList<TrainEvent>(40);
         DBAdapter db = Delayed.getDb(context);
-        String name = ""; 
+        String name = "";
         for(Favorite f : favorites) {
 //            Log.v(Tag, "Favorite: " + f.getName());
             if(f.isActive()) {
+                Log.v(Tag, "Calling DB from widget " + appWidgetIds[0] + " for fav " + f.getName());
                 for(TrainEvent te : db.getStationEvents(f.getName())) {
 //                    Log.v(Tag, "TE: " + te);
                     te.setStation(new Station(f.getName(), null));
@@ -130,11 +131,11 @@ abstract public class DelayedAppWidgetProvider extends AppWidgetProvider
         }
     }
 
-    protected static int getWidgetId(int index, String prefix)
+    protected int getWidgetId(int index, String prefix)
     {
         int id = 0;
         try {
-            Field f = R.id.class.getDeclaredField(prefix + index);
+            Field f = R.id.class.getDeclaredField(getControlsPrefix() + prefix + index);
             Integer i = (Integer) f.get(null);
             id = i.intValue();
         } catch (Exception e) {
@@ -143,6 +144,8 @@ abstract public class DelayedAppWidgetProvider extends AppWidgetProvider
         return id;
     }
     
+    abstract public String getControlsPrefix();
+    
     public void onReceive(Context context, Intent intent)
     {
         super.onReceive(context, intent);
@@ -150,6 +153,7 @@ abstract public class DelayedAppWidgetProvider extends AppWidgetProvider
         Log.v(Tag, "" + intent.getAction() + " " + intent.getDataString());
         
         if(intent.getAction().equals("se.sandos.android.delayed.widgetUpdate")) {
+            Log.v(Tag, "Our own widget update");
             onUpdate(context, AppWidgetManager.getInstance(context), intent.getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS)); 
         }
         

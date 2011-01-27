@@ -13,22 +13,15 @@ public class DelayedAppWidgetProvider11 extends DelayedAppWidgetProvider
 {
     private static final String Tag = "DelayedAppWidgetProvider";
 
+    @Override
+    public String getControlsPrefix()
+    {
+        return "Small";
+    }
+    
+    @Override
     protected int ourLayout()
     {
         return R.layout.widget11;
     }
-    
-    protected static int getWidgetId(int index, String prefix)
-    {
-        int id = 0;
-        try {
-            Field f = R.id.class.getDeclaredField("Small" + prefix + index);
-            Integer i = (Integer) f.get(null);
-            id = i.intValue();
-        } catch (Exception e) {
-            Log.w(Tag, "Something went wrong: " + e);
-        }
-        return id;
-    }
-    
 }

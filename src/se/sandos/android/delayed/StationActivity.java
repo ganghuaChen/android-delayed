@@ -539,7 +539,10 @@ public class StationActivity extends ListActivity
         if (mi.getItemId() == 1)
         {
 //            clearList();
-            listContent.clear();
+            if(listContent != null)
+            {
+                listContent.clear();
+            }
             fetchList();
             return true;
         }

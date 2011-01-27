@@ -5,9 +5,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import se.sandos.android.delayed.TrainEvent;
@@ -62,8 +64,82 @@ public class DBAdapter {
     private static  final String DATABASE_CREATE_4 =
         "create table eventlog(_id integer primary key autoincrement, " + 
         "timestamp, type, text)";
-    
+ 
+    //Cache for reading the DB from _disk_
+    private static Map<String, StationCache> stationCache = new HashMap<String, StationCache>();
 
+    public static class StationCache
+    {
+        private static final long CACHE_TTL = 30000;
+        private List<TrainEvent> events;
+        private long time;
+        private String stationName;
+        
+        public StationCache(List<TrainEvent> events, String name)
+        {
+            this.events = events;
+            time = System.currentTimeMillis();
+            stationName = name;
+        }
+
+        public List<TrainEvent> getEvents()
+        {
+            return events;
+        }
+
+        public String getStationName()
+        {
+            return stationName;
+        }
+
+        public boolean isCurrent()
+        {
+            if((System.currentTimeMillis() - time) > CACHE_TTL)
+            {
+                return false;
+            }
+            
+            return true;
+        }
+        
+        @Override
+        public String toString()
+        {
+            StringBuilder builder = new StringBuilder();
+            builder.append("StationCache [time=").append(time).append(", stationName=").append(stationName).append("]");
+            return builder.toString();
+        }
+
+        @Override
+        public int hashCode()
+        {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ((stationName == null) ? 0 : stationName.hashCode());
+            return result;
+        }
+
+        @Override
+        public boolean equals(Object obj)
+        {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            StationCache other = (StationCache) obj;
+            if (stationName == null)
+            {
+                if (other.stationName != null)
+                    return false;
+            }
+            else if (!stationName.equals(other.stationName))
+                return false;
+            return true;
+        }
+    }
+    
     public void addTrainEvents(final List<TrainEvent> l)
     {
         // (Shallow) Copy the list to avoid ConcurrentModificationException
@@ -126,6 +202,17 @@ public class DBAdapter {
      */
     public List<TrainEvent> getStationEvents(String station)
     {
+        if(stationCache.containsKey(station))
+        {
+            StationCache sc = stationCache.get(station);
+            if(sc.isCurrent())
+            {
+                Log.v(Tag, "Got eventlist from RAM cache");
+                return sc.getEvents();
+            }
+            stationCache.remove(station);
+        }
+        
         ArrayList<TrainEvent> res = new ArrayList<TrainEvent>(100);
 
         Cursor c = db.query(TRAINEVENT_TABLE_NAME, 
@@ -205,10 +292,14 @@ public class DBAdapter {
             }
 
             c.close();
+            StationCache sc = new StationCache(res, station);
+            stationCache.put(station, sc);
+            Log.v(Tag, "Put eventlist to RAM cache");
             return res;
         }
 
         c.close();
+        
         return new ArrayList<TrainEvent>();
     }
 

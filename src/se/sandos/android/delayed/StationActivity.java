@@ -483,7 +483,7 @@ public class StationActivity extends ListActivity
         return true;
     }
 
-    private void clearList()
+    private synchronized void clearList()
     {
         if (listContent != null)
         {
@@ -522,7 +522,7 @@ public class StationActivity extends ListActivity
         maybeRefresh();
     }
 
-    private void maybeRefresh()
+    private synchronized void maybeRefresh()
     {
         //Auto-refresh if latest refresh was more than a few minutes ago
         long now = System.currentTimeMillis(); 
@@ -539,19 +539,22 @@ public class StationActivity extends ListActivity
         if (mi.getItemId() == 1)
         {
 //            clearList();
-            if(listContent != null)
+            synchronized(this)
             {
-                listContent.clear();
-            }
-            Runnable r = new Runnable()
-            {
-                public void run()
+                if(listContent != null)
                 {
-                    fetchList();
+                    listContent.clear();
                 }
-            };
-            new Thread(r).start();
-            return true;
+                Runnable r = new Runnable()
+                {
+                    public void run()
+                    {
+                        fetchList();
+                    }
+                };
+                new Thread(r).start();
+                return true;
+            }
         }
 
         if (mi.getItemId() == 2)

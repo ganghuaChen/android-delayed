@@ -210,6 +210,7 @@ public class DBAdapter {
                 Log.v(Tag, "Got eventlist from RAM cache");
                 return sc.getEvents();
             }
+            Log.v(Tag, "Purged eventlist from RAM cache");
             stationCache.remove(station);
         }
         

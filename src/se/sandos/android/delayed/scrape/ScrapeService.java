@@ -106,6 +106,15 @@ public class ScrapeService extends Service {
             String url = db.getUrl(f.getName());
             scrape(f.getName(), url);
         }
+
+        // We need to add this to the thread-pool unfortunately, since the DB update is
+        // done using the same threadpool.
+        // This job should be "just behind" the db-update job
+        ScrapePool.addJob(new DelayRunnable(DelayRunnable.Importance.NORMAL) {
+            public void run() {
+                scheduleAllWidgetUpdate();
+            }
+        });
         
         // Schedule wakelock-release and alarm setting, this will run after any scrapes are done
         // We want to set the alarm after the scrapes are done, to avoid over-runs from previous
@@ -163,10 +172,8 @@ public class ScrapeService extends Service {
         notificationMgr.notify(SERVICE_NOTIFICATION_ID, notification);
     }
 
-    private void scheduleAllWidgetUpdate(String favorite)
+    private void scheduleAllWidgetUpdate()
     {
-        Log.v(Tag, "scheduleAllWidgetUpdate for " + favorite + " " + getApplicationContext());
-        
         for(Widget w : Prefs.getWidgets(getApplicationContext())) {
             Log.v(Tag, "Updating widget with id " + w.getId());
             Intent update = new Intent();
@@ -189,15 +196,6 @@ public class ScrapeService extends Service {
                 if (result == null) {
                     // this actually means finished!
                     Delayed.getDb(getApplicationContext()).addTrainEvents(trainevents);
-                    
-                    // We need to add this to the thread-pool unfortunately, since the DB update is
-                    // done using the same threadpool.
-                    // This job should be "just behind" the db-update job
-                    ScrapePool.addJob(new DelayRunnable(DelayRunnable.Importance.NORMAL) {
-                        public void run() {
-                            scheduleAllWidgetUpdate(favName);
-                        }
-                    });
                 } else {
                     //This is a fixup (destination) message
                 }

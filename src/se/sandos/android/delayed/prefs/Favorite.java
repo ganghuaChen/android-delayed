@@ -87,18 +87,19 @@ public class Favorite {
         Prefs.removeSetting(ctx, fav + ".targets." + index);
     }
     
-    public boolean filter(String name)
+    public boolean filter(DBAdapter db, TrainEvent te)
     {
-//        if(!targetSet.contains(name)) {
-//            Log.v(Tag ,"Did not contain " + name + "<");
-//        }
-//        for(String s : targets) {
-//            Log.v(Tag, "Contains " + s + "<");
-//        }
-//        for(Iterator<String> i = targetSet.iterator(); i.hasNext();) {
-//            Log.v(Tag, "Contains also " + i.next());
-//        }
-        return targetSet.contains(name);
+        // Check if train passes any of this favorites' targets
+        for(String s : this.targetSet)
+        {
+            if (db.checkIfPasses(s, te.getNumber(), te.getDepartureDate()))
+            {
+                Log.v(Tag, "Adding train " + te.getNumber() + " since it passes " + getName());
+                return true;
+            }
+        }
+        
+        return targetSet.contains(te.getDestination());
     }
     
     public static boolean isFavoriteTarget(List<Favorite> favorites, TrainEvent te, DBAdapter db) {
@@ -109,7 +110,7 @@ public class Favorite {
             }
             
             if(te.getStation().getName().equals(f.getName())) {
-                if(f.filter(te.getDestination())) {
+                if(f.filter(db, te)) {
                     return true;
                 }
                 

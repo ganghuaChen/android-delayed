@@ -52,7 +52,7 @@ public class StationScraper extends Scraper<TrainEvent, Object[]> {
 	public void scrapeImpl() throws Exception {
 		HttpClient hc = new DefaultHttpClient();
 		
-		String base = "http://m.banverket.se/";
+		String base = "http://m.trafikverket.se/";
 		String stationSearch = base + mUrl;
 		Log.i(Tag, "Full url: " + stationSearch);
 		HttpGet hg = new HttpGet(stationSearch);

@@ -109,7 +109,7 @@ public class ScrapeService extends Service {
 
         // We need to add this to the thread-pool unfortunately, since the DB update is
         // done using the same threadpool.
-        // This job should be "just behind" the db-update job
+        // This job should be "just behind" the db-update jobs (one per scraped favorite)
         ScrapePool.addJob(new DelayRunnable(DelayRunnable.Importance.NORMAL) {
             public void run() {
                 scheduleAllWidgetUpdate();
@@ -119,11 +119,11 @@ public class ScrapeService extends Service {
         // Schedule wakelock-release and alarm setting, this will run after any scrapes are done
         // We want to set the alarm after the scrapes are done, to avoid over-runs from previous
         // triggers
-        
         final ScrapeService t = this;
         
         ScrapePool.addJob(new DelayRunnable(DelayRunnable.Importance.HIGH){
             public void run(){
+                Log.v(Tag, "Running service clean-up");
                 wl.release();
                 
                 if(Prefs.isSet(getApplicationContext(), Prefs.PREFS_SERVICE_ENABLED, false)) {
@@ -135,8 +135,6 @@ public class ScrapeService extends Service {
                 t.cancelNotification();
             }
         });
-            
-            
     }
 
     private void cancelNotification()
@@ -174,6 +172,8 @@ public class ScrapeService extends Service {
 
     private void scheduleAllWidgetUpdate()
     {
+        Log.v(Tag, "Sending update intents to all widgets");
+        
         for(Widget w : Prefs.getWidgets(getApplicationContext())) {
             Log.v(Tag, "Updating widget with id " + w.getId());
             Intent update = new Intent();

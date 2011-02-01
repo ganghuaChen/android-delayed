@@ -456,7 +456,7 @@ public class StationActivity extends ListActivity
 
             public void onPartialResult(TrainEvent result)
             {
-                 mHandler.dispatchMessage(Message.obtain(mHandler, 0, result));
+//                 mHandler.dispatchMessage(Message.obtain(mHandler, 0, result));
             }
 
             public void onRestart()
@@ -466,6 +466,7 @@ public class StationActivity extends ListActivity
 
             public void onFail()
             {
+                mHandler.dispatchMessage(Message.obtain(mHandler, ScrapeListener.MSG_STATUS, "Update failure"));
             };
         });
 

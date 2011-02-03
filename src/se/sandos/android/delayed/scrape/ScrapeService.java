@@ -198,6 +198,7 @@ public class ScrapeService extends Service {
                     Delayed.getDb(getApplicationContext()).addTrainEvents(trainevents);
                 } else {
                     //This is a fixup (destination) message
+                    //XXX: we should do something here
                 }
             }
 

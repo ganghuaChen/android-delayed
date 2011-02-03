@@ -26,7 +26,7 @@ import android.os.Debug;
 import android.util.Log;
 
 public class DBAdapter {
-	private final static String Tag = "DBAdapter";
+	private final static String Tag = "dldAdapter";
 	
 	private final static boolean TRACE = false;
 	

@@ -4,7 +4,9 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import se.sandos.android.delayed.Delayed;
 import se.sandos.android.delayed.R;
@@ -18,6 +20,7 @@ import se.sandos.android.delayed.prefs.Prefs;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
@@ -33,6 +36,30 @@ abstract public class DelayedAppWidgetProvider extends AppWidgetProvider
     
     public void onUpdate(Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds)
     {
+        int[] ourIds = appWidgetManager.getAppWidgetIds(new ComponentName(context, this.getClass()));
+        Set<Integer> ids = new HashSet<Integer>();
+        for (int i = 0; i < ourIds.length; i++) {
+            ids.add(ourIds[i]);
+        }
+        boolean hasSomethingTodo = false;
+        for(int i=0; i<appWidgetIds.length; i++)
+        {
+            if(!ids.contains(appWidgetIds[i]))
+            {
+                Log.v(Tag, "Id is not for us: " + appWidgetIds[i]);
+                appWidgetIds[i] = -1;
+            }
+            else
+            {
+                hasSomethingTodo = true;
+            }
+        }
+        
+        if(!hasSomethingTodo)
+        {
+            return;
+        }
+        
         RemoteViews rv = new RemoteViews(context.getPackageName(), ourLayout());
 
         List<Favorite> favorites = Prefs.getFavorites(context);
@@ -124,10 +151,13 @@ abstract public class DelayedAppWidgetProvider extends AppWidgetProvider
         
         for (int i = 0; i < appWidgetIds.length; i++) {
             int id = appWidgetIds[i];
-            Log.v(Tag, "Updating id " + id);
-            Prefs.addWidget(context, id);
-            
-            appWidgetManager.updateAppWidget(id, rv);
+            if(id != -1)
+            {
+                Log.v(Tag, "Updating id " + id);
+                Prefs.addWidget(context, id);
+                
+                appWidgetManager.updateAppWidget(id, rv);
+            }
         }
     }
 
@@ -157,7 +187,7 @@ abstract public class DelayedAppWidgetProvider extends AppWidgetProvider
             onUpdate(context, AppWidgetManager.getInstance(context), intent.getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS)); 
         }
         
-        //Handle deletions ourselfs due to bug in 1.5/1.6
+        //Handle deletions ourselves due to bug in 1.5/1.6
         if(intent.getAction().equals(AppWidgetManager.ACTION_APPWIDGET_DELETED)) {
             int id = intent.getIntExtra("appWidgetId", -1);
             

@@ -158,7 +158,13 @@ public class DBAdapter {
                 Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
                 long s = System.currentTimeMillis();
 
-                String station = trainevents.get(0).getStation().getName();
+                Station st = trainevents.get(0).getStation();
+                if(st == null)
+                {
+                    Log.v(Tag, "Abnormal stuff, no station for first event: " + trainevents.get(0));
+                    return;
+                }
+                String station = st.getName();
                 String[] numbers = new String[trainevents.size()];
                 int index = 0;
                 for (TrainEvent te : trainevents) {

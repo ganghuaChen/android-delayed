@@ -20,16 +20,12 @@ import se.sandos.android.delayed.scrape.ScrapeListener;
 import se.sandos.android.delayed.scrape.ScraperHelper;
 import se.sandos.android.delayed.scrape.ScraperHelper.Nameurl;
 import se.sandos.android.delayed.scrape.StationListScraper;
-import se.sandos.android.delayed.scrape.StationScraper;
 import android.app.ListActivity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Debug;
-import android.os.Handler;
-import android.os.Message;
 import android.text.Html;
-import android.text.util.Linkify;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -59,67 +55,6 @@ public class StationActivity extends ListActivity
     private boolean needsInvalidate = false;
 
     private List<TrainEvent> trainevents = new ArrayList<TrainEvent>();
-
-    private Handler mHandler = new Handler()
-    {
-        public void handleMessage(final Message msg)
-        {
-            runOnUiThread(new Runnable()
-            {
-                public void run()
-                {
-                    handle(msg);
-                }
-            });
-        }
-
-        @SuppressWarnings("unchecked")
-        private void handle(Message msg)
-        {
-            if (msg.what == StationScraper.MSG_DEST)
-            {
-                // Got a proper destination for some particular train. Mend.
-                Object[] vals = (Object[]) msg.obj;
-                List<Nameurl> stations = (List<Nameurl>) vals[1];
-                if (stations.size() > 0)
-                {
-                    Nameurl nu = stations.get(stations.size() - 1);
-
-                    Log.i(Tag, "We got an end destination with value " + nu.name + " and name " + vals[0]);
-
-                    for (Map<String, String> v : listContent)
-                    {
-                        String name = v.get("destination");
-                        if (name != null && name.equals(vals[0]))
-                        {
-                            Log.i(Tag, "found match: " + vals[0] + " " + nu.name);
-                            v.put("destination", nu.name);
-                            sa.notifyDataSetChanged();
-                        }
-                    }
-                }
-
-                return;
-            }
-
-            if (msg.what == ScrapeListener.MSG_STATUS)
-            {
-                StringBuffer sb = new StringBuffer();
-                sb.append(name).append(" ");
-                sb.append(msg.obj);
-                setTitle(sb.toString());
-
-                return;
-            }
-
-            TrainEvent te = (TrainEvent) msg.obj;
-
-            List<TrainEvent> evs = new ArrayList<TrainEvent>();
-            evs.add(te);
-            addEvents(evs, false);
-        }
-
-    };
 
     public void onCreate(Bundle savedInstanceState)
     {
@@ -420,7 +355,7 @@ public class StationActivity extends ListActivity
 //                 mHandler.dispatchMessage(Message.obtain(mHandler, ScrapeListener.MSG_STATUS, status));
             }
 
-            public void onFinished(Object[] result)
+            public void onFinished(final Object[] result)
             {
                 if (result == null)
                 {
@@ -434,11 +369,12 @@ public class StationActivity extends ListActivity
                             refreshList();
                         
                             lastRefresh = System.currentTimeMillis();
-                                
-                            // Send ourselves a status-message
-                            
-                            mHandler.dispatchMessage(Message.obtain(mHandler, ScrapeListener.MSG_STATUS, "updated " + printNow()));
         
+                            StringBuffer sb = new StringBuffer();
+                            sb.append(name).append(" ");
+                            sb.append("updated " + printNow());
+                            setTitle(sb.toString());                            
+                            
                             if (TRACE)
                             {
                                 Debug.stopMethodTracing();
@@ -448,15 +384,46 @@ public class StationActivity extends ListActivity
                 }
                 else
                 {
-                    // In this case, we "abuse" this method and use it
-                    // for mending previously unknown destinations
-                    mHandler.dispatchMessage(Message.obtain(mHandler, StationScraper.MSG_DEST, result));
+                    runOnUiThread(new Runnable()
+                    {
+                        public void run()
+                        {
+                            // Got a proper destination for some particular train. Mend.
+                            @SuppressWarnings("unchecked")
+                            List<Nameurl> stations = (List<Nameurl>) result[1];
+                            if (stations.size() > 0)
+                            {
+                                Nameurl nu = stations.get(stations.size() - 1);
+            
+                                Log.i(Tag, "We got an end destination with value " + nu.name + " and name " + result[0]);
+            
+                                for (Map<String, String> v : listContent)
+                                {
+                                    String name = v.get("destination");
+                                    if (name != null && name.equals(result[0]))
+                                    {
+                                        Log.i(Tag, "found match: " + result[0] + " " + nu.name);
+                                        v.put("destination", nu.name);
+                                        sa.notifyDataSetChanged();
+                                    }
+                                }
+                            }
+                        }
+                    });
                 }
             }
 
-            public void onPartialResult(TrainEvent result)
+            public void onPartialResult(final TrainEvent result)
             {
-                 mHandler.dispatchMessage(Message.obtain(mHandler, 0, result));
+                runOnUiThread(new Runnable()
+                {
+                    public void run()
+                    {
+                        List<TrainEvent> evs = new ArrayList<TrainEvent>();
+                        evs.add(result);
+                        addEvents(evs, false);                 
+                    }
+                });
             }
 
             public void onRestart()
@@ -466,11 +433,29 @@ public class StationActivity extends ListActivity
 
             public void onFail()
             {
-                mHandler.dispatchMessage(Message.obtain(mHandler, ScrapeListener.MSG_STATUS, "Update failure"));
+                runOnUiThread(new Runnable()
+                {
+                    public void run()
+                    {
+                        StringBuffer sb = new StringBuffer();
+                        sb.append(name).append(" ");
+                        sb.append("Update failure");
+                        setTitle(sb.toString());                            
+                    }
+                });
             };
         });
 
-        mHandler.dispatchMessage(Message.obtain(mHandler, ScrapeListener.MSG_STATUS, "Start update..."));
+        runOnUiThread(new Runnable()
+        {
+            public void run()
+            {
+                StringBuffer sb = new StringBuffer();
+                sb.append(name).append(" ");
+                sb.append("Start update...");
+                setTitle(sb.toString());                            
+            }
+        });
     }
 
     public boolean onCreateOptionsMenu(Menu menu)

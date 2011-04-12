@@ -144,10 +144,13 @@ abstract public class DelayedAppWidgetProvider extends AppWidgetProvider
         Log.v(Tag, "Setting pending intent to name" + name);
         
         PendingIntent pi = PendingIntent.getActivity(context, 0, intent, 0);
+        /*
         for(int j=0; j<=5; j++) {
             rv.setOnClickPendingIntent(getWidgetId(j, "WidgetTime"), pi);
             rv.setOnClickPendingIntent(getWidgetId(j, "WidgetDelay"), pi);
-        }
+        }*/
+        
+        rv.setOnClickPendingIntent(getWidgetId("WidgetLayout"), pi);
         
         for (int i = 0; i < appWidgetIds.length; i++) {
             int id = appWidgetIds[i];
@@ -173,6 +176,20 @@ abstract public class DelayedAppWidgetProvider extends AppWidgetProvider
         }
         return id;
     }
+
+    protected int getWidgetId(String prefix)
+    {
+        int id = 0;
+        try {
+            Field f = R.id.class.getDeclaredField(getControlsPrefix() + prefix);
+            Integer i = (Integer) f.get(null);
+            id = i.intValue();
+        } catch (Exception e) {
+            Log.w(Tag, "Something went wrong: " + e);
+        }
+        return id;
+    }
+    
     
     abstract public String getControlsPrefix();
     

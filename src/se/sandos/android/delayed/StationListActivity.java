@@ -56,7 +56,7 @@ public class StationListActivity extends ListActivity {
 				break;
 			case MSG_PARTIAL_RESULT:
 				hasSeenIncomplete = true;
-				Log.v(Tag, "Got incomplete list");
+				//Log.v(Tag, "Got incomplete list");
 				Station s = (Station)msg.obj;
 				addRow(s);
 				DBAdapter db = Delayed.getDb(getApplicationContext());
@@ -64,7 +64,7 @@ public class StationListActivity extends ListActivity {
 				if(status == -1) {
 					Log.v(Tag, "Error inserting");
 				} else {
-					Log.v(Tag, "Success inserting " + db.getNumberOfStations() + " " + db);
+					//Log.v(Tag, "Success inserting " + db.getNumberOfStations() + " " + db);
 				}
 				break;
 			}

@@ -118,7 +118,7 @@ public class ScrapeService extends Service {
         // This job should be "just behind" the db-update jobs (one per scraped favorite)
         ScrapePool.addJob(new DelayRunnable(DelayRunnable.Importance.NORMAL) {
             public void run() {
-                scheduleAllWidgetUpdate();
+                scheduleAllWidgetUpdate(getApplicationContext());
             }
         });
         
@@ -176,18 +176,18 @@ public class ScrapeService extends Service {
         notificationMgr.notify(SERVICE_NOTIFICATION_ID, notification);
     }
 
-    private void scheduleAllWidgetUpdate()
+    public static void scheduleAllWidgetUpdate(Context ctx)
     {
         Log.v(Tag, "Sending update intents to all widgets");
         
-        for(Widget w : Prefs.getWidgets(getApplicationContext())) {
+        for(Widget w : Prefs.getWidgets(ctx)) {
             Log.v(Tag, "Updating widget with id " + w.getId());
             Intent update = new Intent();
             update.setAction("se.sandos.android.delayed.widgetUpdate");
             //update.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
             update.setData(Uri.fromParts("delayed", "widgetupdate", String.valueOf(w.getId())));
             update.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, new int[] {w.getId()});
-            getApplicationContext().sendBroadcast(update);
+            ctx.sendBroadcast(update);
         }
     }
 

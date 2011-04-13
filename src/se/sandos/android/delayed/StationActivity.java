@@ -17,6 +17,7 @@ import se.sandos.android.delayed.db.DBAdapter;
 import se.sandos.android.delayed.prefs.PreferencesActivity;
 import se.sandos.android.delayed.prefs.Prefs;
 import se.sandos.android.delayed.scrape.ScrapeListener;
+import se.sandos.android.delayed.scrape.ScrapeService;
 import se.sandos.android.delayed.scrape.ScraperHelper;
 import se.sandos.android.delayed.scrape.ScraperHelper.Nameurl;
 import se.sandos.android.delayed.scrape.StationListScraper;
@@ -361,7 +362,8 @@ public class StationActivity extends ListActivity
                 {
                     // this actually means finished!
                     Delayed.getDb(getApplicationContext()).addTrainEvents(trainevents);
-
+                    ScrapeService.scheduleAllWidgetUpdate(getApplicationContext());
+                    
                     runOnUiThread(new Runnable()
                     {
                         public void run()

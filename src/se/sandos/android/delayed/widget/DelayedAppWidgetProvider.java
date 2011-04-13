@@ -136,6 +136,9 @@ abstract public class DelayedAppWidgetProvider extends AppWidgetProvider
 
         for (int i = 0; i < appWidgetIds.length; i++) {
             int id = appWidgetIds[i];
+            
+            removeButtons(context, id);
+            
             if(id != -1)
             {
                 Log.v(Tag, "Updating id " + id);

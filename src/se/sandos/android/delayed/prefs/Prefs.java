@@ -149,6 +149,20 @@ public class Prefs {
         return res;
     }
     
+    public static Widget findWidget(Context context, int id)
+    {
+        List<Widget> widgets = Prefs.getWidgets(context);
+        for (Widget widget : widgets)
+        {
+            if(widget.getId() == id)
+            {
+                return widget;
+            }
+        }
+        
+        return null;
+    }    
+    
     public static void saveWidget(Context ctx, Widget w)
     {
         if(!hasWidget(ctx, w.getId())) {

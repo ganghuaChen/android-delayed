@@ -143,7 +143,9 @@ abstract public class DelayedAppWidgetProvider extends AppWidgetProvider
             {
                 Log.v(Tag, "Updating id " + id);
                 
-                if(getControlsPrefix().equals(""))
+                Widget w = Prefs.findWidget(context, id);
+                
+                if(getControlsPrefix().equals("") && w.getClickSetting() != Widget.CLICK_SHOW)
                 {
                     Intent intent = new Intent("widgetclick", null, context, DelayedAppWidgetProvider41.class);
                     intent.putExtra("widgetid", id);
@@ -216,8 +218,7 @@ abstract public class DelayedAppWidgetProvider extends AppWidgetProvider
 
         if(intent.getAction().equals("widgetrefresh"))
         {
-            removeButtons(context, intent.getExtras().getInt("widgetid"));
-            ScrapeService.runOnceNowForced(context);
+            refresh(context, intent.getExtras().getInt("widgetid"));
         }
         
         if(intent.getAction().equals("widgetclick"))
@@ -235,6 +236,12 @@ abstract public class DelayedAppWidgetProvider extends AppWidgetProvider
             
             Prefs.removeWidget(context, id);
         }
+    }
+
+    private void refresh(Context context, int widgetId)
+    {
+        removeButtons(context, widgetId);
+        ScrapeService.runOnceNowForced(context);
     }
 
     private void removeButtons(Context ctx, int widgetId)
@@ -289,10 +296,38 @@ abstract public class DelayedAppWidgetProvider extends AppWidgetProvider
                         
                         PendingIntent pi2 = PendingIntent.getActivity(ctx, widgetId, open, 0);
                         rv.setOnClickPendingIntent(R.id.open, pi2);
+
+                        Intent cfg = new Intent("cfg", null, ctx, WidgetConfigActivity.class);
+                        cfg.setData(Uri.fromParts("delayed", "trainstation", ""));
+                        cfg.putExtra("widgetId", widgetId);
+
+                        PendingIntent pi3 = PendingIntent.getActivity(ctx, widgetId, cfg, 0);
+                        rv.setOnClickPendingIntent(R.id.config, pi3);
                         
                         AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(ctx);                       
                         appWidgetManager.updateAppWidget(widgetId, rv);
                     }
+                }
+                else if(click == Widget.CLICK_REFRESH)
+                {
+                    refresh(ctx, widgetId);
+                }
+                else if(click == Widget.CLICK_SHOW)
+                {
+                    String station = null;
+                    List<Favorite> favorites = Prefs.getFavorites(ctx);
+                    for(Favorite f : favorites) {
+                        if(f.isActive()) {
+                            station = f.getName();
+                        }
+                    }
+                    
+                    Intent intent = new Intent("se.sandos.android.delayed.Station", null, ctx, StationActivity.class);
+                    intent.setData(Uri.fromParts("delayed", "trainstation", station));
+                    intent.putExtra("name", (String)null);
+                    intent.putExtra("url", (String)null);
+                    
+                    ctx.startActivity(intent);
                 }
             }
         }

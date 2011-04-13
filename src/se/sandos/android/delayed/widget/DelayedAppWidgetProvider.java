@@ -17,6 +17,8 @@ import se.sandos.android.delayed.db.DBAdapter;
 import se.sandos.android.delayed.db.Station;
 import se.sandos.android.delayed.prefs.Favorite;
 import se.sandos.android.delayed.prefs.Prefs;
+import se.sandos.android.delayed.prefs.Widget;
+import se.sandos.android.delayed.scrape.ScrapeService;
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
@@ -62,10 +64,10 @@ abstract public class DelayedAppWidgetProvider extends AppWidgetProvider
         
         RemoteViews rv = new RemoteViews(context.getPackageName(), ourLayout());
 
-        List<Favorite> favorites = Prefs.getFavorites(context);
         List<TrainEvent> events = new ArrayList<TrainEvent>(40);
-        DBAdapter db = Delayed.getDb(context);
         String name = "";
+        DBAdapter db = Delayed.getDb(context);
+        List<Favorite> favorites = Prefs.getFavorites(context);
         for(Favorite f : favorites) {
 //            Log.v(Tag, "Favorite: " + f.getName());
             if(f.isActive()) {
@@ -132,31 +134,36 @@ abstract public class DelayedAppWidgetProvider extends AppWidgetProvider
             }
         }
 
-        Intent mainIntent = new Intent("android.intent.action.MAIN", null, context, StationListActivity.class);
-        PendingIntent mainPi = PendingIntent.getActivity(context, 1, mainIntent, 0);
-        rv.setOnClickPendingIntent(R.id.EmptyPlaceHolder, mainPi);
-        
-        Intent intent = new Intent("se.sandos.android.delayed.Station", null, context, StationActivity.class);
-        intent.setData(Uri.fromParts("delayed", "trainstation", name));
-        intent.putExtra("name", (String)null);
-        intent.putExtra("url", (String)null);
-        
-        Log.v(Tag, "Setting pending intent to name" + name);
-        
-        PendingIntent pi = PendingIntent.getActivity(context, 0, intent, 0);
-        /*
-        for(int j=0; j<=5; j++) {
-            rv.setOnClickPendingIntent(getWidgetId(j, "WidgetTime"), pi);
-            rv.setOnClickPendingIntent(getWidgetId(j, "WidgetDelay"), pi);
-        }*/
-        
-        rv.setOnClickPendingIntent(getWidgetId("WidgetLayout"), pi);
-        
         for (int i = 0; i < appWidgetIds.length; i++) {
             int id = appWidgetIds[i];
             if(id != -1)
             {
                 Log.v(Tag, "Updating id " + id);
+                
+                if(getControlsPrefix().equals(""))
+                {
+                    Intent intent = new Intent("widgetclick", null, context, DelayedAppWidgetProvider41.class);
+                    intent.putExtra("widgetid", id);
+                    intent.setData(Uri.fromParts("delayed", "aSA", "frag"));
+                    PendingIntent pi = PendingIntent.getBroadcast(context, id, intent, 0);
+                    
+                    //Here we do re-route to enable other functionality
+                    rv.setOnClickPendingIntent(getWidgetId("WidgetLayout"), pi);
+                    
+                    Log.v(Tag, "Set onclick rerouted");
+                }
+                else
+                {
+                    Intent intent = new Intent("se.sandos.android.delayed.Station", null, context, StationActivity.class);
+                    intent.setData(Uri.fromParts("delayed", "trainstation", name));
+                    intent.putExtra("name", (String)null);
+                    intent.putExtra("url", (String)null);
+                    
+                    PendingIntent pi = PendingIntent.getActivity(context, id, intent, 0);
+                    
+                    rv.setOnClickPendingIntent(getWidgetId("WidgetLayout"), pi);
+                }
+                
                 Prefs.addWidget(context, id);
                 
                 appWidgetManager.updateAppWidget(id, rv);
@@ -197,11 +204,24 @@ abstract public class DelayedAppWidgetProvider extends AppWidgetProvider
     {
         super.onReceive(context, intent);
 
-        Log.v(Tag, "" + intent.getAction() + " " + intent.getDataString());
+        Log.v(Tag, "" + intent.getAction() + " " + intent.getDataString() + " " + intent);
         
         if(intent.getAction().equals("se.sandos.android.delayed.widgetUpdate")) {
             Log.v(Tag, "Our own widget update " + this.getClass());
             onUpdate(context, AppWidgetManager.getInstance(context), intent.getIntArrayExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS)); 
+        }
+
+        if(intent.getAction().equals("widgetrefresh"))
+        {
+            removeButtons(context, intent.getExtras().getInt("widgetid"));
+            ScrapeService.runOnceNowForced(context);
+        }
+        
+        if(intent.getAction().equals("widgetclick"))
+        {
+            Log.v(Tag, "Someone clicked the widget! " );
+            
+            onWidgetClick(context, intent.getExtras().getInt("widgetid"));
         }
         
         //Handle deletions ourselves due to bug in 1.5/1.6
@@ -211,6 +231,67 @@ abstract public class DelayedAppWidgetProvider extends AppWidgetProvider
             Log.v(Tag, "Id: " + id);
             
             Prefs.removeWidget(context, id);
+        }
+    }
+
+    private void removeButtons(Context ctx, int widgetId)
+    {
+        RemoteViews rv = new RemoteViews(ctx.getPackageName(), ourLayout());
+        rv.setViewVisibility(R.id.refresh, View.INVISIBLE);
+        rv.setViewVisibility(R.id.config, View.INVISIBLE);
+        rv.setViewVisibility(R.id.open, View.INVISIBLE);
+        
+        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(ctx);                       
+        appWidgetManager.updateAppWidget(widgetId, rv);
+    }
+
+    private void onWidgetClick(Context ctx, int widgetId)
+    {
+        List<Widget> widgets = Prefs.getWidgets(ctx);
+        for (Widget widget : widgets)
+        {
+            if(widget.getId() == widgetId)
+            {
+                int click = widget.getClickSetting();
+                if(click == Widget.CLICK_BUTTONS)
+                {
+                    //Toggle buttons
+                    if(getControlsPrefix().equals(""))
+                    {
+                        RemoteViews rv = new RemoteViews(ctx.getPackageName(), ourLayout());
+                        rv.setViewVisibility(R.id.refresh, View.VISIBLE);
+                        rv.setViewVisibility(R.id.config, View.VISIBLE);
+                        rv.setViewVisibility(R.id.open, View.VISIBLE);
+                        
+                        Intent refresh = new Intent("widgetrefresh", null, ctx, DelayedAppWidgetProvider41.class);
+                        refresh.putExtra("widgetid", widgetId);
+                        refresh.setData(Uri.fromParts("delayed", "refresh", "frag"));
+                    
+                        PendingIntent pi = PendingIntent.getBroadcast(ctx, 0, refresh, 0);
+                        rv.setOnClickPendingIntent(R.id.refresh, pi);
+
+                        Intent open = new Intent("se.sandos.android.delayed.Station", null, ctx, StationActivity.class);
+                        
+                        String stationName = "";
+                        List<Favorite> favorites = Prefs.getFavorites(ctx);
+                        for(Favorite f : favorites) {
+                            if(f.isActive()) {
+                                stationName = f.getName();
+                            }
+                        }
+                        
+                        open.setData(Uri.fromParts("delayed", "trainstation", stationName));
+                        open.putExtra("name", (String)null);
+                        open.putExtra("url", (String)null);
+                        
+                        PendingIntent pi2 = PendingIntent.getActivity(ctx, widgetId, open, 0);
+                        rv.setOnClickPendingIntent(R.id.open, pi2);
+                        
+                        AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(ctx);                       
+                        appWidgetManager.updateAppWidget(widgetId, rv);
+                    }
+                }
+            }
         }
     }
 }

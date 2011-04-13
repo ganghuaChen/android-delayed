@@ -389,7 +389,22 @@ public class DBAdapter {
 //                Log.v(Tag, "Setting null delayed");
                 cv.putNull(TRAINEVENT_KEY_DELAY);
             }
-            cv.put(TRAINEVENT_KEY_EXTRA, extra);
+            if(extra != null)
+            {
+                cv.put(TRAINEVENT_KEY_EXTRA, extra);
+            }
+            else
+            {
+                cv.putNull(TRAINEVENT_KEY_EXTRA);
+            }
+            if(track != null)
+            {
+                cv.put(TRAINEVENT_KEY_TRACK, track);
+            }
+            else
+            {
+                cv.putNull(TRAINEVENT_KEY_TRACK);
+            }
 //            Log.v(Tag, "Setting extra: " + extra);
             long res = db.update(TRAINEVENT_TABLE_NAME, cv, "" + TRAINEVENT_KEY_STATION + " = ? and " + TRAINEVENT_KEY_NUMBER + " = " + number, new String[]{station});
 //            Log.v(Tag, "Affected " + res);

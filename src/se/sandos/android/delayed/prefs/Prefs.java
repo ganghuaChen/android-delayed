@@ -139,7 +139,7 @@ public class Prefs {
             if(contains(ctx, wdgt)) {
                 Widget w = new Widget(getIntSetting(ctx, wdgt, -1));
                 w.setIndex(index++);
-                
+                w.setClickSetting(getIntSetting(ctx, wdgt + ".click", 0));
                 res.add(w);
             } else {
                 break;
@@ -149,6 +149,17 @@ public class Prefs {
         return res;
     }
     
+    public static void saveWidget(Context ctx, Widget w)
+    {
+        if(!hasWidget(ctx, w.getId())) {
+            Log.e(Tag, "Could not find widget with id " + w.getId());
+            return;
+        }
+        
+        final String wdgt = PREFS_WIDGET_PREFIX + w.getIndex();
+        setIntSetting(ctx, wdgt, w.getId());
+        setIntSetting(ctx, wdgt + ".click", w.getClickSetting());
+    }
     
     public static void addWidget(Context ctx, int id)
     {

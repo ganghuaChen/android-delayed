@@ -26,6 +26,10 @@
 <TextView android:layout_width="wrap_content" android:layout_height="wrap_content" android:id="@+id/WidgetDelay5" android:layout_alignParentRight="true" android:layout_below="@+id/WidgetDelay4" android:textStyle="bold" android:text="Nofav" android:textColor="#ffdd0000" android:paddingRight="5dip"   android:textScaleX="1.3" android:textSize="11dip" android:maxHeight="13dip"></TextView>
 <TextView android:layout_width="wrap_content" android:layout_below="@+id/WidgetTime5" android:layout_height="wrap_content" android:id="@+id/EmptyPlaceHolder" android:textColor="#ffffffff" android:paddingLeft="5dip"></TextView>
 
-
+<LinearLayout android:id="@+id/WidgetLinearLayout" android:layout_alignParentLeft="true" android:layout_centerVertical="true" android:layout_width="fill_parent" android:layout_height="wrap_content">
+    <Button android:text="Refresh" android:id="@+id/refresh" android:layout_width="0px" android:layout_weight="1.0" android:layout_centerVertical="true" android:layout_height="wrap_content" android:visibility="invisible"></Button>
+    <Button android:text="Config" android:id="@+id/config" android:layout_width="0px" android:layout_weight="1.0" android:layout_height="wrap_content" android:visibility="invisible"></Button>
+    <Button android:text="Open" android:id="@+id/open" android:layout_width="0px" android:layout_weight="1.0" android:layout_height="wrap_content" android:visibility="invisible"></Button>
+</LinearLayout>
 
 </RelativeLayout>

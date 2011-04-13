@@ -31,6 +31,7 @@ import android.util.Log;
 public class ScrapeService extends Service {
     private static final String Tag = "ScrapeService";
     private static final int SERVICE_NOTIFICATION_ID = 1;
+    private static boolean forceRun = true;
     
     @Override
     public IBinder onBind(Intent arg0)
@@ -50,10 +51,15 @@ public class ScrapeService extends Service {
     public void onStart(Intent intent, int startid)
     {
     	ConnectivityManager cm = (ConnectivityManager) getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-        if(!cm.getBackgroundDataSetting() || !Prefs.isSet(getApplicationContext(), Prefs.PREFS_SERVICE_ENABLED, false)) {
+        if(!forceRun && (!cm.getBackgroundDataSetting() || !Prefs.isSet(getApplicationContext(), Prefs.PREFS_SERVICE_ENABLED, false))) {
             stopSelf();
             removeAlarm(getApplicationContext());
             return;
+        }
+
+        if(forceRun)
+        {
+            forceRun = false;
         }
         
         showNotification();
@@ -246,6 +252,13 @@ public class ScrapeService extends Service {
     
     public static void runOnceNow(Context ctx)
     {
+        Intent i = new Intent(ctx, ScrapeService.class);
+        ctx.startService(i);
+    }
+
+    public static void runOnceNowForced(Context ctx)
+    {
+        forceRun = true;
         Intent i = new Intent(ctx, ScrapeService.class);
         ctx.startService(i);
     }

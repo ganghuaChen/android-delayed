@@ -140,73 +140,60 @@ public class DBAdapter {
         }
     }
     
-    public void addTrainEvents(final List<TrainEvent> l)
+    public synchronized void addTrainEvents(final List<TrainEvent> l, String stationName)
     {
         // (Shallow) Copy the list to avoid ConcurrentModificationException
         final List<TrainEvent> trainevents = new ArrayList<TrainEvent>(l);
 
+        Log.v(Tag, "Number of events to store: " + trainevents.size() + " " + Thread.currentThread());
+        
         if (trainevents == null || trainevents.size() == 0) {
+            //Clean everything
+            int res = db.delete(TRAINEVENT_TABLE_NAME, TRAINEVENT_KEY_STATION + " = ?", new String[]{stationName});
+            Log.v(Tag, "Deleted " + res + " rows");
             return;
         }
 
-        ScrapePool.addJob(new DelayRunnable(DelayRunnable.Importance.HIGH) {
-            public void run()
-            {
-                if (TRACE) {
-                    Debug.startMethodTracing("dbstore");
-                }
-                Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
-                long s = System.currentTimeMillis();
+        if (TRACE) {
+            Debug.startMethodTracing("dbstore");
+        }
+        Thread.currentThread().setPriority(Thread.MIN_PRIORITY);
+        long s = System.currentTimeMillis();
 
-                Station st = trainevents.get(0).getStation();
-                if(st == null)
-                {
-                    Log.v(Tag, "Abnormal stuff, no station for first event: " + trainevents.get(0));
-                    return;
-                }
-                String station = st.getName();
-                String[] numbers = new String[trainevents.size()];
-                int index = 0;
-                for (TrainEvent te : trainevents) {
-                    numbers[index++] = te.getNumber();
-//                    Log.v(Tag, "Exists 1: " + numbers[index-1]);
-                }
-                TrainEvent[] events = getTrainEvents(station, numbers);
-
-                Set<String> existing_events = new HashSet<String>();
-                Log.v(Tag, "Number of found pre-existing trains: " + events.length);
-                for (int i = 0; i < events.length; i++) {
-//                    Log.v(Tag, "Exists 2: " + events[i]);
-                    existing_events.add(events[i].getNumber());
-                }
-    
-                int count = 0;
-                for (TrainEvent te : trainevents) {
-                    if (!existing_events.contains(te.getNumber())) {
-                        addTrainEventImpl(te.getStation().getName(), te.getDepartureDate(), te.getTrack(), te.getNumber(), te
-                                .getDelayedDate(), te.getExtra(), te.getDestination(), true);
-                    } else {
-                        // Might still need updating, extra or delay!
-                        addTrainEventImpl(te.getStation().getName(), te.getDepartureDate(), te.getTrack(), te.getNumber(), te
-                                .getDelayedDate(), te.getExtra(), te.getDestination(), false);
-                    }
-                    count++;
-                }
-                if (TRACE) {
-                    Debug.stopMethodTracing();
-                }
-                Log.v(Tag, "Took " + (System.currentTimeMillis() - s) + " for " + count);
-            }
-        });
+        Station st = trainevents.get(0).getStation();
+        if(st == null)
+        {
+            Log.e(Tag, "Abnormal stuff, no station for first event: " + trainevents.get(0));
+            return;
+        }
+        String station = st.getName();
+        
+        //Remove ALL other events for this station. Simplifies things
+        //We trust whatever our source is to keep the right stuff there
+        //(Not always true, but we can't really do it better ourselves!)
+        int res = db.delete(TRAINEVENT_TABLE_NAME, TRAINEVENT_KEY_STATION + " = ?", new String[]{station});
+        Log.v(Tag, "Deleted " + res + " rows");
+        
+        int count = 0;
+        for (TrainEvent te : trainevents)
+        {
+            addTrainEventImpl(te.getStation().getName(), te.getDepartureDate(), te.getTrack(), te.getNumber(),
+                    te.getDelayedDate(), te.getExtra(), te.getDestination(), true);
+            count++;
+        }
+        if (TRACE) {
+            Debug.stopMethodTracing();
+        }
+        Log.v(Tag, "Took " + (System.currentTimeMillis() - s) + " for " + count + " " + Thread.currentThread());
     }
     
     /**
-     * Return all trainevents for this station. Culling?
+     * Return all trainevents for this station. 
      * 
      * @param station
      * @return
      */
-    public List<TrainEvent> getStationEvents(String station)
+    public synchronized List<TrainEvent> getStationEvents(String station)
     {
         if(stationCache.containsKey(station))
         {
@@ -234,12 +221,8 @@ public class DBAdapter {
                 TRAINEVENT_KEY_STATION + "= ?", new String[] { station }, null,
                 null, null);
         c.move(1);
-        Calendar cal = Calendar.getInstance();
-        //String cald = SIMPLE_DATEFORMATTER.format(cal);
-        //-6 minute fuzz, arbitrary value for now
-        //cal.add(Calendar.MINUTE, -4);
         
-        Log.v(Tag, "Number of events in db: " + c.getCount());
+        Log.v(Tag, "Number of events in db: " + c.getCount() + " " + Thread.currentThread());
         if (!c.isAfterLast() && !c.isBeforeFirst()) {
             while (!c.isAfterLast()) {
                 TrainEvent te = new TrainEvent(null);
@@ -260,44 +243,7 @@ public class DBAdapter {
                 	te.setTrack(c.getString(6));
                 }
 
-                //Log.v(Tag, "Comparing " + te.getDepartureDate() + " " + cald);
-                long now = cal.getTimeInMillis();
-                long item = c.getLong(0);
-                //Log.v(Tag, "Long: " + item + " " + SIMPLE_DATEFORMATTER.format(te.getDepartureDate()) + " " + cal.getTimeInMillis());
-
-//                if(now < item) {
-//                    Log.v(Tag, "Before!");
-//                }
-                //Calendar.before is broken??? Does not work for me anyway...
-                if(te.getExtra().equals("")) {
-                    if(now < (item + (1000*60*6)) || (te.getDelayedDate() != null && now < (te.getDelayedDate().getTime() + (1000*60*6) ))){
-                        res.add(te);
-                    } else {
-                        //Remove it
-//                        Log.v(Tag, "Removing (empty extra) " + (now-item) + " " + SIMPLE_DATEFORMATTER.format(te.getDepartureDate()) + " " + SIMPLE_DATEFORMATTER.format(new Date(now)) + " #: " + te.getNumber() + " d: " + te.getDestination() + " tes departure: " + te.toString());
-//                        if(te.getDelayedDate() != null) {
-//                            Log.v(Tag, " Delayed until: " + SIMPLE_DATEFORMATTER.format(te.getDelayedDate()) + " " + now + " < " + te.getDelayedDate().getTime() + " " + SIMPLE_DATEFORMATTER.format(new Date(now)));
-//                        }
-                        db.execSQL("delete from trainevents where _id = " + c.getInt(4), new Object[0]);
-                    }
-                } else {
-//                    Log.v(Tag, "Extra is set: " + te.getExtra());
-                    if(now < (item + (1000*60*75))){
-//                        Log.v(Tag, "Adding: " + te.getNumber() + ":" + te.getStation());
-//                        Log.v(Tag, "Removing (non-empty extra) " + (now-item) + " " + SIMPLE_DATEFORMATTER.format(te.getDepartureDate()) + " " + SIMPLE_DATEFORMATTER.format(new Date(now)) + " #: " + te.getNumber() + " d: " + te.getDestination() + " tes departure: " + te.toString());
-//                        if(te.getDelayedDate() != null) {
-//                            Log.v(Tag, " Delayed until: " + SIMPLE_DATEFORMATTER.format(te.getDelayedDate()) + " " + now + " < " + te.getDelayedDate().getTime() + " " + SIMPLE_DATEFORMATTER.format(new Date(now)));
-//                        }
-                        res.add(te);
-                    } else {
-//                        Log.v(Tag, "Removing (non-empty extra) " + (now-item) + " " + SIMPLE_DATEFORMATTER.format(te.getDepartureDate()) + " " + SIMPLE_DATEFORMATTER.format(new Date(now)) + " #: " + te.getNumber() + " d: " + te.getDestination() + " tes departure: " + te.toString());
-//                        if(te.getDelayedDate() != null) {
-//                            Log.v(Tag, " Delayed until: " + SIMPLE_DATEFORMATTER.format(te.getDelayedDate()) + " " + now + " < " + te.getDelayedDate().getTime() + " " + SIMPLE_DATEFORMATTER.format(new Date(now)));
-//                        }
-//                        Log.v(Tag, "Removing due to non-empty extra, but too old: " + te.toString());
-                        db.execSQL("delete from trainevents where _id = " + c.getInt(4), new Object[0]);
-                    }
-                }
+                res.add(te);
                 
                 c.move(1);
             }
@@ -374,43 +320,12 @@ public class DBAdapter {
     {
         if(time == null)
         {
-            Log.v(Tag, "Null time, not so sure about this");
+            Log.e(Tag, "Null time, not so sure about this");
             return -1;
         }
         
         stationCache.remove(station);
-        if(!add) {
-//            Log.v(Tag, "Updating " + number);
-            ContentValues cv = new ContentValues();
-            if(delay != null) {
-//                Log.v(Tag, "Setting delayed: " + delay.getTime());
-                cv.put(TRAINEVENT_KEY_DELAY, delay.getTime());
-            } else {
-//                Log.v(Tag, "Setting null delayed");
-                cv.putNull(TRAINEVENT_KEY_DELAY);
-            }
-            if(extra != null)
-            {
-                cv.put(TRAINEVENT_KEY_EXTRA, extra);
-            }
-            else
-            {
-                cv.putNull(TRAINEVENT_KEY_EXTRA);
-            }
-            if(track != null)
-            {
-                cv.put(TRAINEVENT_KEY_TRACK, track);
-            }
-            else
-            {
-                cv.putNull(TRAINEVENT_KEY_TRACK);
-            }
-//            Log.v(Tag, "Setting extra: " + extra);
-            long res = db.update(TRAINEVENT_TABLE_NAME, cv, "" + TRAINEVENT_KEY_STATION + " = ? and " + TRAINEVENT_KEY_NUMBER + " = " + number, new String[]{station});
-//            Log.v(Tag, "Affected " + res);
-            return res;
-        }
-//        Log.v(Tag, "Adding " + number);
+
 		ContentValues cv = new ContentValues();
 		cv.put(TRAINEVENT_KEY_STATION, station);
 	    cv.put(TRAINEVENT_KEY_TIME, time.getTime());
@@ -430,7 +345,7 @@ public class DBAdapter {
 		return status;
     }
     
-    public TrainEvent[] getTrainEvents(String station, String[] numbers)
+    public synchronized TrainEvent[] getTrainEvents(String station, String[] numbers)
     {
     	if(station == null) {
     		return  null;
@@ -504,7 +419,7 @@ public class DBAdapter {
 		helper.close();
 	}
 	
-	public StationList getStations()
+	public synchronized StationList getStations()
 	{
 		Cursor c = db.rawQuery("select name, urlid from stations", null);
 		c.move(1);
@@ -532,7 +447,7 @@ public class DBAdapter {
 		return status;
 	}
 	
-	public void clearStations()
+	public synchronized void clearStations()
 	{
 		Cursor c = db.rawQuery("delete from " + STATION_TABLE_NAME, null);
 		c.move(1);

@@ -64,6 +64,11 @@
 			</intent-filter>
             <meta-data android:name="android.appwidget.provider" android:resource="@xml/appwidget41" />
         </receiver>
+        <activity android:name="se.sandos.android.delayed.widget.WidgetConfigActivity">
+			<intent-filter>
+                <action android:name="cfg" />
+			</intent-filter>
+        </activity>
 
 		<!-- Auto-start of service at boot-time -->
 		<receiver android:name=".scrape.OnBoot" android:label="@string/app_name">

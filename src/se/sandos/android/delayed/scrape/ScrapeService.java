@@ -201,7 +201,6 @@ public class ScrapeService extends Service {
             public void onFinished(Object[] result) {
                 if (result == null) {
                     // this actually means finished!
-                    Log.v(Tag, "Station: " + favName + " " + trainevents.size());
                     Delayed.getDb(getApplicationContext()).addTrainEvents(trainevents, favName);
                 } else {
                     //This is a fixup (destination) message

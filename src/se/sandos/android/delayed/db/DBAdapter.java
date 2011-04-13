@@ -145,7 +145,7 @@ public class DBAdapter {
         // (Shallow) Copy the list to avoid ConcurrentModificationException
         final List<TrainEvent> trainevents = new ArrayList<TrainEvent>(l);
 
-        Log.v(Tag, "Number of events to store: " + trainevents.size() + " " + Thread.currentThread());
+        Log.v(Tag, "Number of events to store: " + trainevents.size() + " " + Thread.currentThread() + " station: " + stationName);
         
         if (trainevents == null || trainevents.size() == 0) {
             //Clean everything

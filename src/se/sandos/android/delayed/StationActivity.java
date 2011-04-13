@@ -115,6 +115,7 @@ public class StationActivity extends ListActivity
         for (TrainEvent te : events)
         {
             boolean updated = false;
+            trainevents.add(te);
             if (existsAndUpdate(te) == 2)
             {
                 updated = true;
@@ -124,7 +125,6 @@ public class StationActivity extends ListActivity
                 return;
             }
 
-            trainevents.add(te);
             if (!updated)
             {
                 needsInvalidate = true;
@@ -361,7 +361,6 @@ public class StationActivity extends ListActivity
                 if (result == null)
                 {
                     // this actually means finished!
-                    Log.v(Tag, "Station: " + name + " " + trainevents.size());
                     Delayed.getDb(getApplicationContext()).addTrainEvents(trainevents, name);
                     ScrapeService.scheduleAllWidgetUpdate(getApplicationContext());
                     

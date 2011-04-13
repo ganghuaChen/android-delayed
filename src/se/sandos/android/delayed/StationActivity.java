@@ -361,7 +361,8 @@ public class StationActivity extends ListActivity
                 if (result == null)
                 {
                     // this actually means finished!
-                    Delayed.getDb(getApplicationContext()).addTrainEvents(trainevents);
+                    Log.v(Tag, "Station: " + name + " " + trainevents.size());
+                    Delayed.getDb(getApplicationContext()).addTrainEvents(trainevents, name);
                     ScrapeService.scheduleAllWidgetUpdate(getApplicationContext());
                     
                     runOnUiThread(new Runnable()

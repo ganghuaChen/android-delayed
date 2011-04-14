@@ -208,6 +208,7 @@ public class Prefs {
                     hasDeleted = true;
                     final String wdgt = PREFS_WIDGET_PREFIX + f.getIndex();
                     removeSetting(ctx, wdgt);
+                    removeSetting(ctx, wdgt + ".click");
                 }
             } else {
                 highestIndex = f.getIndex();
@@ -216,6 +217,7 @@ public class Prefs {
                 f.setIndex(f.getIndex()-1);
                 final String wdgt = PREFS_WIDGET_PREFIX + f.getIndex();
                 setIntSetting(ctx, wdgt, f.getId());
+                setIntSetting(ctx, wdgt + ".click", f.getClickSetting());
             }
         }
         
@@ -223,6 +225,7 @@ public class Prefs {
         if(highestIndex != -1) {
             final String wdgt = PREFS_WIDGET_PREFIX + highestIndex;
             removeSetting(ctx, wdgt);
+            removeSetting(ctx, wdgt + ".click");
         }
     }
     

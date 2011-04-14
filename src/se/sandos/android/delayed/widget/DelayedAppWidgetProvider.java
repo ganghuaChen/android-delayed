@@ -145,7 +145,7 @@ abstract public class DelayedAppWidgetProvider extends AppWidgetProvider
                 
                 Widget w = Prefs.findWidget(context, id);
                 
-                if(getControlsPrefix().equals("") && w.getClickSetting() != Widget.CLICK_SHOW)
+                if(getControlsPrefix().equals("") && (w == null || w.getClickSetting() != Widget.CLICK_SHOW))
                 {
                     Intent intent = new Intent("widgetclick", null, context, DelayedAppWidgetProvider41.class);
                     intent.putExtra("widgetid", id);
@@ -232,7 +232,7 @@ abstract public class DelayedAppWidgetProvider extends AppWidgetProvider
         if(intent.getAction().equals(AppWidgetManager.ACTION_APPWIDGET_DELETED)) {
             int id = intent.getIntExtra("appWidgetId", -1);
             
-            Log.v(Tag, "Id: " + id);
+            Log.v(Tag, "Removing widgetId: " + id);
             
             Prefs.removeWidget(context, id);
         }

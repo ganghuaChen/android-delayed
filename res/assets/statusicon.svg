@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:xlink="http://www.w3.org/1999/xlink"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   width="240"
+   height="380"
+   id="svg2"
+   version="1.1"
+   inkscape:version="0.48.0 r9654"
+   sodipodi:docname="statusicon.svg"
+   inkscape:export-filename="C:\Users\johba\projs\personal\kod\android\delayed\res\drawable-ldpi-v9\statusbar.png"
+   inkscape:export-xdpi="4.5"
+   inkscape:export-ydpi="4.5">
+  <defs
+     id="defs4">
+    <linearGradient
+       id="linearGradient4869">
+      <stop
+         style="stop-color:#525252;stop-opacity:1;"
+         offset="0"
+         id="stop4871" />
+      <stop
+         style="stop-color:#5b5b5b;stop-opacity:1;"
+         offset="1"
+         id="stop4873" />
+    </linearGradient>
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4869"
+       id="linearGradient4887"
+       x1="45.329941"
+       y1="83.136185"
+       x2="115.21361"
+       y2="83.136185"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="translate(-29.410499,-32.10871)" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient4869"
+       id="linearGradient4902"
+       gradientUnits="userSpaceOnUse"
+       gradientTransform="matrix(3.3862607,0,0,3.3862607,-152.83471,584.72144)"
+       x1="45.329941"
+       y1="83.136185"
+       x2="115.21361"
+       y2="83.136185" />
+  </defs>
+  <sodipodi:namedview
+     id="base"
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1.0"
+     inkscape:pageopacity="0.0"
+     inkscape:pageshadow="2"
+     inkscape:zoom="1.3103252"
+     inkscape:cx="32.39448"
+     inkscape:cy="185.14656"
+     inkscape:document-units="px"
+     inkscape:current-layer="layer1"
+     showgrid="false"
+     inkscape:window-width="1366"
+     inkscape:window-height="746"
+     inkscape:window-x="-8"
+     inkscape:window-y="-8"
+     inkscape:window-maximized="1" />
+  <metadata
+     id="metadata7">
+    <rdf:RDF>
+      <cc:Work
+         rdf:about="">
+        <dc:format>image/svg+xml</dc:format>
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title></dc:title>
+      </cc:Work>
+    </rdf:RDF>
+  </metadata>
+  <g
+     inkscape:label="Layer 1"
+     inkscape:groupmode="layer"
+     id="layer1"
+     transform="translate(0,-672.36217)">
+    <path
+       style="fill:url(#linearGradient4902);fill-opacity:1;stroke:none"
+       d="m 119.03292,747.94753 c -65.347513,0 -118.41329401,52.95997 -118.41329401,118.30737 0,65.34738 53.06578101,118.30766 118.41329401,118.30766 65.34754,0 118.30749,-52.96028 118.30749,-118.30766 0,-65.3474 -52.95995,-118.30737 -118.30749,-118.30737 z m -53.333592,45.82034 51.852112,0 c 11.69345,1.6e-4 20.5324,0.96231 26.6668,2.75132 8.24289,2.42834 15.39113,6.71209 21.26995,12.91013 5.8786,6.19837 10.26612,13.77376 13.33341,22.75146 3.06702,8.97793 4.65598,20.06457 4.6561,33.2278 -1.2e-4,11.56572 -1.46332,21.47057 -4.33864,29.84146 -3.51457,10.22387 -8.50894,18.54187 -15.02654,24.86765 -4.92034,4.79238 -11.62942,8.53314 -20.0001,11.21682 -6.2622,1.98098 -14.60012,2.96297 -25.0795,2.96297 l -53.333592,0 0,-140.52961 z m 28.359932,23.80966 0,93.01626 21.16413,0 c 7.92341,0 13.62841,-0.37547 17.14294,-1.27003 4.60065,-1.14972 8.39334,-3.1781 11.42863,-5.92565 3.03511,-2.74781 5.59619,-7.25131 7.51327,-13.54504 1.91687,-6.29427 2.85705,-14.85179 2.85715,-25.71425 -1e-4,-10.86297 -0.94028,-19.15896 -2.85715,-24.97388 -1.91708,-5.81473 -4.69774,-10.3919 -8.14819,-13.65089 -3.45065,-3.25871 -7.81822,-5.41053 -13.12177,-6.56085 -3.96182,-0.89446 -11.71487,-1.37553 -23.28054,-1.37567 l -12.69847,0 z"
+       id="path4099"
+       inkscape:connector-curvature="0"
+       inkscape:export-filename="C:\Users\johba\projs\personal\kod\android\delayed\res\drawable-hdpi-v9\statusbar.png"
+       inkscape:export-xdpi="25.01"
+       inkscape:export-ydpi="25.01" />
+    <text
+       xml:space="preserve"
+       style="font-size:64px;font-style:normal;font-weight:normal;line-height:125%;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;font-family:Sans"
+       x="76.089546"
+       y="-1.4527317"
+       id="text4897"
+       sodipodi:linespacing="125%"
+       transform="translate(0,952.36217)"><tspan
+         sodipodi:role="line"
+         id="tspan4899"
+         x="76.089546"
+         y="-1.4527317"> </tspan></text>
+  </g>
+</svg>

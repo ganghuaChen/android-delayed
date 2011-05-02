@@ -7,13 +7,13 @@ import java.util.List;
 import java.util.Set;
 
 import se.sandos.android.delayed.Delayed;
+import se.sandos.android.delayed.R;
 import se.sandos.android.delayed.StationActivity;
 import se.sandos.android.delayed.TrainEvent;
 import se.sandos.android.delayed.db.DBAdapter;
 import se.sandos.android.delayed.prefs.Favorite;
 import se.sandos.android.delayed.prefs.Prefs;
 import se.sandos.android.delayed.prefs.Widget;
-import android.R;
 import android.app.AlarmManager;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -156,7 +156,7 @@ public class ScrapeService extends Service {
         String ns = Context.NOTIFICATION_SERVICE;
         NotificationManager notificationMgr = (NotificationManager) getSystemService(ns);
         
-        int icon = R.drawable.ic_dialog_alert;
+        int icon = R.drawable.statusbar;
         CharSequence tickerText = "Delayed";
         long when = System.currentTimeMillis();
 
@@ -201,6 +201,7 @@ public class ScrapeService extends Service {
             public void onFinished(Object[] result) {
                 if (result == null) {
                     // this actually means finished!
+                    StationActivity.checkForDupes(trainevents);
                     Delayed.getDb(getApplicationContext()).addTrainEvents(trainevents, favName);
                 } else {
                     //This is a fixup (destination) message
